@@ -1,0 +1,10 @@
+# File: .gitignore
+
+# Cartella delle dipendenze di Bundler
+/vendor/
+
+# Cartella di configurazione di Bundler
+/.bundle/
+
+# Cartella di output di Jekyll (il sito costruito)
+/_site/
