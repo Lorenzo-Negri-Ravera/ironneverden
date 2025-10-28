@@ -3,128 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>IronNeverden – ACLED</title>
+    <title>IronNeverden Project</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">    
     <link rel="stylesheet" href="./style.css">
     <link rel="icon" href="./favicon.ico" type="image/x-icon">
-
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            line-height: 1.6;
-            background-color: #f8f9fa;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 20px auto;
-            padding: 25px;
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        header {
-            text-align: center;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
-
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-
-        h2 {
-            color: #34495e;
-            font-size: 1.5rem;
-            margin-top: 0;
-        }
-
-        h3 {
-            color: #2980b9;
-            border-bottom: 1px solid #ecf0f1;
-            padding-bottom: 5px;
-        }
-
-        .team-members p {
-            font-style: italic;
-            color: #555;
-            font-size: 1.1rem;
-        }
-
-        section {
-            margin-bottom: 30px;
-        }
-
-        p {
-            color: #444;
-        }
-
-        footer {
-            text-align: center;
-            color: #999;
-            font-size: 0.9rem;
-            margin-top: 40px;
-        }
-    </style>
 </head>
 
 <body>
-    <div class="container">
+    <div class="container bg-white shadow-sm rounded p-4 my-4">
 
-        <header>
-            <h1>Our Data Analysis Project</h1>
+        <header class="text-center border-bottom pb-4 mb-5">
+
+            <h1 class="display-4">Conflict and Human Suffering</h1>
+
             <div class="team-members">
-                <h2>Group Name: IronNeverden</h2>
-                <p>
-                    <strong>Team Members:</strong> 
-                    Barbati Luca, 
-                    Negri Ravera Lorenzo, 
-                    Viotti Tommaso
-                </p>
+                <h2>IronNeverden</h2>
+                <p><em>
+                    Luca Barbati, Lorenzo Negri Ravera, Tommaso Viotti
+                </em></p>
             </div>
         </header>
 
-        <main>
-            <section id="project-description">
-                <h3>Project Description</h3>
+        <div class="text-container">
+            <main>
+                <section id="project-description" class="mb-4">
+                    
+                    <h3>Overview</h3>
 
-                <p>
-                    The Armed Conflict Location & Event Data Project (ACLED) is a global initiative that 
-                    collects, curates, and publishes detailed information about political violence, armed conflict, and protest 
-                    events around the world. Its primary goal is to provide reliable, real-time data that help researchers, 
-                    policymakers, journalists, and humanitarian organizations understand where, when, and how violence occurs.
-                </p>
+                    <p>
+                        This project is concerned with the analysis of data related to political violence and demonstration events, with a specific geographic focus on Europe and Central Asia.
+                        The reference dataset is provided by the Armed Conflict Location & Event Data Project (ACLED), 
+                        a global initiative that collects, curates, and publishes detailed information about political violence, armed conflict, and protest events around the world. 
+                    </p>
 
-                <p>
-                    The ACLED database contains millions of records describing events such as battles, attacks on civilians, 
-                    explosions, and demonstrations. Each event is georeferenced and annotated with attributes such as date, 
-                    location, type of event, actors involved, and fatalities. The data are compiled by a global network of 
-                    researchers who monitor local and international sources to ensure accuracy and consistency.
-                </p>
+                    <h3>Dataset</h3>
+                    <p>
+                        The dataset provides an aggregated view. Events are consolidated by temporal period and geographical position, 
+                        consequently this structure enables the analysis and comparison of spatio-temporal patterns. 
+                    </p>
 
-                <p>
-                    This project makes it possible to analyze spatial and temporal patterns of conflict, track emerging crises, 
-                    and compare levels of instability across countries and regions. ACLED’s data are freely available and can be 
-                    visualized using its interactive tools or downloaded for in-depth statistical and geographical analysis.
-                </p>
+                    <p>
+                        Specifically, the dataset provides a multidimensional structure for analysis. 
+                        Geographically, each record is situated within a macro-area (<strong>REGION</strong>) and a specific <strong>COUNTRY</strong>, with events further localized to the primary administrative division (<strong>ADMIN1</strong>).
+                        The temporal axis is defined by the <strong>WEEK</strong> field, which indicates the start week for data aggregation.
+                    </p>
+                    
+                    <p>
+                        Incident classification is provided at three levels of granularity: 
+                        <strong>EVENT_TYPE</strong> (the main category, such as "Protests" or "Battles"), 
+                        <strong>SUB_EVENT_TYPE</strong> (the specific classification, like "Peaceful protest"), 
+                        and <strong>DISORDER_TYPE</strong> (a broader classification, such as "Political violence"). 
+                        The primary quantitative metrics are <strong>EVENTS</strong>, representing the total count of incidents for that grouping, and <strong>FATALITIES</strong>, the sum of associated victims.
+                    </p>
 
-                <!-- Example image section (optional) -->
-                <!--
-                <img src="acled_map.png" alt="Global Conflict Map from ACLED" style="width:100%; border-radius:8px; margin-top:15px;">
-                -->
-            </section>
-        </main>
-
-        <footer>
+                    <p>
+                        Finally, the dataset includes utility fields for spatial analysis and data linkage: 
+                        <strong>CENTROID_LATITUDE</strong> and <strong>CENTROID_LONGITUDE</strong> provide the geographic centroid coordinates for the ADMIN1 area, 
+                        <strong>POPULATION_EXPOSURE</strong> estimates the exposed population, and <strong>ID</strong> serves as a unique numeric identifier for the area.
+                    </p>    
+                    
+                </section>
+                </main>
+        </div> <footer class="text-center text-muted small mt-5">
             <p>© 2025 - IronNeverden</p>
         </footer>
 
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
 </body>
 </html>

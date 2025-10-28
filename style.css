@@ -1,0 +1,36 @@
+/* File: style.css (Aggiornato) */
+
+body {
+    /* Fira Sans for the main text (Regular - 400) */
+    font-family: 'Fira Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    background-color: #f8f9fa;
+    color: #25282A;
+}
+
+/* h1: Roboto Slab Bold */
+h1.display-4{
+    font-family: 'Roboto Slab', serif;
+    font-weight: 700;
+}
+
+/* h2: Roboto Slab Regular */
+h2 {
+    font-family: 'Roboto Slab', serif;
+    font-weight: 400;
+}
+
+/* h3, h4, h5, h6: Fira Sans Bold */
+h3, h4, h5, h6 {
+    font-family: 'Fira Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 700; /* Bold */
+    color: #199BFC;
+}
+
+
+/* Class to define a readable website, 45-75ch rule */
+.text-container {
+    max-width: 70ch;
+    margin-left: auto;
+    margin-right: auto;
+}
