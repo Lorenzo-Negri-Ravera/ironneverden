@@ -79,3 +79,28 @@ h3, h4, h5, h6 {
     margin-left: auto;
     margin-right: auto;
 }
+
+/* ======================================= */
+/* Styles for D3.js Charts               */
+/* ======================================= */
+
+.axis path, .axis line { 
+  stroke: #ccc; 
+}
+
+.axis text { 
+  font-family: 'Fira Sans' !important; 
+  
+  font-size: 10px; 
+  color: #25282A; /* You can change this to #25282A if you prefer */
+}
+
+.cell { 
+  stroke-width: 1px; 
+  stroke: #eee; 
+}
+
+.legend-text {
+  font-family: 'Fira Sans' !important; /* Forza Fira Sans */
+  font-size: 12px;
+}
