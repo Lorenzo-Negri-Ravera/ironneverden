@@ -28,6 +28,36 @@
                 <h1>Event Count by Country and Year</h1>
                 <svg id="grouped-bar-chart-container"></svg>
             </section>
+
+            <section id="waffle-charts-section" class="my-5">
+                <h1 class="text-center">Distribution of protests</h1>
+            
+                <div id="charts-container" class="d-flex flex-row justify-content-center" style="gap: 40px; margin-top: 20px;">
+                    <div class="chart-wrapper text-center">
+                        <h2>Russia</h2>
+                        <svg id="waffle-ru"></svg>
+                    </div>
+                    <div class="chart-wrapper text-center">
+                        <h2>Ukraine</h2>
+                        <svg id="waffle-uk"></svg>
+                    </div>
+                </div>
+            
+                <div id="waffle-legend-container" class="d-flex flex-column align-items-center" style="margin-top: 30px;">
+                </div>
+            </section>
+
+            <section id="bar-chart-section" class="my-5 text-center">
+                <h1>Number of events in Ukraine</h1>
+                <svg id="bar-chart-container"></svg>
+            </section>
+
+            <section id="stacked-bar-chart-section" class="my-5 text-center">
+                <h1>Kinds of events in Ukraine by year</h1>
+                <svg id="stacked-bar-chart-container"></svg>
+            </section>
+
+
         </main>
     </div> 
 
@@ -41,6 +71,9 @@
 
     <script src="../../scripts/lab2/heatmap.js"></script>
     <script src="../../scripts/lab2/grouped_bar_chart.js"></script>
+    <script src="../../scripts/lab2/waffle_chart.js"></script>
+    <script src="../../scripts/lab2/bar_chart.js"></script>
+    <script src="../../scripts/lab2/stacked_bar_chart.js"></script>
 
 </body>
 </html>

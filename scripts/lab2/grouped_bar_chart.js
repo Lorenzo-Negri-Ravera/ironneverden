@@ -1,9 +1,9 @@
 // File: grouped_bar_chart.js
 
-
+// Load the file json
 d3.json("../../data/lab2/Events_UK_RU.json").then(function(data) {
     
-    // dimensions and margins
+    // Definition of the sizes and margins
     const width = 928;
     const height = 600;
     const marginTop = 30;
@@ -12,69 +12,68 @@ d3.json("../../data/lab2/Events_UK_RU.json").then(function(data) {
     const marginLeft = 60;
 
     
-    //
+    // Extraction of the events and countries
     const eventTypes = [...new Set(data.map(d => d.EVENT_TYPE))].sort(d3.ascending);
+    const countries = [...new Set(data.map(d => d.COUNTRY))].sort();
+
+    // Definition of the x axis
     const fx = d3.scaleBand()
         .domain(eventTypes)
         .rangeRound([marginLeft, width - marginRight])
         .paddingInner(0.1);
 
-    // X (inner bars) encodes the COUNTRY
-    const countries = [...new Set(data.map(d => d.COUNTRY))].sort();
     const x = d3.scaleBand()
         .domain(countries)
         .rangeRound([0, fx.bandwidth()])
         .padding(0.05);
 
-    // Color encodes the COUNTRY
+    // Color to encode Russia and Ukraine
     const color = d3.scaleOrdinal()
         .domain(countries)
-        .range(d3.schemeCategory10); // Assigns colors to Russia and Ukraine
+        .range(d3.schemeCategory10); 
 
-    // Y (height) encodes the COUNT
+    // Definition of the y axis
     const y = d3.scaleLinear()
         .domain([0, d3.max(data, d => d.count)]).nice()
         .rangeRound([height - marginBottom, marginTop]);
 
-    // 4. Select the SVG container
+    // Building of the SVG container
     const svg = d3.select("#grouped-bar-chart-container")
         .attr("width", width)
         .attr("height", height)
         .attr("viewBox", [0, 0, width, height])
         .attr("style", "max-width: 100%; height: auto;");
 
-    // Append a group for each EVENT TYPE and a rect for each COUNTRY
+    // Building of the Grouped bar chart
     svg.append("g")
       .selectAll()
-      .data(d3.group(data, d => d.EVENT_TYPE)) // Group by EVENT TYPE
+      .data(d3.group(data, d => d.EVENT_TYPE)) 
       .join("g")
-        .attr("transform", ([eventType]) => `translate(${fx(eventType)},0)`) // Position the group
+        .attr("transform", ([eventType]) => `translate(${fx(eventType)},0)`) 
       .selectAll()
-      .data(([, d]) => d) // Bind the inner data (the two countries)
+      .data(([, d]) => d) 
       .join("rect")
         .attr("x", d => x(d.COUNTRY))
         .attr("y", d => y(d.count))
         .attr("width", x.bandwidth())
-        .attr("height", d => y(0) - y(d.count)) // <-- CORRETTO
+        .attr("height", d => y(0) - y(d.count))
         .attr("fill", d => color(d.COUNTRY))
-    
-    // Add a tooltip
-    .append("title")
+      .append("title")
       .text(d => `Type: ${d.EVENT_TYPE}\nCountry: ${d.COUNTRY}\nCount: ${d.count}`);
 
-    // Append the horizontal axis (EVENT TYPE)
+    // Append the x axis 
     svg.append("g")
         .attr("transform", `translate(0,${height - marginBottom})`)
         .call(d3.axisBottom(fx).tickSizeOuter(0))
         .call(g => g.selectAll(".domain").remove());
 
-    // 7. Append the vertical axis (COUNT)
+    // Append the y axis 
     svg.append("g")
         .attr("transform", `translate(${marginLeft},0)`)
         .call(d3.axisLeft(y).ticks(null, "s"))
         .call(g => g.selectAll(".domain").remove());
 
-    // 8. --- NEW: Add a Legend ---
+    // Add and define a legend 
     const legend = svg.append("g")
         .attr("class", "legend")
         .attr("transform", `translate(${width - marginRight - 100}, ${marginTop})`);
@@ -92,13 +91,13 @@ d3.json("../../data/lab2/Events_UK_RU.json").then(function(data) {
         .data(countries)
         .join("text")
         .attr("x", 20)
-        .attr("y", (d, i) => i * 20 + 12) // Vertically aligned to the middle
+        .attr("y", (d, i) => i * 20 + 12) 
         .text(d => d)
-        .attr("class", "legend-text"); // Use this class for styling    
+        .attr("class", "legend-text");   
 
 }).catch(function(error) {
     console.error("Error loading Events_UK_RU.json:", error);
-    d3.select("#uk-ru-chart-container") // Select the container to show the error
+    d3.select("#uk-ru-chart-container") 
       .append("text")
       .text("Error: could not load data.");
 });
