@@ -13,12 +13,14 @@ const categoryLabels = categories.map(c => c.label);
 // Definition of the color for each label
 const color = d3.scaleOrdinal()
     .domain(categoryLabels)
-    .range(["#4daf4a", "#ff7f00", "#e41a1c"]); // -> Green, Orange, Red
+    .range(["#002677", "#F4633A", "#C8102E"]); // -> Dark Blue, Orange, Red
 
 // Waffle grid size
 const gridSize = 25; 
 const gridCols = 10;
 const totalSquares = 100;
+const width =250;
+const height = 250;
 
 
 // Load the json files
@@ -26,7 +28,13 @@ Promise.all([
     d3.json("../../data/lab2/waffle_data_RU.json"),
     d3.json("../../data/lab2/waffle_data_UK.json")
 ]).then(function([dataRU, dataUK]) {
-    
+
+    d3.select("#main-container")
+      .insert("h2", "#waffle-container")
+      .attr("class", "graph-title")
+      .style("text-align", "center")
+      .text("Proportional composition of types of police intervention in protests");
+
     // Data Transformation: convert raw data to an array of 100 elements
     // - Computes the total protests
     // - Determines the percentage of each category and converts it to a number of squares
@@ -66,21 +74,40 @@ Promise.all([
     }
     
 
-    // Definition of a function to draw a Waffle chart
-    function drawWaffle(svgSelector, waffleData) {
-        // Select the existing SVG container
+    // Definizione di una funzione per disegnare un Waffle chart
+    function drawWaffle(svgSelector, waffleData, title) {
+        // Seleziona il contenitore SVG esistente
         const svg = d3.select(svgSelector);
 
-        svg.attr("width", 250)
-           .attr("height", 250);
+        // Definisci uno spazio per il titolo
+        const gridTopMargin = 30; // 30px di spazio per il titolo
+
+        // Calcola un piccolo offset per centrare la griglia orizzontalmente
+        const gridWidth = gridCols * gridSize;
+        const xOffset = Math.max(0, (width - gridWidth) / 2);
+
+        svg.attr("width", width)
+           // Regola l'altezza e la viewBox per includere il margine del titolo
+           .attr("height", height + gridTopMargin)
+           .attr("viewBox", [0, 0, width, height + gridTopMargin])
+           .attr("style", "max-width: 100%; height: auto; display: block; margin: 0 auto;");
         
-        // Building of the waffle chart
+        // Aggiungi il titolo centrato
+        svg.append("text")
+           .attr("class", "graph-subtitle")
+           .attr("x", width / 2) // Centra orizzontalmente
+           .attr("y", 20)
+           .attr("text-anchor", "middle")
+           .text(title);
+
+        // Costruzione del waffle chart
         svg.selectAll(".waffle-cell")
            .data(waffleData)
            .join("rect")
              .attr("class", "waffle-cell")
-             .attr("x", (d, i) => (i % gridCols) * gridSize)
-             .attr("y", (d, i) => Math.floor(i / gridCols) * gridSize)
+             .attr("x", (d, i) => (i % gridCols) * gridSize + xOffset)
+             // Applica il margine superiore alla posizione Y della griglia
+             .attr("y", (d, i) => Math.floor(i / gridCols) * gridSize + gridTopMargin) 
              .attr("width", gridSize - 1)
              .attr("height", gridSize - 1)
              .attr("fill", d => color(d.category))
@@ -93,34 +120,35 @@ Promise.all([
     // Build the charts
     const waffleDataRU = createWaffleArray(dataRU);
     const waffleDataUK = createWaffleArray(dataUK);
-    
-    // Draw the charts
-    drawWaffle("#waffle-ru", waffleDataRU);
-    drawWaffle("#waffle-uk", waffleDataUK);
 
-    // Build the legend
-    const legendContainer = d3.select("#waffle-legend-container");
-    
-    legendContainer.html(""); 
+
+    // Draw the charts
+    drawWaffle("#waffle-ru", waffleDataRU, "Russia");
+    drawWaffle("#waffle-uk", waffleDataUK, "Ukraine");
+
+    // Create legend
+    const legendContainer = d3.select("#waffle-legend-container")
+        .append("div")
+        .attr("class", "legend-text");
 
     categories.forEach(cat => {
-        const item = legendContainer.append("div")
-            .style("display", "flex")
-            .style("align-items", "center")
-            .style("margin-bottom", "5px");
-
-        item.append("div")
-            .style("width", "18px")
-            .style("height", "18px")
-            .style("margin-right", "8px")
-            .style("border", "1px solid #ccc")
-            .style("background-color", color(cat.label));
-
-        item.append("span")
-            .attr("class", "legend-text")
-            .text(cat.label);
+        const legendItem = legendContainer.append("div")
+            .style("display", "inline-block")
+            .style("margin-right", "20px");
+        
+        legendItem.append("span")
+            .style("display", "inline-block")
+            .style("width", "20px")
+            .style("height", "20px")
+            .style("background-color", color(cat.label))
+            .style("margin-right", "5px")
+            .style("vertical-align", "middle");
+        
+        legendItem.append("span")
+            .text(cat.label)
+            .style("vertical-align", "middle");
     });
-
+    
 }).catch(function(error) {
     console.error("Error loading JSON files:", error);
     d3.select("#waffle-charts-section") 

@@ -2,11 +2,11 @@
 
 // Load the json file
 d3.json("../../data/lab2/Events_Ukraine.json").then(function(data) {
-    
-    // Setting sizez and margins
-    const width = 928;
+
+    // Setting sizes and margins
+    const width = 850;
     const height = 500;
-    const marginTop = 30;
+    const marginTop = 60;
     const marginRight = 0;
     const marginBottom = 30;
     const marginLeft = 60; 
@@ -31,10 +31,17 @@ d3.json("../../data/lab2/Events_Ukraine.json").then(function(data) {
         .attr("height", height)
         .attr("viewBox", [0, 0, width, height])
         .attr("style", "max-width: 100%; height: auto;");
+    
+    svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", marginTop / 2.5)
+        .attr("text-anchor", "middle") 
+        .attr("class", "graph-title")
+        .text("Temporal trend of civil unrest and violence events in Ukraine since 2017");
 
     // Building of the barchart
     svg.append("g")
-        .attr("fill", "steelblue") 
+        .attr("fill", "#002677") 
       .selectAll()
       .data(data)
       .join("rect")
@@ -56,7 +63,7 @@ d3.json("../../data/lab2/Events_Ukraine.json").then(function(data) {
         .call(d3.axisLeft(y)) 
         .call(g => g.append("text")
             .attr("x", -marginLeft)
-            .attr("y", 10)
+            .attr("y", marginTop - 10)
             .attr("fill", "currentColor")
             .attr("text-anchor", "start")
             .text("Number of Events")); 

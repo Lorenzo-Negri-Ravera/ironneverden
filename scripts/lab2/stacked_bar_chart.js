@@ -1,15 +1,15 @@
 // File: stacked_bar_chart.js
 
 // Load the json file
-d3.json("../../data/lab2/Year_Events_UK.json").then(function(data) {
+d3.json("../../data/lab2/Year_Events_UKR.json").then(function(data) {
     
     // Set sizes and margins
     const width = 928;
     const height = 500;
-    const marginTop = 30;
-    const marginRight = 150; 
+    const marginTop = 60;
+    const marginRight = 252; 
     const marginBottom = 30;
-    const marginLeft = 40;
+    const marginLeft = 50;
 
     // Extraction of the data to build the stacked barchart
     const keys = [...new Set(data.map(d => d.EVENT_TYPE))];
@@ -45,7 +45,7 @@ d3.json("../../data/lab2/Year_Events_UK.json").then(function(data) {
     // Set the color
     const color = d3.scaleOrdinal()
         .domain(keys)
-        .range(d3.schemeTableau10); 
+        .range(["#002677", "#C8102E", "#FEDC97", "#D9D9D6", "#25282A"]); // Dark Blue, Orange, Red, Yellow, Green
 
 
     // Select the existing SVG container
@@ -54,6 +54,13 @@ d3.json("../../data/lab2/Year_Events_UK.json").then(function(data) {
         .attr("height", height)
         .attr("viewBox", [0, 0, width, height])
         .attr("style", "max-width: 100%; height: auto;");
+    
+    svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", marginTop / 2)
+        .attr("text-anchor", "middle") 
+        .attr("class", "graph-title")
+        .text("Normalized visualization of types of civil unrest and violence events in Ukraine since 2017");
 
     // Building of the stacked barchart
     svg.append("g")
@@ -89,7 +96,6 @@ d3.json("../../data/lab2/Year_Events_UK.json").then(function(data) {
     svg.append("g")
         .attr("transform", `translate(${marginLeft},0)`)
         .call(d3.axisLeft(y).ticks(null, "%")) // Format as percentage
-        .call(g => g.select(".domain").remove());
     
 
     // Build the legend
@@ -109,12 +115,10 @@ d3.json("../../data/lab2/Year_Events_UK.json").then(function(data) {
     legendGroups.append("text")
         .attr("x", 20)
         .attr("y", 12) 
-        .text(d => d) 
-        .style("font-size", "12px")
-        .style("font-family", "Arial, sans-serif");         // CHANGE WITH THE CORRECT FONT
+        .text(d => d);
 
 }).catch(function(error) {
-    console.error("Error loading ../../data/lab2/Year_Events_UK.json:", error);
+    console.error("Error loading ../../data/lab2/Year_Events_UKR.json:", error);
     d3.select("#stacked-bar-chart-container") 
       .append("text")
       .text("Error: could not load data.");

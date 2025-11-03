@@ -1,14 +1,14 @@
 // File: grouped_bar_chart.js
 
 // Load the file json
-d3.json("../../data/lab2/Events_UK_RU.json").then(function(data) {
+d3.json("../../data/lab2/Events_UKR_RUS.json").then(function(data) {
     
     // Definition of the sizes and margins
-    const width = 928;
-    const height = 600;
+    const width = 850;
+    const height = 500;
     const marginTop = 30;
     const marginRight = 10;
-    const marginBottom = 20;
+    const marginBottom = 30;
     const marginLeft = 60;
 
     
@@ -22,6 +22,7 @@ d3.json("../../data/lab2/Events_UK_RU.json").then(function(data) {
         .rangeRound([marginLeft, width - marginRight])
         .paddingInner(0.1);
 
+    // Subgroup scale: for the countries within each event type
     const x = d3.scaleBand()
         .domain(countries)
         .rangeRound([0, fx.bandwidth()])
@@ -30,7 +31,7 @@ d3.json("../../data/lab2/Events_UK_RU.json").then(function(data) {
     // Color to encode Russia and Ukraine
     const color = d3.scaleOrdinal()
         .domain(countries)
-        .range(d3.schemeCategory10); 
+        .range(["#C8102E", "#002677"]); 
 
     // Definition of the y axis
     const y = d3.scaleLinear()
@@ -44,22 +45,13 @@ d3.json("../../data/lab2/Events_UK_RU.json").then(function(data) {
         .attr("viewBox", [0, 0, width, height])
         .attr("style", "max-width: 100%; height: auto;");
 
-    // Building of the Grouped bar chart
-    svg.append("g")
-      .selectAll()
-      .data(d3.group(data, d => d.EVENT_TYPE)) 
-      .join("g")
-        .attr("transform", ([eventType]) => `translate(${fx(eventType)},0)`) 
-      .selectAll()
-      .data(([, d]) => d) 
-      .join("rect")
-        .attr("x", d => x(d.COUNTRY))
-        .attr("y", d => y(d.count))
-        .attr("width", x.bandwidth())
-        .attr("height", d => y(0) - y(d.count))
-        .attr("fill", d => color(d.COUNTRY))
-      .append("title")
-      .text(d => `Type: ${d.EVENT_TYPE}\nCountry: ${d.COUNTRY}\nCount: ${d.count}`);
+    svg.append("text")
+        .attr("class", "graph-title") // Applica la classe CSS
+        .attr("x", width / 2) // Centra orizzontalmente
+        .attr("y", marginTop / 2) // Posiziona verticalmente nel margine
+        .attr("text-anchor", "middle") // Assicura il centraggio
+        .text("Comparison of Civil Unrest and Violence in Russia and Ukraine since 2017");
+
 
     // Append the x axis 
     svg.append("g")
@@ -70,8 +62,7 @@ d3.json("../../data/lab2/Events_UK_RU.json").then(function(data) {
     // Append the y axis 
     svg.append("g")
         .attr("transform", `translate(${marginLeft},0)`)
-        .call(d3.axisLeft(y).ticks(null, "s"))
-        .call(g => g.selectAll(".domain").remove());
+        .call(d3.axisLeft(y).ticks(null, "s"));
 
     // Add and define a legend 
     const legend = svg.append("g")
@@ -95,9 +86,26 @@ d3.json("../../data/lab2/Events_UK_RU.json").then(function(data) {
         .text(d => d)
         .attr("class", "legend-text");   
 
+    // Building of the Grouped bar chart
+    svg.append("g")
+      .selectAll()
+      .data(d3.group(data, d => d.EVENT_TYPE)) 
+      .join("g")
+        .attr("transform", ([eventType]) => `translate(${fx(eventType)},0)`) 
+      .selectAll()
+      .data(([, d]) => d) 
+      .join("rect")
+        .attr("x", d => x(d.COUNTRY))
+        .attr("y", d => y(d.count))
+        .attr("width", x.bandwidth())
+        .attr("height", d => y(0) - y(d.count))
+        .attr("fill", d => color(d.COUNTRY))
+      .append("title")
+      .text(d => `Type: ${d.EVENT_TYPE}\nCountry: ${d.COUNTRY}\nCount: ${d.count}`);
+
 }).catch(function(error) {
-    console.error("Error loading Events_UK_RU.json:", error);
-    d3.select("#uk-ru-chart-container") 
+    console.error("Error loading Events_UKR_RUS.json:", error);
+    d3.select("#grouped-bar-chart-container") 
       .append("text")
       .text("Error: could not load data.");
 });
