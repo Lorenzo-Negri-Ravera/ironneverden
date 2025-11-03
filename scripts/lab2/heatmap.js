@@ -37,7 +37,7 @@ d3.json("../../data/lab2/top15_countries_by_year.json").then(function(data) {
     // Definition of the color
     const colorScale = d3.scaleLinear()
         .domain([0, maxCount])
-        .range(["#fcd199ff", "#C8102E"]);     // from beige to bordeaux/red 
+        .range(["#fcd199ff", "#C8102E"]);     // from beige to red 
 
     // Define the SVG container and its dimensions
     const svg = d3.select("#heatmap-container")

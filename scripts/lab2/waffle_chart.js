@@ -19,21 +19,20 @@ const color = d3.scaleOrdinal()
 const gridSize = 25; 
 const gridCols = 10;
 const totalSquares = 100;
-const width =250;
+const width = 250;
 const height = 250;
 
-
-// Load the json files
+// Load the JSON files
 Promise.all([
     d3.json("../../data/lab2/waffle_data_RU.json"),
     d3.json("../../data/lab2/waffle_data_UK.json")
 ]).then(function([dataRU, dataUK]) {
 
     d3.select("#main-container")
-      .insert("h2", "#waffle-container")
-      .attr("class", "graph-title")
-      .style("text-align", "center")
-      .text("Proportional composition of types of police intervention in protests");
+        .insert("h2", "#waffle-container")
+        .attr("class", "graph-title")
+        .style("text-align", "center")
+        .text("Proportional composition of types of police intervention in protests");
 
     // Data Transformation: convert raw data to an array of 100 elements
     // - Computes the total protests
@@ -74,39 +73,39 @@ Promise.all([
     }
     
 
-    // Definizione di una funzione per disegnare un Waffle chart
+    // Definition of a function to draw a Waffle chart
     function drawWaffle(svgSelector, waffleData, title) {
-        // Seleziona il contenitore SVG esistente
+        // Select the existing SVG container
         const svg = d3.select(svgSelector);
 
-        // Definisci uno spazio per il titolo
-        const gridTopMargin = 30; // 30px di spazio per il titolo
+        // Define space for the title
+        const gridTopMargin = 30; // 30px of space for the title
 
-        // Calcola un piccolo offset per centrare la griglia orizzontalmente
+        // Calculate a small offset to center the grid horizontally
         const gridWidth = gridCols * gridSize;
         const xOffset = Math.max(0, (width - gridWidth) / 2);
 
         svg.attr("width", width)
-           // Regola l'altezza e la viewBox per includere il margine del titolo
+           // Adjust the height and viewBox to include the title margin
            .attr("height", height + gridTopMargin)
            .attr("viewBox", [0, 0, width, height + gridTopMargin])
            .attr("style", "max-width: 100%; height: auto; display: block; margin: 0 auto;");
         
-        // Aggiungi il titolo centrato
+        // Add the centered title
         svg.append("text")
            .attr("class", "graph-subtitle")
-           .attr("x", width / 2) // Centra orizzontalmente
+           .attr("x", width / 2) // Center horizontally
            .attr("y", 20)
            .attr("text-anchor", "middle")
            .text(title);
 
-        // Costruzione del waffle chart
+        // Construction of the waffle chart
         svg.selectAll(".waffle-cell")
            .data(waffleData)
            .join("rect")
              .attr("class", "waffle-cell")
              .attr("x", (d, i) => (i % gridCols) * gridSize + xOffset)
-             // Applica il margine superiore alla posizione Y della griglia
+             // Apply the top margin to the Y position of the grid
              .attr("y", (d, i) => Math.floor(i / gridCols) * gridSize + gridTopMargin) 
              .attr("width", gridSize - 1)
              .attr("height", gridSize - 1)
@@ -120,7 +119,6 @@ Promise.all([
     // Build the charts
     const waffleDataRU = createWaffleArray(dataRU);
     const waffleDataUK = createWaffleArray(dataUK);
-
 
     // Draw the charts
     drawWaffle("#waffle-ru", waffleDataRU, "Russia");

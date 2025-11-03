@@ -25,7 +25,7 @@
         </header>
 
         <main>
-            <section id="WIP" class="my-5 text-center">
+            <section id="heatmap-section" class="my-5 text-center">
                 <div class="text-container">
                     <h3>Analysis of Civil Violence and its Impact on the Population in Europe-Central Asia</h3>
                         <p>
@@ -45,42 +45,35 @@
                         This highlights the significant effects on the civilian population of the raging conflict between Ukraine and Russia.
                         To understand better the phenomena, a deeper analysis is performed on the two countries.
                     </p>
+                </div>
             </section>
 
-            <section id="grouped-bar-chart-section" class="my-5 text-center">
-                <div class="text-container">
+            <section id="grouped-bar-chart-section" class="mt-5 text-center">
+                <div class="text-container mb-5">
                     <h4>Comparison of events between Ukraine and Russia</h4>
                         <p>
-                            Specifically, the first graph compares the number of different events 
-                            (battles, protests, explosions/remote violence, riots and violence against civilians) 
-                            that occurred in the two countries during the period analysed.
-                            As expected, the significant number of battles and explosions that occurred in Ukraine stands out,
-                             as does the high number of protests that occurred in Russia.
-                            With regard to protests, the next graph analyses the proportional composition of the subtypes
-                             of protests (peaceful, with intervention, with excessive force against protesters).
-                            This allows us to visually compare the incidence of peaceful protests with those that required
-                             intervention by the police (moderate or with excessive force), highlighting the different dynamics
-                              of public order management in the two countries.
-
-                            
-                            come prima anlisi, vogl
-                            as first analysis, we want to understand wich are the phenomena that 
-                            
-                            ON the graph above, it's described the 
-
-
-                        
+                            To analyze the internal and external tensions, we examine the cumulative frequencies of events 
+                            (Battles, Explosions/Remote violence, Protests, Riots and Violence against civilians) recorded in 
+                            Russia and Ukraine since 2017.
                         </p>
                 </div>
                 <svg id="grouped-bar-chart-container"></svg>
+                <div class="text-container mt-5">
+                    <p>
+                        As shown by the data, is evident that Ukraine has experienced a significantly higher number of battles and explosions/remote violence compared to Russia.
+                        This highlights the asymmetrical nature of the ukranian-russian conflict, with first experiencing more civilian-targeted violence 
+                        in the form of bomings and battles on its soil.
+                        Meanwhile, Russia has seen a higher incidence of protests and riots, indicating internal dissent possibly related to the war effort and its consequences.
+                    </p>
+                </div> 
             </section>
 
-            <section id="waffle-charts-section" class="my-5 text-center">
-                <div class="text-container">
+            <section id="waffle-charts-section" class="text-center">
+                <div class="text-container mb-5">
                     <p>
-                        Moreover, an analysis was conducted to understand the distribution of protest types in Russia and Ukraine. 
-                        The accompanying waffle chart illustrates the incidence of the three categories 
-                        studied: "Peaceful protest," "Protest with intervention," and "Excessive force.
+                        Moreover, an analysis was conducted to understand the distribution of protests types in Russia and Ukraine. 
+                        The following waffle chart illustrates the incidence of the three categories: 
+                        "Peaceful protest", "Protest with intervention" and "Excessive force against protesters".
                     </p>
                 </div>
                 <div id="main-container">
@@ -95,54 +88,63 @@
                     <div id="waffle-legend-container" class="d-flex flex-column align-items-center" style="margin-top: 30px;"></div>
                 </div>
 
-                <div class="text-container">
-                    <p style="margin-top: 30px;">    
-                            As shown in the chart, peaceful protests are the predominant category in both nations, 
-                            comprising 81% of the total protests in Russia and 96% in Ukraine.
-
-                            Conversely, protests involving a state response (classified as either "Protest with intervention" or "Excessive force") 
-                            are recorded at a significantly higher rate in Russia. 
-                            In total, 19% of protests in Russia faced intervention. 
-                            This is in sharp contrast to Ukraine, where state responses occurred in 4% of protests (comprising 3% "Protest with intervention" and 1% "Excessive force").
-
-                            Regarding the use of excessive force, this category is observed in 1% of all Ukrainian protests, 
-                            whereas its value in the Russian is about 0%.
-                        </p>
+                <div class="text-container my-5">
+                    <p>
+                        The chart allows us to visually compare the incidence of peaceful protests with those that required
+                        intervention by the police (moderate or with excessive force), highlighting the different dynamics
+                        of public order management in the two countries. 
+                        <br>
+                        Specifically, protests involving a state response are recorded at a significantly higher rate in Russia.
+                        In total, 19% of protests in Russia faced interventionin, in sharp contrast to Ukraine, where state responses 
+                        occurred in 4% of protests. Excessive force is used in 1% of protests in Ukraine, whereas its value in Russia is less 
+                        than 1%.
+                        <br>
+                        However, the peaceful protests are the predominant category in both nations, comprising 81% of the total protests in Russia 
+                        and 96% in Ukraine.                            
+                    </p>
                 </div> 
             </section>
 
-            <section id="bar-chart-section" class="my-5 text-center">
-            <div class="text-container">
-                <h4>Analysis focused on Ukrainian territory</h4>
+            <section id="bar-chart-section" class="text-center">
+            <div class="text-container my-5">
+                <h4>Analysis focused within Ukrainian borders</h4>
                     <p>
-                        After comparing the two countries, the final phase of the analysis focuses exclusively on the internal evolution of events in Ukraine.
-                        The bar chart illustrates the temporal trend of the total number of events that occurred in the country. 
-                        Through this, it is possible to observe a net and substantial increase starting in 2022, almost tripling the total number of events that 
-                        occurred in the previous year and consequently highlighting the occurrence of a crucial phenomenon.
+                        After comparing the two countries, the final phase of the analysis focuses exclusively on the internal 
+                        evolution of events in Ukraine.
+                        The barchart illustrates the temporal trend of the total number of events that occurred in the country,
+                        which shows a substantial increase starting in 2022, almost tripling the total number of events from the 
+                        previous year and consequently highlighting the occurrence of a crucial phenomenon.    
                     </p>
                 </div>
                 <svg id="bar-chart-container"></svg>
             </section>
 
-            <section id="stacked-bar-chart-section" class="my-5 text-center">
-                <div class="text-container">
+            <section id="stacked-bar-chart-section" class=" text-center">
+                <div class="text-container my-5">
                     <p>
-                        Subsequently, we seek to understand in greater depth and detail the increase in events that have occurred in the country over the years.
-                        The analysis highlights a real structural transformation.
-                        Specifically, it should be noted that since 2022 there has been an increase in battles and a significant increase in explosions and remote violence, with the latter overshadowing the notable protests of previous years: while in the years prior to 2022 “Protests” accounted for the majority of events, since 2022 their incidence has plummeted.
-                        In fact, protests are being replaced by “Battles” and, predominantly, by “Explosions/Remote violence”.
-                        It is also significant to note the peak in the category “Violence against civilians” in 2022. 
-                        Taken all these insights together, they mark the beginning of large-scale armed conflict.
+                        Subsequently, we seek to understand in greater depth and detail the increase in events that have occurred in 
+                        the country over the years.
+                        The visualization reveals a dramatic shift. Prior to 2022, "Protests" accounted for the majority of events. 
+                        Since that year, however, their incidence has droped, coinciding with a significant increase in battles, 
+                        explosions, and remote violence that now overshadows previous protests.
+                        The 2022 peak in the "Violence against civilians" category is also significant, highlighting the armed conflict's 
+                        heavy impact on the civilian population.
                     </p>
                 </div>
                 <svg id="stacked-bar-chart-container"></svg>
+                <div class="text-container my-5">
+                    <p>                      
+                        Taken all these insights together, they mark the beginning of the large-scale armed conflict. 
+                        The data illustrates a clear transition point in 2022, moving from a state of political instability, primarily defined by protests, 
+                        to an armed conflict, dominated by battles and remote violence.
+                    </p>
+                </div>
             </section>
-
-
         </main>
     </div> 
 
-    <footer class="text-center text-muted small mt-5">
+    <footer class="text-center text-muted small my-5">
+        <a href="/index.html">Back to Home</a>
         <p>© 2025 - IronNeverden</p>
     </footer>
 

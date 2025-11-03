@@ -45,11 +45,12 @@ d3.json("../../data/lab2/Events_UKR_RUS.json").then(function(data) {
         .attr("viewBox", [0, 0, width, height])
         .attr("style", "max-width: 100%; height: auto;");
 
+    // Add the title
     svg.append("text")
-        .attr("class", "graph-title") // Applica la classe CSS
-        .attr("x", width / 2) // Centra orizzontalmente
-        .attr("y", marginTop / 2) // Posiziona verticalmente nel margine
-        .attr("text-anchor", "middle") // Assicura il centraggio
+        .attr("class", "graph-title")
+        .attr("x", width / 2)
+        .attr("y", marginTop / 2)
+        .attr("text-anchor", "middle")
         .text("Comparison of Civil Unrest and Violence in Russia and Ukraine since 2017");
 
 

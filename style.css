@@ -10,47 +10,47 @@ body {
 
 /* roboto-slab-regular - latin */
 @font-face {
-  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-display: swap; 
   font-family: 'Roboto Slab';
   font-style: normal;
   font-weight: 400;
-  src: url('fonts/roboto-slab-v36-latin-regular.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+  src: url('fonts/roboto-slab-v36-latin-regular.woff2') format('woff2'); 
 }
 
 /* roboto-slab-700 - latin */
 @font-face {
-  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-display: swap; 
   font-family: 'Roboto Slab';
   font-style: normal;
   font-weight: 700;
-  src: url('fonts/roboto-slab-v36-latin-700.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+  src: url('fonts/roboto-slab-v36-latin-700.woff2') format('woff2'); 
 }
 
 /* fira-sans-regular - latin */
 @font-face {
-  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-display: swap; 
   font-family: 'Fira Sans';
   font-style: normal;
   font-weight: 400;
-  src: url('fonts/fira-sans-v18-latin-regular.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+  src: url('fonts/fira-sans-v18-latin-regular.woff2') format('woff2'); 
 }
 
 /* fira-sans-italic - latin */
 @font-face {
-  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-display: swap; 
   font-family: 'Fira Sans';
   font-style: italic;
   font-weight: 400;
-  src: url('fonts/fira-sans-v18-latin-italic.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+  src: url('fonts/fira-sans-v18-latin-italic.woff2') format('woff2');
 }
 
 /* fira-sans-700 - latin */
 @font-face {
-  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-display: swap; 
   font-family: 'Fira Sans';
   font-style: normal;
   font-weight: 700;
-  src: url('fonts/fira-sans-v18-latin-700.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+  src: url('fonts/fira-sans-v18-latin-700.woff2') format('woff2'); 
 }
 
 /* h1: Roboto Slab Bold */
@@ -59,6 +59,7 @@ h1.display-4{
     font-weight: 700;
     color: #25282A;
 }
+
 
 h1 {
     font-family: 'Roboto Slab', serif;
@@ -96,9 +97,8 @@ h4, h5, h6 {
     text-align: left;
 }
 
-/* ======================================= */
-/* Global Styles d3 graph                  */
-/* ======================================= */
+
+/* Global Styles d3 graph */
 .graph-title {
   font-family: 'Fira Sans', sans-serif;
   font-size: 16px;

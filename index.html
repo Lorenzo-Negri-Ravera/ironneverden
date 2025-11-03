@@ -10,7 +10,7 @@
     <link rel="icon" href="./favicon.ico" type="image/x-icon">
 </head>
 
-<body>
+<body>  
     <div class="container bg-white shadow-sm rounded py-4">
 
         <header class="text-center border-bottom pb-4 mb-5 px-4">
@@ -26,51 +26,40 @@
 
         
         <main>
-            <section id="project-description" class="my-5">
-                <img src="./imgs/bitmap.svg" class="img-fluid w-100" alt="Countries involved in the study">
+            <section id="project-description" class="my-5 text-center">
+                <img src="./imgs/bitmap.svg" class="img-fluid w-75" alt="Countries involved in the study">
 
-                <div class="text-container">
+                <div class="text-container mt-5">
                     <h3>Introduction</h3>
 
                     <p>
+                        <br>
                         This project is concerned with the analysis of data related to political violence and demonstration events, with a specific geographic focus on Europe and Central Asia.
                         The reference dataset is provided by the Armed Conflict Location & Event Data Project (ACLED), 
                         a global initiative that collects, curates, and publishes detailed information about political violence, armed conflict, and protest events around the world. 
                     </p>
-                
+                    <h5>Dataset Overview</h5>
                     <p>
-                        The dataset provides an aggregated view. Events are consolidated by temporal period and geographical position, 
+                        The events in the related dataset are consolidated by temporal period and geographical position, 
                         consequently this structure enables the analysis and comparison of spatio-temporal patterns. 
+                        <br>
+                        From a geographical perspective, the data presents a hierarchy from the macro-region to the primary administrative division, 
+                        while the temporal dimension is defined by a weekly aggregation.
+                        To describe the nature of each event, different categories are used, ranging from the most general to the most specific. 
+                        The main quantitative metrics for analysis include the total number of events and the number of associated fatalities, 
+                        supplemented by estimates of the exposed population to support more advanced analysis.
                     </p>
-
-                    <p>
-                        Specifically, the dataset provides a multidimensional structure for analysis. 
-                        Geographically, each record is situated within a macro-area (<strong>REGION</strong>) and a specific <strong>COUNTRY</strong>, with events further localized to the primary administrative division (<strong>ADMIN1</strong>).
-                        The temporal axis is defined by the <strong>WEEK</strong> field, which indicates the start week for data aggregation.
-                    </p>
-                    
-                    <p>
-                        Incident classification is provided at three levels of granularity: 
-                        <strong>EVENT_TYPE</strong> (the main category, such as "Protests" or "Battles"), 
-                        <strong>SUB_EVENT_TYPE</strong> (the specific classification, like "Peaceful protest"), 
-                        and <strong>DISORDER_TYPE</strong> (a broader classification, such as "Political violence"). 
-                        The primary quantitative metrics are <strong>EVENTS</strong>, representing the total count of incidents for that grouping, and <strong>FATALITIES</strong>, the sum of associated victims.
-                    </p>
-
-                    <p>
-                        Finally, the dataset includes utility fields for spatial analysis and data linkage: 
-                        <strong>CENTROID_LATITUDE</strong> and <strong>CENTROID_LONGITUDE</strong> provide the geographic centroid coordinates for the ADMIN1 area, 
-                        <strong>POPULATION_EXPOSURE</strong> estimates the exposed population, and <strong>ID</strong> serves as a unique numeric identifier for the area.
-                    </p>    
+                    <h5>Visualizations</h5>
+                    <a href="./pages/lab2/ukraine_russia_study.html">Analysis of Civil Violence and its Impact on the Population in Europe-Central Asia</a>
                 </div>
             </section>
         </main>
-    </div> 
+    </div>
+
     <footer class="text-center text-muted small mt-5">
         <p>© 2025 - IronNeverden</p>
-        <p><a href="./pages/lab2/ukraine_russia_study.html">Ukraine-Russia Study</a></p>
     </footer>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </body>
 </html>
