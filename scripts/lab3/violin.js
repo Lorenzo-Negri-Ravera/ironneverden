@@ -10,11 +10,6 @@ d3.json("../../data/lab3/UK_Distribution.json").then(function(data) {
         "Remote explosive/landmine/IED"
     ];
     
-    // Filter data to only include the 3 categories
-    const filteredData = data.filter(d => 
-        eventCategories.includes(d.SUB_EVENT_TYPE) 
-    );
-
     // Setting sizes and margins
     const width = 850;
     const height = 500;
@@ -40,7 +35,7 @@ d3.json("../../data/lab3/UK_Distribution.json").then(function(data) {
 
 
     // Definition of the axes
-    const yMax = d3.max(filteredData, d => d.POPULATION_EXPOSURE);
+    const yMax = d3.max(data, d => d.POPULATION_EXPOSURE);
     const y = d3.scaleLog() 
         .domain([1, yMax > 1 ? yMax : 10]) 
         .range([height - marginBottom, marginTop])
@@ -59,7 +54,7 @@ d3.json("../../data/lab3/UK_Distribution.json").then(function(data) {
         .thresholds(y.ticks(20)); 
 
     // Group data by category
-    const groupedData = d3.group(filteredData, d => d.SUB_EVENT_TYPE);
+    const groupedData = d3.group(data, d => d.SUB_EVENT_TYPE);
 
     // Calculate bins and find the global maximum density
     let globalMaxDensity = 0;

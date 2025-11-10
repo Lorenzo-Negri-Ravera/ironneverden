@@ -3,20 +3,7 @@
 // Load the json file
 d3.json("../../data/lab3/ExplosionFatalities.json").then(function(data) {
 
-    // --- 1. Data Filtering (NEW) ---
-    // Filter for Ukraine and specific event type
-    const filteredData = data.filter(d => {
-        return d.COUNTRY === "Ukraine" && 
-               d.EVENT_TYPE === "Explosions/Remote violence";
-    });
-
-    // --- 2. Data Preparation ---
-    // Ensure FATALITIES is a number
-    filteredData.forEach(d => {
-        d.FATALITIES = +d.FATALITIES;
-    });
-
-    // --- 3. Setup SVG and Margins ---
+    // Margins and sizes
     const width = 850;
     const height = 500;
     const marginTop = 60;
@@ -24,7 +11,7 @@ d3.json("../../data/lab3/ExplosionFatalities.json").then(function(data) {
     const marginBottom = 40;
     const marginLeft = 60; 
 
-    // Select an existing SVG container
+    // Build the SVG container
     const svg = d3.select("#histogram-container")
         .attr("width", width)
         .attr("height", height)
@@ -37,39 +24,35 @@ d3.json("../../data/lab3/ExplosionFatalities.json").then(function(data) {
         .attr("y", marginTop / 2.5)
         .attr("text-anchor", "middle") 
         .attr("class", "graph-title")
-        // Title updated slightly to be more specific
-        .text("Distribution of Fatalities from Explosions in Ukraine");
+        .text("Fatalities distribution caused by Explosions in Ukraine");
 
-    // --- 4. Definition of the axes ---
-
-    // X-axis scale (Linear for fatalities count)
-    // Use filteredData to find max
-    const xMax = d3.max(filteredData, d => d.FATALITIES);
+    // Definition of the axis 
+    // x-axis
+    const xMax = d3.max(data, d => d.FATALITIES);
     const x = d3.scaleLinear()
         .domain([0, xMax > 0 ? xMax : 1]).nice() 
         .range([marginLeft, width - marginRight]);
     
-    // --- 5. Histogram Binning ---
-    
-    // Create a histogram generator
+
+    // Create a histogram 
     const histogram = d3.histogram()
-        .value(d => d.FATALITIES)   // Use FATALITIES as the value
-        .domain(x.domain())       // Set the domain based on the x-scale
-        .thresholds(x.ticks(20)); // Bins are linear
+        .value(d => d.FATALITIES)   
+        .domain(x.domain())       
+        .thresholds(x.ticks(20)); 
 
     // Apply the histogram generator to the filtered data
-    const bins = histogram(filteredData);
+    //const bins = histogram(filteredData);
+    const bins = histogram(data);
 
-    // --- 6. Y-axis scale (Sqrt for frequency) ---
-    // Use bins (from filteredData) to find max
+    // y-axis 
     const yMax = d3.max(bins, d => d.length);
     const y = d3.scaleSqrt() // Use Sqrt scale for Y-axis
         .domain([0, yMax > 0 ? yMax : 1]) 
         .range([height - marginBottom, marginTop]);
 
-    // --- 7. Building of the histogram bars ---
+    // Building of the histogram  
     svg.append("g")
-        .attr("fill", "#002677") // Using the dark blue color
+        .attr("fill", "#002677")
       .selectAll("rect")
       .data(bins)
       .join("rect")
@@ -80,7 +63,6 @@ d3.json("../../data/lab3/ExplosionFatalities.json").then(function(data) {
       .append("title")
         .text(d => `Fatalities: [${d.x0}-${d.x1}]\nFrequency: ${d.length}`); 
 
-    // --- 8. Draw Axes ---
     
     // Add the x-axis
     svg.append("g")
@@ -96,13 +78,13 @@ d3.json("../../data/lab3/ExplosionFatalities.json").then(function(data) {
     // Add the y-axis
     svg.append("g")
         .attr("transform", `translate(${marginLeft},0)`)
-        .call(d3.axisLeft(y).ticks(null, "s")) // Sqrt scale ticks
+        .call(d3.axisLeft(y).ticks(null, "s")) 
         .call(g => g.append("text")
             .attr("x", -marginLeft)
             .attr("y", marginTop - 10)
             .attr("fill", "currentColor")
             .attr("text-anchor", "start")
-            .text("Frequency (Weeks) (Sqrt Scale)")); 
+            .text("Frequency (Sqrt Scale)")); 
 
 }).catch(function(error) {
     console.error("Error loading ../../data/lab3/ExplosionFatalities.json:", error);

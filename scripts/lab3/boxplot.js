@@ -66,7 +66,7 @@ Promise.all([
         .attr("y", marginTop / 3)
         .attr("text-anchor", "middle") 
         .attr("class", "graph-title")
-        .text("Comparing Population Exposure from Battles and Explosions in Ukraine");
+        .text("Comparing Population Exposure from Battles and Explosions in Ukraine since 2022");
 
     // Definition of the axes
     const x = d3.scaleBand()
