@@ -8,7 +8,7 @@ d3.json("../../data/lab2/Events_UKR_RUS.json").then(function(data) {
     const height = 500;
     const marginTop = 30;
     const marginRight = 10;
-    const marginBottom = 55; // Potresti voler aumentare questo valore se la legenda si sovrappone
+    const marginBottom = 70; // Potresti voler aumentare questo valore se la legenda si sovrappone
     const marginLeft = 10;
 
     
@@ -80,7 +80,7 @@ d3.json("../../data/lab2/Events_UKR_RUS.json").then(function(data) {
     
     // Posiziona la legenda 15px sotto la linea dell'asse x (che è a height - marginBottom)
     // Si posizionerà all'interno dell'area definita da marginBottom
-    const legendY = height - marginBottom + 40 ; 
+    const legendY = height - marginBottom + 50 ; 
 
     // Add and define a legend 
     const legend = svg.append("g")
