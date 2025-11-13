@@ -80,7 +80,7 @@ d3.json("../../data/lab3/UK_Distribution.json").then(function(data) {
     // Color scale
     const color = d3.scaleOrdinal()
         .domain(eventCategories)
-        .range(["#002677", "#C8102E", "#FEDC97"]); 
+        .range(["#002677", "#C8102E", "#F1C400"]); 
 
 
     // Buld violins

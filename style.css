@@ -134,3 +134,9 @@ h4, h5, h6 {
   font-size: 20px;
   fill: #25282A;
 }
+
+.bar-value {
+  font-family: 'Fira Sans', sans-serif;
+  font-size: 15px;
+  fill: #25282A; 
+}

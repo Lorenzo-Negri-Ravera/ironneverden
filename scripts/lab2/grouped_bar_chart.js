@@ -8,13 +8,13 @@ d3.json("../../data/lab2/Events_UKR_RUS.json").then(function(data) {
     const height = 500;
     const marginTop = 30;
     const marginRight = 10;
-    const marginBottom = 30;
-    const marginLeft = 60;
+    const marginBottom = 55; // Potresti voler aumentare questo valore se la legenda si sovrappone
+    const marginLeft = 10;
 
     
     // Extraction of the events and countries
     const eventTypes = [...new Set(data.map(d => d.EVENT_TYPE))].sort(d3.ascending);
-    const countries = [...new Set(data.map(d => d.COUNTRY))].sort();
+    const countries = [...new Set(data.map(d => d.COUNTRY))].sort(); // Es: ["Russia", "Ukraine"]
 
     // Definition of the x axis
     const fx = d3.scaleBand()
@@ -60,21 +60,39 @@ d3.json("../../data/lab2/Events_UKR_RUS.json").then(function(data) {
         .call(d3.axisBottom(fx).tickSizeOuter(0))
         .call(g => g.selectAll(".domain").remove());
 
-    // Append the y axis 
-    svg.append("g")
-        .attr("transform", `translate(${marginLeft},0)`)
-        .call(d3.axisLeft(y).ticks(null, "s"));
+    // --- RIMOSSO ---
+    // // Append the y axis 
+    // svg.append("g")
+    //     .attr("transform", `translate(${marginLeft},0)`)
+    //     .call(d3.axisLeft(y).ticks(null, "s"));
+    // --- FINE RIMOZIONE ---
+
+
+    // --- MODIFICATO: Legenda Orizzontale in Basso al Centro ---
+    
+    // Spazio stimato per ogni elemento della legenda (rettangolo + testo + padding)
+    const legendItemWidth = 90; // Regola questo valore se i nomi dei paesi sono lunghi
+    const totalLegendWidth = countries.length * legendItemWidth;
+    
+    // Calcola la posizione X per centrare la legenda
+    // (width / 2) - (totalLegendWidth / 2)
+    const legendX = (width - totalLegendWidth) / 2;
+    
+    // Posiziona la legenda 15px sotto la linea dell'asse x (che è a height - marginBottom)
+    // Si posizionerà all'interno dell'area definita da marginBottom
+    const legendY = height - marginBottom + 40 ; 
 
     // Add and define a legend 
     const legend = svg.append("g")
         .attr("class", "legend")
-        .attr("transform", `translate(${width - marginRight - 100}, ${marginTop})`);
+        // Applica la trasformazione calcolata per centrare e posizionare in basso
+        .attr("transform", `translate(${legendX}, ${legendY})`);
 
     legend.selectAll("rect")
         .data(countries)
         .join("rect")
-        .attr("x", 0)
-        .attr("y", (d, i) => i * 20)
+        .attr("x", (d, i) => i * legendItemWidth) // Posiziona orizzontalmente in base all'indice
+        .attr("y", 0) // Posizione Y fissa all'interno del gruppo legenda
         .attr("width", 15)
         .attr("height", 15)
         .attr("fill", color);
@@ -82,10 +100,12 @@ d3.json("../../data/lab2/Events_UKR_RUS.json").then(function(data) {
     legend.selectAll("text")
         .data(countries)
         .join("text")
-        .attr("x", 20)
-        .attr("y", (d, i) => i * 20 + 12) 
+        .attr("x", (d, i) => i * legendItemWidth + 20) // Posiziona testo 20px a dx del rettangolo
+        .attr("y", 12) // Allinea verticalmente il testo (altezza 15 / 2 + offset)
         .text(d => d)
         .attr("class", "legend-text");   
+    // --- FINE MODIFICA LEGGENDA ---
+
 
     // Building of the Grouped bar chart
     svg.append("g")
@@ -103,6 +123,22 @@ d3.json("../../data/lab2/Events_UKR_RUS.json").then(function(data) {
         .attr("fill", d => color(d.COUNTRY))
       .append("title")
       .text(d => `Type: ${d.EVENT_TYPE}\nCountry: ${d.COUNTRY}\nCount: ${d.count}`);
+
+    // --- AGGIUNTO: Testo con i valori sopra le barre ---
+    svg.append("g")
+      .selectAll()
+      .data(d3.group(data, d => d.EVENT_TYPE))
+      .join("g")
+        .attr("transform", ([eventType]) => `translate(${fx(eventType)},0)`)
+      .selectAll()
+      .data(([, d]) => d)
+      .join("text")
+        .attr("class", "bar-value") // Classe per lo styling CSS
+        .attr("x", d => x(d.COUNTRY) + x.bandwidth() / 2) // Posiziona in mezzo alla barra
+        .attr("y", d => y(d.count) - 5) // Posiziona 5px sopra la barra
+        .attr("text-anchor", "middle") // Centra il testo
+        .text(d => d.count); // Mostra il valore 'count'
+    // --- FINE AGGIUNTA ---
 
 }).catch(function(error) {
     console.error("Error loading Events_UKR_RUS.json:", error);

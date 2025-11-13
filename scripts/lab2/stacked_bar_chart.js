@@ -45,7 +45,7 @@ d3.json("../../data/lab2/Year_Events_UKR.json").then(function(data) {
     // Set the color
     const color = d3.scaleOrdinal()
         .domain(keys)
-        .range(["#002677", "#C8102E", "#FEDC97", "#D9D9D6", "#25282A"]); // Dark Blue, Orange, Red, Yellow, Green
+        .range(["#002677", "#C8102E", "#F1C400", "#D9D9D6", "#25282A"]); // Dark Blue, Orange, Red, Yellow, Green
 
 
     // Select the existing SVG container
@@ -111,6 +111,7 @@ d3.json("../../data/lab2/Year_Events_UKR.json").then(function(data) {
     svg.append("g")
         .attr("transform", `translate(${marginLeft},0)`)
         .call(d3.axisLeft(y).ticks(null, "%")) // Format as percentage
+        .call(g => g.selectAll(".domain").remove());
     
 
     // Build the legend
