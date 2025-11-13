@@ -3,8 +3,8 @@
 // Load the file json
 d3.json("../../data/lab2/top15_countries_by_year.json").then(function(data) {
     
-    const width = 600;
-    const height = 640;
+    const width = 650;
+    const height = 700;
     const marginTop = 60;
     const marginRight = 110;
     const marginBottom = 40;

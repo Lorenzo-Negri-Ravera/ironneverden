@@ -4,12 +4,12 @@
 d3.json("../../data/lab2/Events_Ukraine.json").then(function(data) {
 
     // Setting sizes and margins
-    const width = 850;
-    const height = 500;
+    const width = 1000;
+    const height = 600;
     const marginTop = 60;
-    const marginRight = 0;
-    const marginBottom = 30;
-    const marginLeft = 60; 
+    const marginRight = 50; 
+    const marginBottom = 70;
+    const marginLeft = 50;
 
     // Extract the year data
     const xDomain = [...new Set(data.map(d => d.YEAR))].sort(d3.ascending);

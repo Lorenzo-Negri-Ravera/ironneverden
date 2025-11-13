@@ -4,11 +4,11 @@
 d3.json("../../data/lab2/Year_Events_UKR.json").then(function(data) {
     
     // Set sizes and margins
-    const width = 928;
-    const height = 500;
+    const width = 1000;
+    const height = 600;
     const marginTop = 60;
-    const marginRight = 252; 
-    const marginBottom = 30;
+    const marginRight = 50; 
+    const marginBottom = 70;
     const marginLeft = 50;
 
     // Extraction of the data to build the stacked barchart
@@ -112,26 +112,67 @@ d3.json("../../data/lab2/Year_Events_UKR.json").then(function(data) {
         .attr("transform", `translate(${marginLeft},0)`)
         .call(d3.axisLeft(y).ticks(null, "%")) // Format as percentage
         .call(g => g.selectAll(".domain").remove());
+        
+
+    // --- MODIFICATO: Legenda Orizzontale Dinamica e Robusta in Basso al Centro ---
     
+    // Margine fisso che vuoi tra la fine di una label testuale e l'inizio del prossimo quadratino
+    const legendPadding = 40; 
+    
+    // Posiziona la legenda 50px sotto la linea dell'asse x
+    const legendY = height - marginBottom + 50; 
 
-    // Build the legend
-    const legend = svg.append("g")
-        .attr("transform", `translate(${width - marginRight + 20}, ${marginTop})`);
+    // Build the legend container (inizialmente posizionato a sinistra per calcolare le larghezze)
+    const legendContainer = svg.append("g")
+        .attr("class", "legend-container")
+        .attr("transform", `translate(0, ${legendY})`);
 
-    const legendGroups = legend.selectAll("g")
+
+    // 1. Crea i gruppi con rettangoli e testo
+    const legendGroups = legendContainer.selectAll("g")
       .data(keys)
       .join("g")
-        .attr("transform", (d, i) => `translate(0, ${i * 20})`);
-
+        .attr("class", "legend-item");
+        
     legendGroups.append("rect")
         .attr("width", 15)
         .attr("height", 15)
         .attr("fill", d => color(d)); 
 
-    legendGroups.append("text")
-        .attr("x", 20)
+    const legendText = legendGroups.append("text")
+        .attr("x", 20) // 5px di margine dopo il quadratino di 15px
         .attr("y", 12) 
-        .text(d => d);
+        .text(d => d)
+        .attr("class", "legend-text");
+        
+        
+    // 2. Misura la larghezza di ciascun gruppo e calcola le posizioni
+    let currentX = 0;
+    let totalLegendWidth = 0;
+    
+    // Usa .each() per misurare dopo che il testo è stato aggiunto
+    legendGroups.each(function() {
+        // Misura l'intera larghezza del gruppo (rect + text)
+        const itemWidth = this.getBBox().width; 
+        
+        // Applica la traslazione (posizionamento X)
+        d3.select(this).attr("transform", `translate(${currentX}, 0)`);
+        
+        // Aggiorna la posizione per l'elemento successivo (+ padding)
+        currentX += itemWidth + legendPadding;
+    });
+
+    // La larghezza totale è l'ultimo punto di partenza (currentX) meno l'ultimo padding non necessario
+    // Poiché currentX è stato aggiornato dopo l'ultimo elemento, togliamo l'ultimo padding
+    totalLegendWidth = currentX - legendPadding;
+
+    // 3. Centra l'intero contenitore
+    const legendX = (width - totalLegendWidth) / 2;
+
+    // Riposiziona il contenitore al centro
+    legendContainer.attr("transform", `translate(${legendX}, ${legendY})`);
+
+    // --- FINE MODIFICA LEGGENDA ---
 
 }).catch(function(error) {
     console.error("Error loading ../../data/lab2/Year_Events_UKR.json:", error);

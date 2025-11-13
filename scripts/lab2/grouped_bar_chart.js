@@ -4,17 +4,17 @@
 d3.json("../../data/lab2/Events_UKR_RUS.json").then(function(data) {
     
     // Definition of the sizes and margins
-    const width = 850;
-    const height = 500;
-    const marginTop = 30;
-    const marginRight = 10;
-    const marginBottom = 70; // Potresti voler aumentare questo valore se la legenda si sovrappone
-    const marginLeft = 10;
+    const width = 1000;
+    const height = 600;
+    const marginTop = 60;
+    const marginRight = 50; 
+    const marginBottom = 70;
+    const marginLeft = 50;
 
     
     // Extraction of the events and countries
     const eventTypes = [...new Set(data.map(d => d.EVENT_TYPE))].sort(d3.ascending);
-    const countries = [...new Set(data.map(d => d.COUNTRY))].sort(); // Es: ["Russia", "Ukraine"]
+    const countries = [...new Set(data.map(d => d.COUNTRY))].sort(); 
 
     // Definition of the x axis
     const fx = d3.scaleBand()

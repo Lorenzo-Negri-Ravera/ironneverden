@@ -16,11 +16,11 @@ const color = d3.scaleOrdinal()
     .range(["#002677", "#F4633A", "#C8102E"]); // -> Dark Blue, Orange, Red
 
 // Waffle grid size
-const gridSize = 25; 
+const gridSize = 30; 
 const gridCols = 10;
 const totalSquares = 100;
-const width = 250;
-const height = 250;
+const width = 300;
+const height = 300;
 
 // Load the JSON files
 Promise.all([

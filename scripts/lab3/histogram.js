@@ -4,12 +4,12 @@
 d3.json("../../data/lab3/ExplosionFatalities.json").then(function(data) {
 
     // Margins and sizes
-    const width = 850;
-    const height = 500;
+    const width = 1000;
+    const height = 600;
     const marginTop = 60;
-    const marginRight = 30;
-    const marginBottom = 40;
-    const marginLeft = 60; 
+    const marginRight = 50; 
+    const marginBottom = 70;
+    const marginLeft = 50;
 
     // Build the SVG container
     const svg = d3.select("#histogram-container")

@@ -46,12 +46,12 @@ Promise.all([
     const combinedStats = [statsBattles, statsExplosions];
 
     // Setting sizes and margins
-    const width = 600;
-    const height = 500;
+    const width = 1000;
+    const height = 600;
     const marginTop = 60;
-    const marginRight = 30;
-    const marginBottom = 30;
-    const marginLeft = 60;
+    const marginRight = 50; 
+    const marginBottom = 70;
+    const marginLeft = 50;
 
     // Building of the SVG container
     const svg = d3.select("#boxplot-container")
@@ -106,7 +106,7 @@ Promise.all([
     // Building of the Boxplots 
 
     // Define width of the boxes 
-    const boxWidthRatio = 0.5;
+    const boxWidthRatio = 0.3;
     
     // Create a group for each boxplot
     const boxGroups = svg.selectAll(".box-group")
