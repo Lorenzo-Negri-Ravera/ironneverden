@@ -62,20 +62,28 @@ d3.json("../../data/lab2/Year_Events_UKR.json").then(function(data) {
         .attr("class", "graph-title")
         .text("Normalized visualization of types of civil unrest and violence events in Ukraine since 2017");
 
-    // Building of the stacked barchart
-    svg.append("g")
+    
+        // Building of the stacked barchart
+    
+    // Create groups for each series
+    const groups = svg.append("g")
       .selectAll()
       .data(series)
-      .join("g")
-        .attr("fill", d => color(d.key))
-      .selectAll("rect")
+      .join("g");
+        
+    // Create the rects 
+    const rects = groups.selectAll("rect")
       .data(D => D.map(d => (d.key = D.key, d))) 
       .join("rect")
+        .attr("fill", d => color(d.key)) 
         .attr("x", d => x(d.data.YEAR))
         .attr("y", d => y(d[1]))
         .attr("height", d => y(d[0]) - y(d[1]))
-        .attr("width", x.bandwidth()) 
-    .append("title")    // definition of a interactive tooltip to show information for each stack
+        .attr("width", x.bandwidth())
+        .style("transition", "opacity 0.7s ease-in-out"); 
+    
+    // Add the interaction with the rects
+    rects.append("title")
       .text(d => {
           const originalData = d.data;
           const eventType = d.key;
@@ -86,6 +94,13 @@ d3.json("../../data/lab2/Year_Events_UKR.json").then(function(data) {
           return `${originalData.YEAR} - ${eventType}\nCount: ${count} (${percent}%)`;
         });
 
+    // Action for the interaction
+    rects.on("mouseover", function(event, d) {
+        rects.style("opacity", 0.3); 
+        d3.select(this).style("opacity", 1);
+    }).on("mouseout", function(event, d) {        
+        rects.style("opacity", 1);
+    });
 
     // Add the x-axis (year)
     svg.append("g")
