@@ -46,7 +46,7 @@ Promise.all([
     const combinedStats = [statsBattles, statsExplosions];
 
     // Setting sizes and margins
-    const width = 1000;
+    const width = 650;
     const height = 600;
     const marginTop = 60;
     const marginRight = 50; 

@@ -43,7 +43,7 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
         .attr("width", width)
         .attr("height", height)
         .attr("viewBox", [0, 0, width, height])
-        .attr("style", "max-width: 100%; height: auto; font: 10px sans-serif;");
+        .attr("style", "max-width: 100%; height: auto");
     
     // Title
     svg.append("text")
@@ -53,20 +53,30 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
         .attr("class", "graph-title")
         .text("Evolution of the Main Assault Tactics on Ukrainian Territory"); 
 
-
     // Line generation function
     const line = d3.line()
         .defined(d => !isNaN(d.value))
         .x(d => x(d.date))
         .y(d => y(d.value));
 
-    
+    // --- MODIFIED: Clip Path Definition ---
+    // We define a rectangular clip path that will act as a curtain.
+    // Initially, it has width 0 (everything hidden).
+    const clip = svg.append("defs").append("clipPath")
+        .attr("id", "chart-clip")
+        .append("rect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", 0) // Start hidden
+        .attr("height", height);
+
     // Draw the chart lines
     const paths = svg.append("g") 
         .attr("fill", "none")
         .attr("stroke-width", 2.5) 
         .attr("stroke-linejoin", "round")
         .attr("stroke-linecap", "round")
+        .attr("clip-path", "url(#chart-clip)") // --- MODIFIED: Apply the clip path ---
       .selectAll(".line-path") 
       .data(groups) 
       .join("path")
@@ -76,69 +86,68 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
         .attr("d", ([, values]) => line(values));
 
 
-    // --- Funzioni di Animazione e Reset ---
+    // --- Animation and Reset Functions (Translated & Modified) ---
 
-    // La funzione di preparazione e nascondimento
+    // Function to prepare and hide (Reset)
     function resetLines() {
-        // Interrompe eventuali transizioni in corso
-        paths.interrupt(); 
+        // Interrupts any active transitions
+        clip.interrupt(); 
         
-        // Applica l'attributo per nascondere la linea
-        paths.each(function() {
-            const length = this.getTotalLength(); 
-            d3.select(this)
-                .attr("stroke-dasharray", length + " " + length)
-                .attr("stroke-dashoffset", length); // Nasconde la linea
-        });
+        // --- MODIFIED: Reset logic ---
+        // Instead of dashoffset, we reset the width of the clip rectangle to 0
+        clip.attr("width", 0);
     }
 
-    // La funzione per avviare l'animazione di disegno
+    // Function to start the drawing animation
     function startDrawingAnimation() {
-        // Eseguiamo il reset prima di avviare l'animazione per sicurezza
+        // Run reset first for safety
         resetLines(); 
         
-        paths.transition()
+        // --- MODIFIED: Animation logic ---
+        // We animate the width of the clip rectangle from 0 to the full width.
+        // This reveals the chart from left to right, perfectly synchronized on the X-axis.
+        clip.transition()
             .duration(5000) 
             .ease(d3.easeLinear)
-            .attr("stroke-dashoffset", 0); // Disegna la linea
+            .attr("width", width); 
     }
 
-    // --- AGGIUNTA INTERSECTION OBSERVER per l'animazione allo scroll ---
+    // --- ADDED INTERSECTION OBSERVER for scroll animation (Translated) ---
     const chartContainerElement = document.querySelector("#line-chart-container");
     
     if (chartContainerElement && 'IntersectionObserver' in window) {
         
-        // 1. Nascondiamo le linee all'inizio, con un piccolo ritardo per garantire che getTotalLength funzioni
+        // 1. Hide lines initially
         setTimeout(resetLines, 50);
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 
-                // Entrata nella viewport: Avvia l'animazione
+                // Entering the viewport: Start animation
                 if (entry.isIntersecting) {
-                    // Timeout di sicurezza per l'animazione
+                    // Safety timeout for animation
                     setTimeout(startDrawingAnimation, 300); 
                 } 
-                // Uscita dalla viewport: Resetta la linea
+                // Leaving the viewport: Reset the line
                 else {
-                    // Timeout di sicurezza per il reset
+                    // Safety timeout for reset
                     setTimeout(resetLines, 50); 
                 }
             });
         }, {
-            // Un threshold di 0.5 è un buon equilibrio (il 50% è visibile)
+            // A threshold of 0.5 is a good balance (50% visible)
             threshold: 0.5 
         });
         
-        // Inizia l'osservazione
+        // Start observing
         observer.observe(chartContainerElement);
 
     } else {
-        // Fallback: se Observer non è supportato o contenitore non trovato, avvia subito l'animazione
-        console.warn("IntersectionObserver non supportato o contenitore non trovato. Animazione forzata all'avvio.");
+        // Fallback: if Observer is not supported or container not found, start immediately
+        console.warn("IntersectionObserver not supported or container not found. Forcing animation start.");
         setTimeout(startDrawingAnimation, 100); 
     }
-    // --- FINE INTERSECTION OBSERVER ---
+    // --- END INTERSECTION OBSERVER ---
 
 
     // Add x-axes
@@ -169,18 +178,18 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
         .text("Number of Events"); 
 
 
-    // Margine fisso che vuoi tra la fine di una label testuale e il prossimo quadratino
+    // Fixed margin between the end of a text label and the next square
     const legendPadding = 40; 
     
-    // Posiziona la legenda sotto l'asse X (che è a height - marginBottom)
-    const legendY = height - marginBottom + 80 ; 
+    // Position the legend below the X axis (which is at height - marginBottom)
+    const legendY = height - marginBottom + 70; 
 
-    // Build the legend container (temporaneamente a sinistra per misurare le larghezze)
+    // Build the legend container (temporarily on the left to measure widths)
     const legendContainer = svg.append("g")
         .attr("class", "legend-container")
         .attr("transform", `translate(0, ${legendY})`);
 
-    // 1. Crea i gruppi con rettangoli (linee) e testo
+    // 1. Create groups with rectangles (lines) and text
     const legendGroups = legendContainer.selectAll("g")
       .data(keys)
       .join("g")
@@ -199,33 +208,33 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
         .attr("class", "legend-text");
         
         
-    // 2. Misura la larghezza di ciascun gruppo e calcola le posizioni
+    // 2. Measure the width of each group and calculate positions
     let currentX = 0;
     let totalLegendWidth = 0;
     
-    // Usa .each() per misurare dopo che il testo è stato aggiunto
+    // Use .each() to measure after text has been added
     legendGroups.each(function() {
-        // Misura l'intera larghezza del gruppo (rect + text)
+        // Measure the full width of the group (rect + text)
         const itemWidth = this.getBBox().width; 
         
-        // Applica la traslazione (posizionamento X)
+        // Apply translation (X positioning)
         d3.select(this).attr("transform", `translate(${currentX}, 0)`);
         
-        // Aggiorna la posizione per l'elemento successivo (+ padding)
+        // Update position for next item (+ padding)
         currentX += itemWidth + legendPadding;
     });
 
-    // La larghezza totale è l'ultimo punto di partenza (currentX) meno l'ultimo padding non necessario
+    // Total width is the last starting point (currentX) minus the last unnecessary padding
     totalLegendWidth = currentX - legendPadding;
 
-    // 3. Centra l'intero contenitore
+    // 3. Center the entire container
     const legendX = (width - totalLegendWidth) / 2;
 
-    // Riposiziona il contenitore al centro e in basso
+    // Reposition the container to the center and bottom
     legendContainer.attr("transform", `translate(${legendX}, ${legendY})`);
 
 
-    //Interactive part (tooltip e hover) (omesso per brevità, non è stato modificato)
+    // Interactive part (tooltip and hover)
     const points = data.map((d) => [x(d.date), y(d.value), d.division, d.date, d.value]);
     const tooltipDateFormat = d3.timeFormat("%d %b %Y"); 
 
@@ -274,8 +283,8 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
     }
 
 }).catch(function(error) {
-    console.error("Errore nel caricamento del file JSON:", error);
+    console.error("Error loading JSON file:", error);
     d3.select("#line-chart-container") 
       .append("text")
-      .text("Errore: impossibile caricare i dati. Controllare la console per i dettagli.");
+      .text("Error: unable to load data. Check console for details.");
 });

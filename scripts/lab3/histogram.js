@@ -70,7 +70,7 @@ d3.json("../../data/lab3/ExplosionFatalities.json").then(function(data) {
         .call(d3.axisBottom(x).tickSizeOuter(0))
         .call(g => g.append("text") 
             .attr("x", marginLeft + (width - marginLeft - marginRight) / 2)
-            .attr("y", marginBottom - 4)
+            .attr("y", marginBottom -20)
             .attr("fill", "currentColor")
             .attr("text-anchor", "middle")
             .text("Number of Fatalities")); 
