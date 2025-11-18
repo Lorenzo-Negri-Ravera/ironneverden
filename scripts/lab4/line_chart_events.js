@@ -48,7 +48,7 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
     // Title
     svg.append("text")
         .attr("x", width / 2)
-        .attr("y", marginTop / 2)
+        .attr("y", marginTop / 3)
         .attr("text-anchor", "middle") 
         .attr("class", "graph-title")
         .text("Evolution of the Main Assault Tactics on Ukrainian Territory"); 
@@ -59,8 +59,7 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
         .x(d => x(d.date))
         .y(d => y(d.value));
 
-    // --- MODIFIED: Clip Path Definition ---
-    // We define a rectangular clip path that will act as a curtain.
+    // Definition of a rectangular clip path that will act as a curtain.
     // Initially, it has width 0 (everything hidden).
     const clip = svg.append("defs").append("clipPath")
         .attr("id", "chart-clip")
@@ -76,7 +75,7 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
         .attr("stroke-width", 2.5) 
         .attr("stroke-linejoin", "round")
         .attr("stroke-linecap", "round")
-        .attr("clip-path", "url(#chart-clip)") // --- MODIFIED: Apply the clip path ---
+        .attr("clip-path", "url(#chart-clip)") 
       .selectAll(".line-path") 
       .data(groups) 
       .join("path")
@@ -86,15 +85,14 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
         .attr("d", ([, values]) => line(values));
 
 
-    // --- Animation and Reset Functions (Translated & Modified) ---
+
+    // Animation and Reset Functions 
 
     // Function to prepare and hide (Reset)
     function resetLines() {
         // Interrupts any active transitions
         clip.interrupt(); 
-        
-        // --- MODIFIED: Reset logic ---
-        // Instead of dashoffset, we reset the width of the clip rectangle to 0
+        // Reset the width of the clip rectangle to 0
         clip.attr("width", 0);
     }
 
@@ -103,8 +101,7 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
         // Run reset first for safety
         resetLines(); 
         
-        // --- MODIFIED: Animation logic ---
-        // We animate the width of the clip rectangle from 0 to the full width.
+        // Animation of the width of the clip rectangle from 0 to the full width.
         // This reveals the chart from left to right, perfectly synchronized on the X-axis.
         clip.transition()
             .duration(5000) 
@@ -117,7 +114,7 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
     
     if (chartContainerElement && 'IntersectionObserver' in window) {
         
-        // 1. Hide lines initially
+        // Hide lines initially
         setTimeout(resetLines, 50);
 
         const observer = new IntersectionObserver((entries) => {
@@ -125,17 +122,15 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
                 
                 // Entering the viewport: Start animation
                 if (entry.isIntersecting) {
-                    // Safety timeout for animation
                     setTimeout(startDrawingAnimation, 300); 
                 } 
                 // Leaving the viewport: Reset the line
                 else {
-                    // Safety timeout for reset
                     setTimeout(resetLines, 50); 
                 }
             });
         }, {
-            // A threshold of 0.5 is a good balance (50% visible)
+            // Threshold for triggering (50% visibility)
             threshold: 0.5 
         });
         
@@ -143,11 +138,9 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
         observer.observe(chartContainerElement);
 
     } else {
-        // Fallback: if Observer is not supported or container not found, start immediately
         console.warn("IntersectionObserver not supported or container not found. Forcing animation start.");
         setTimeout(startDrawingAnimation, 100); 
     }
-    // --- END INTERSECTION OBSERVER ---
 
 
     // Add x-axes
@@ -179,17 +172,17 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
 
 
     // Fixed margin between the end of a text label and the next square
-    const legendPadding = 40; 
+    const legendPadding = 50; 
     
-    // Position the legend below the X axis (which is at height - marginBottom)
-    const legendY = height - marginBottom + 70; 
+    // Position the legend below the X axis
+    const legendY = height - marginBottom + 80; 
 
-    // Build the legend container (temporarily on the left to measure widths)
+    // Build the legend container 
     const legendContainer = svg.append("g")
         .attr("class", "legend-container")
         .attr("transform", `translate(0, ${legendY})`);
 
-    // 1. Create groups with rectangles (lines) and text
+    // Create groups with rectangles (lines) and text
     const legendGroups = legendContainer.selectAll("g")
       .data(keys)
       .join("g")
@@ -208,33 +201,25 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
         .attr("class", "legend-text");
         
         
-    // 2. Measure the width of each group and calculate positions
+    // Measure the width of each group and calculate positions
     let currentX = 0;
     let totalLegendWidth = 0;
     
-    // Use .each() to measure after text has been added
+    // Change the position of the legend items
     legendGroups.each(function() {
-        // Measure the full width of the group (rect + text)
         const itemWidth = this.getBBox().width; 
-        
-        // Apply translation (X positioning)
         d3.select(this).attr("transform", `translate(${currentX}, 0)`);
-        
-        // Update position for next item (+ padding)
         currentX += itemWidth + legendPadding;
     });
 
-    // Total width is the last starting point (currentX) minus the last unnecessary padding
     totalLegendWidth = currentX - legendPadding;
 
-    // 3. Center the entire container
+    // Center the entire container
     const legendX = (width - totalLegendWidth) / 2;
-
-    // Reposition the container to the center and bottom
     legendContainer.attr("transform", `translate(${legendX}, ${legendY})`);
 
 
-    // Interactive part (tooltip and hover)
+    // Interactive part 
     const points = data.map((d) => [x(d.date), y(d.value), d.division, d.date, d.value]);
     const tooltipDateFormat = d3.timeFormat("%d %b %Y"); 
 
