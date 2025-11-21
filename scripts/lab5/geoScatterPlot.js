@@ -1,6 +1,5 @@
 // File: geoScatterPlot.js
-const GEOJSON_PATH = "../../data/lab5/ukraine_map/ua.json";
-const ATTACKS_JSON_PATH = "../../data/lab5/GeoAttacks.json";
+
 
 Promise.all([
     d3.json(GEOJSON_PATH),
