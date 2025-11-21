@@ -109,7 +109,7 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
             .attr("width", width); 
     }
 
-    // --- ADDED INTERSECTION OBSERVER for scroll animation (Translated) ---
+    // Observer for animation
     const chartContainerElement = document.querySelector("#line-chart-container");
     
     if (chartContainerElement && 'IntersectionObserver' in window) {
@@ -144,24 +144,34 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
 
 
     // Add x-axes
-    svg.append("g")
+    const xAxisGroup = svg.append("g") // Salvato il gruppo dell'asse X
         .attr("transform", `translate(0,${height - marginBottom})`)
         .call(d3.axisBottom(x)
             .ticks(d3.timeMonth.every(6)) 
             .tickFormat(d3.timeFormat("%b %Y"))
-            .tickSizeOuter(0))
-        .selectAll("text")
+            .tickSizeOuter(0));
+            
+    const xAxisLabels = xAxisGroup.selectAll("text")
           .attr("y", 10) 
           .attr("x", -5)
           .attr("dy", ".35em")
           .attr("transform", "rotate(-45)") 
           .style("text-anchor", "end");
 
+
     // Add y-axes
     const yAxisGroup = svg.append("g")
         .attr("transform", `translate(${marginLeft},0)`)
-        .call(d3.axisLeft(y).ticks(null, "f")) 
-        .call(g => g.select(".domain").remove());
+        .call(d3.axisLeft(y).ticks(null, "f")
+            .tickSize(-(width - marginLeft - marginRight)) 
+            .tickSizeOuter(0)
+            .tickFormat(d => d === 0 ? "" : d) 
+        ) 
+        .call(g => g.select(".domain").remove()) 
+        .call(g => g.selectAll(".tick line") 
+            .attr("stroke", "#A4BCC2")
+            .attr("stroke-width", 1.2)
+            .attr("stroke-dasharray", "3,3"));
         
     yAxisGroup.append("text")
         .attr("x", -marginLeft + 10) 
@@ -221,7 +231,14 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
 
     // Interactive part 
     const points = data.map((d) => [x(d.date), y(d.value), d.division, d.date, d.value]);
-    const tooltipDateFormat = d3.timeFormat("%d %b %Y"); 
+    //const tooltipDateFormat = d3.timeFormat("%d %b %Y");  // Not used
+
+    const trackerLine = svg.append("line")
+        .attr("class", "tracker-line")
+        .attr("stroke", "#555")
+        .attr("stroke-width", 1)
+        .attr("stroke-dasharray", "4,4") 
+        .attr("display", "none"); 
 
     const dot = svg.append("g")
         .attr("display", "none");
@@ -229,11 +246,20 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
     dot.append("circle")
         .attr("r", 2.5)
         .attr("fill", "black"); 
-
-    dot.append("text")
+    
+    dot.append("text")  
         .attr("text-anchor", "middle")
         .attr("y", -8)
-        .attr("fill", "black");
+        .attr("fill", "black")
+        .attr("font-weight", "bold");
+        
+    const dateLabel = svg.append("text")
+        .attr("class", "date-label-x")
+        .attr("text-anchor", "middle")
+        .attr("y", height - marginBottom + 40) 
+        .attr("fill", "black")
+        .attr("font-weight", "bold")
+        .attr("display", "none");
 
     svg
         .on("pointerenter", pointerentered)
@@ -247,24 +273,66 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
         const i = d3.leastIndex(points, ([xCoord, yCoord]) => Math.hypot(xCoord - xm, yCoord - ym));
         
         const [px, py, k, date, value] = points[i]; 
-        
-        paths.style("stroke", ([key]) => key === k ? color(k) : "#ddd") 
+
+        // Pick the color for the series
+        const seriesColor = color(k); 
+        paths.style("stroke", ([key]) => key === k ? seriesColor : "#ddd") 
             .filter(([key]) => key === k).raise();
         
-        dot.attr("transform", `translate(${px},${py})`);
-        dot.select("text").text(`${k}: ${Math.round(value)} (${tooltipDateFormat(date)})`);
+        // Apply opacity to the "selected line"
+        legendGroups.style("opacity", d => d === k ? 1 : 0.3); 
         
+        // Update position and text of the dot
+        dot.attr("transform", `translate(${px},${py})`);
+        dot.select("text").text(`${Math.round(value)}`);      // Visualize only the value
         dot.attr("display", null);
+
+        // Update tracker line and date label
+        trackerLine
+            .attr("x1", px)
+            .attr("x2", px)
+            .attr("y1", py) 
+            .attr("y2", height - marginBottom) 
+            .attr("stroke", seriesColor)
+            .attr("display", null);
+            
+        dateLabel
+            .attr("x", px)
+            .text(d3.timeFormat("%d %b %Y")(date)) 
+            .attr("fill", "#000000ff")
+            .attr("display", null);
+        
+        // Hide the x-axis labels
+        xAxisLabels.attr("display", "none");
     }
 
     function pointerentered() {
         paths.style("mix-blend-mode", null).style("stroke", "#ddd"); 
         dot.attr("display", null);
+
+        // Show tracker line and date label
+        trackerLine.attr("display", null);
+        dateLabel.attr("display", null);
+
+        legendGroups.style("opacity", 0.3);   
+        
+        // Hide the x-axis labels
+        xAxisLabels.attr("display", "none");
     }
 
     function pointerleft() {
         paths.style("mix-blend-mode", "multiply").style("stroke", ([key]) => color(key)); 
         dot.attr("display", "none");
+
+        // Hide tracker line and date label
+        trackerLine.attr("display", "none");
+        dateLabel.attr("display", "none");
+
+        // Reset legend opacity
+        legendGroups.style("opacity", 1);  
+        
+        // Show the x-axis labels
+        xAxisLabels.attr("display", null);
     }
 
 }).catch(function(error) {

@@ -40,14 +40,9 @@ Promise.all([
 
     const attacks_data = Array.from(aggregated_map.values());
     
-    // --- 3. PROJECTION CONFIGURATION (Fit to Bounds) ---
 
-    // Define the initial projection (e.g., Mercator)
-    const projection = d3.geoMercator();
-        
-    // Create an initial path generator (needed for bounds calculation)
-    const path = d3.geoPath()
-        .projection(projection);
+    // Define the initial projection and path generator
+    const projection = d3.geoMercator();    
 
     // Calculate the geographical center
     const center = d3.geoCentroid(geojson);
@@ -58,14 +53,13 @@ Promise.all([
         .fitExtent(
             // Extent (pixel boundaries) for the map, adding a 10px padding
             [[marginLeft, 10], [width - marginRight, height - 10]], 
-            geojson // The GeoJSON object to fit
+            geojson // GeoJSON object to fit
         );
         
     // Recreate the path generator with the adapted projection
-    const updatedPath = d3.geoPath()
-        .projection(projection);
+    const updatedPath = d3.geoPath().projection(projection);
 
-    // --- 4. DRAW THE MAP (Boundaries) ---
+    // Draw the map
     svg.selectAll(".region-boundary")
         .data(geojson.features)
         .join("path")
@@ -75,26 +69,23 @@ Promise.all([
         .attr("stroke", "#333") 
         .attr("stroke-width", 0.5);
     
-    // --- 5. CONFIGURATION FOR SCATTER PLOT POINTS ---
 
     // Find the maximum attack count for scaling
     const maxAttackCount = d3.max(attacks_data, d => d.attack_count);
     
-    // Use a square root scale (d3.scaleSqrt) for the radius
+    // Use a square root scale (d3.scaleSqrt) for the radius for the scatter points
     const radiusScale = d3.scaleSqrt()
         .domain([0, maxAttackCount])
         .range([3, 25]); // Min radius 3px, Max radius 25px
     
-    // --- 6. DRAW THE SCATTER PLOT (Circles) ---
+    // Draw the scatter points
     svg.selectAll(".attack-dot")
         .data(attacks_data) 
         .enter()
         .append("circle")
         .attr("class", "attack-dot")
-        // Project Lat/Long coordinates to screen coordinates
         .attr("cx", d => projection([d.longitude, d.latitude])[0])
         .attr("cy", d => projection([d.longitude, d.latitude])[1])
-        // Apply the calculated radius based on attack count
         .attr("r", d => radiusScale(d.attack_count)) 
         
         // Styles
