@@ -1,4 +1,4 @@
-// File: geoChoropleth.js - Choropleth Map with Region Inference
+// File: geoChoropleth.js 
 
 const GEOJSON_PATH = "../../data/lab5/ukraine_map/ua.json";
 const ATTACKS_JSON_PATH = "../../data/lab5/GeoExplosions.json";
@@ -13,36 +13,30 @@ Promise.all([
     const marginLeft = 10;
     const marginRight = 70;
     const marginBottom = 20;
-    const marginTop = 40; // Adjusted for better spacing
+    const marginTop = 40; 
 
-    // ----------------------------------------------------
-    // 1. Data Preparation (Cleaning and Aggregation)
-    // ----------------------------------------------------
 
     // Filter data, dropping records with null region_id, and aggregate by region_id summing the 'count'
     const attackCountsByRegion = d3.rollups(
-        raw_attacks_data.filter(d => d.region_id !== null), // DISCARD nulls
-        v => d3.sum(v, d => d.count),                       // Aggregation function (sum of 'count')
-        d => d.region_id                                    // Grouping key (region_id)
+        raw_attacks_data.filter(d => d.region_id !== null), 
+        v => d3.sum(v, d => d.count),                       
+        d => d.region_id                                    
     );
 
-    // Convert the rollups array into a Map object for efficient lookup: { region_id: total_count }
+    // Convert the array into a Map
     const countsMap = new Map(attackCountsByRegion);
 
     // Add the 'count' property to each GeoJSON feature
     geojson.features.forEach(feature => {
         const regionId = feature.properties.id;
-        // Retrieve the count or use 0 if the region is not present in countsMap
         feature.properties.count = countsMap.get(regionId) || 0;
     });
 
     // Get the maximum count for the color scale domain
     const maxCount = d3.max(geojson.features, d => d.properties.count);
 
-    // ----------------------------------------------------
-    // 2. D3 Configuration (SVG, Color Scale, Projection)
-    // ----------------------------------------------------
 
+    // Build the SVG container
     const svg = d3.select("#geo-choropleth-container")
         .attr("width", width)
         .attr("height", height)
@@ -77,26 +71,23 @@ Promise.all([
         .style("border-radius", "5px")
         .style("padding", "5px");
 
-    // ----------------------------------------------------
-    // 3. Drawing the Choropleth Map
-    // ----------------------------------------------------
-
+    // Draw the Choropleth Map
     svg.append("g")
         .attr("class", "regions")
-        .attr("transform", `translate(${marginLeft}, ${marginTop})`) // Center the map roughly
+        .attr("transform", `translate(${marginLeft}, ${marginTop})`) // Center the map 
         .selectAll("path")
         .data(geojson.features)
         .join("path")
         .attr("d", path)
         .attr("fill", d => colorScale(d.properties.count)) // Color based on attack count
-        .attr("stroke", "#333")
-        .attr("stroke-width", 0.5)
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 0.8)
         .on("mouseover", function(event, d) {
             d3.select(this).attr("fill", "red"); // Highlight on hover
             tooltip.transition()
                 .duration(200)
                 .style("opacity", .9);
-            tooltip.html(`Region: ${d.properties.name_en}<br>Attacks: ${d.properties.count}`)
+            tooltip.html(`Region: ${d.properties.name}<br>Attacks: ${d.properties.count}`)
                 .style("left", (event.pageX + 10) + "px")
                 .style("top", (event.pageY - 28) + "px");
         })
@@ -111,6 +102,7 @@ Promise.all([
                 .style("opacity", 0);
         });
 
+    // Title
     svg.append("text")
         .attr("x", width / 2)
         .attr("y", marginTop / 2)
@@ -118,15 +110,13 @@ Promise.all([
         .attr("class", "graph-title")
         .text("Geographic distribution of explosions on Ukraine soil during the conflict");
 
-    // ----------------------------------------------------
-    // 4. Drawing the Colorbar (Legend)
-    // ----------------------------------------------------
+
     
     // Define Colorbar dimensions and position
     const legendWidth = 10;
     const legendHeight = height - marginTop - marginBottom - 200; 
     
-    // Position the legend on the right side of the SVG
+    // Position the Colorbar on the right side 
     const legendX = width - marginRight - 10;
     const legendY = (height - marginBottom - legendHeight) / 2 + marginTop; 
 
@@ -157,13 +147,13 @@ Promise.all([
         .attr("width", legendWidth)
         .attr("height", legendHeight)
         .style("fill", "url(#choropleth-gradient)")
-        .attr("stroke", "#333")
+        .attr("stroke", "#eee")
         .attr("stroke-width", 0.5);
-
-    // Create the scale for the legend axis
+    
+    // Create the scale for the Colorbar
     const legendScale = d3.scaleLinear()
-        .domain([0, maxCount]) // Domain is the data range
-        .range([legendY + legendHeight, legendY]); // Range is the pixel height (reversed for top-to-bottom reading)
+        .domain([0, maxCount]) 
+        .range([legendY + legendHeight, legendY]); 
 
     // Draw the legend axis
     svg.append("g")
@@ -174,7 +164,7 @@ Promise.all([
             .tickSize(3)
             .tickFormat(d3.format(".0f"))); // Format ticks as integers
 
-    // Optional: Remove the axis line (domain)
+    // Remove the axis line (domain)
     svg.select(".legend-axis .domain").remove();
 
 }).catch(function(error) {
