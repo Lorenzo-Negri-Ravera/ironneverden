@@ -1,22 +1,24 @@
-// File: geoPieMultiChart.js
+// File: geoCategorical.js
 
 Promise.all([
     d3.json(GEOJSON_PATH),
     d3.json(ATTACKS_JSON_PATH)
 ]).then(function([geojson, raw_attacks_data]) {
 
-    // --- 1. SETUP DIMENSIONI E SVG ---
+    // svg dimensions
     const width = 1000;
     const height = 650;
     const marginTop = 80;
+    const marginBottom = 60;
     
-    const svg = d3.select("#geo-pie-multi-chart-container")
+    //  building SVG container
+    const svg = d3.select("#geo-categorical-container")
         .attr("width", width)
         .attr("height", height)
         .attr("viewBox", [0, 0, width, height])
         .attr("style", "max-width: 100%; height: auto");
     
-    // Titolo Principale
+    // Main Title
     svg.append("text")
         .attr("x", width / 2)
         .attr("y", marginTop / 2)
@@ -26,7 +28,7 @@ Promise.all([
         .style("font-weight", "bold")
         .text("Predominant Attack Type by Region in Ukraine");
 
-    // Sottotitolo Istruzioni
+    // Instruction Subtitle
     svg.append("text")
         .attr("x", width / 2)
         .attr("y", marginTop / 2 + 25)
@@ -35,19 +37,19 @@ Promise.all([
         .style("fill", "#666")
         .text("Click on a region to view detailed statistics. Click outside to reset.");
 
-    // --- 2. ELABORAZIONE DATI ---
 
+    // remove entries located on the sea (region_id null)
     const cleanData = raw_attacks_data.filter(d => d.region_id !== null);
     
-    // Lista completa di tutti i tipi di eventi possibili (ordinati)
+    // Complete list of all possible event types (sorted)
     const allEventTypes = Array.from(new Set(cleanData.map(d => d.SUB_EVENT_TYPE))).sort();
 
-    // Scala Colori
+    // Color Scale
     const colorScale = d3.scaleOrdinal()
         .domain(allEventTypes)
         .range(["#002677", "#F1C400", "#C8102E"]); 
 
-    // Raggruppamento dati per i dettagli
+    // Grouping data
     const attacksByRegion = d3.rollup(
         cleanData,
         v => d3.sum(v, d => d.count),
@@ -55,13 +57,13 @@ Promise.all([
         d => d.SUB_EVENT_TYPE
     );
 
-    // Calcolo "Maggioranza" per colorare la mappa
+    // Calculate "Majority" for coloring the map
     const majorityByRegion = new Map();
     attacksByRegion.forEach((typesMap, regionId) => {
         let maxCount = 0;
         let dominantType = null;
         for (const [type, count] of typesMap) {
-            if (count > maxCount) {
+            if (count >= maxCount) {
                 maxCount = count;
                 dominantType = type;
             }
@@ -71,36 +73,35 @@ Promise.all([
         }
     });
 
-    // --- 3. SETUP MAPPA ---
 
+    // building the map projection
     const projection = d3.geoMercator()
         .fitExtent([[20, marginTop], [width - 20, height - 60]], geojson); 
 
     const pathGenerator = d3.geoPath().projection(projection);
 
-    // Rettangolo invisibile per il RESET (dietro la mappa)
+    // Invisible rectangle for RESET (behind the map)
     svg.append("rect")
         .attr("width", width)
         .attr("height", height)
         .attr("fill", "transparent")
         .on("click", resetView);
 
-    // Gruppo che contiene la mappa
     const mapLayer = svg.append("g").attr("class", "map-layer");
 
-    // --- 4. SETUP PANNELLO DETTAGLI (Inizialmente nascosto) ---
-    
+  
+    // detail panel
     const panelWidth = 300;
-    const panelX = width - panelWidth - 20; // Posizionato in alto a destra
-    const panelY = marginTop + 20;
+    const panelX = 50; // Positioned in bottom left corner
+    const panelY = height - marginBottom-200; // Adjusted to place it at the bottom
 
     const detailGroup = svg.append("g")
         .attr("class", "detail-panel")
         .attr("transform", `translate(${panelX}, ${panelY})`)
         .style("display", "none") 
-        .style("pointer-events", "none"); // Click passano attraverso se nascosto
+        .style("pointer-events", "none");
 
-    // Sfondo del box (Altezza dinamica gestita dopo)
+    
     const detailBackground = detailGroup.append("rect")
         .attr("width", panelWidth)
         .attr("fill", "white")
@@ -110,7 +111,6 @@ Promise.all([
         .attr("ry", 8)
         .style("filter", "drop-shadow(3px 3px 5px rgba(0,0,0,0.3))");
 
-    // Titolo del pannello
     const detailTitle = detailGroup.append("text")
         .attr("x", panelWidth / 2)
         .attr("y", 25)
@@ -119,12 +119,12 @@ Promise.all([
         .style("font-size", "16px")
         .text("Region Name");
 
-    // Contenitore per le barre del grafico
+    // detail bar chart group
     const chartGroup = detailGroup.append("g")
-        .attr("transform", "translate(20, 50)"); // Margine interno superiore
+        .attr("transform", "translate(20, 50)");
 
-    // --- 5. DISEGNO MAPPA E INTERAZIONE ---
 
+    // coloring the map based on majority attack type
     const paths = mapLayer.selectAll("path")
         .data(geojson.features)
         .join("path")
@@ -138,33 +138,37 @@ Promise.all([
             return majorityData ? colorScale(majorityData.type) : "#ccc";
         });
 
-    // Gestione Click sulla Regione
+    // managing click events on regions
     paths.on("click", function(event, d) {
-        event.stopPropagation(); // Stop bubbling (altrimenti attiva il reset)
+        event.stopPropagation();
         const regionId = d.properties.id;
         const regionName = d.properties.name || regionId;
 
-        // Effetto "Focus": Sbiadisce gli altri, evidenzia questo
-        paths.transition().duration(300).style("opacity", 0.3);
+        // reset of borders and opacity
+        paths.transition().duration(300)
+            .style("opacity", 0.3)
+            .attr("stroke", "#fff")
+            .attr("stroke-width", 1);
         
+        // highlight selected region
         d3.select(this)
             .transition().duration(300)
             .style("opacity", 1)
             .attr("stroke", "#333")
             .attr("stroke-width", 2);
 
-        // Aggiorna e mostra il box
+        // update and show the detail panel
         updateDetailPanel(regionId, regionName);
     });
 
-    // --- 6. FUNZIONE AGGIORNAMENTO BOX (Logica Smart) ---
+    // function to update detail panel
     function updateDetailPanel(regionId, regionName) {
         const dataMap = attacksByRegion.get(regionId);
         
-        // Calcola totale (0 se nessun dato)
+        // compute total attacks
         const totalAttacks = dataMap ? Array.from(dataMap.values()).reduce((a, b) => a + b, 0) : 0;
-
-        // Crea array dati includendo TUTTI i tipi (anche quelli a 0)
+        
+        // build bars data
         const chartData = allEventTypes.map(type => {
             const count = dataMap ? (dataMap.get(type) || 0) : 0;
             return {
@@ -174,40 +178,40 @@ Promise.all([
             };
         });
 
-        // Ordina per conteggio decrescente (più frequenti in alto)
+        // bars sorted by count descending
         chartData.sort((a, b) => b.count - a.count);
 
-        // Aggiorna Titolo
+        // update title
         detailTitle.text(`${regionName} (Total: ${totalAttacks})`);
 
-        // -- Calcolo Dimensioni Dinamiche --
+        // compute dimensions of the chart
         const chartW = panelWidth - 40; 
         const barHeight = 12; 
         const labelHeight = 14; 
-        const itemGap = 12; // Spazio tra i blocchi
+        const itemGap = 12;
         
-        // Altezza di un singolo blocco
+        // height of a single block
         const itemHeight = labelHeight + barHeight + itemGap;
 
-        // Altezza totale dinamica
+        // dynamic total height
         const dynamicHeight = 50 + (chartData.length * itemHeight) + 15;
         detailBackground.attr("height", dynamicHeight);
 
-        // Pulisci grafico vecchio
+        // clear old chart
         chartGroup.selectAll("*").remove();
 
-        // Scala X
+        // X scale
         const xScale = d3.scaleLinear()
             .domain([0, 100])
             .range([0, chartW]);
 
-        // Disegna gruppi
+        // Draw groups
         const groups = chartGroup.selectAll(".bar-group")
             .data(chartData)
             .join("g")
             .attr("transform", (d, i) => `translate(0, ${i * itemHeight})`);
 
-        // 1. Label (Sopra la barra)
+        // bar label
         groups.append("text")
             .attr("x", 0)
             .attr("y", labelHeight - 4)
@@ -216,7 +220,7 @@ Promise.all([
             .style("fill", "#333")
             .text(d => d.type);
 
-        // 2. Sfondo Barra (Grigio chiaro)
+        // bar background
         groups.append("rect")
             .attr("y", labelHeight)
             .attr("width", chartW)
@@ -224,17 +228,17 @@ Promise.all([
             .attr("fill", "#f0f0f0")
             .attr("rx", 3);
 
-        // 3. Barra Valore (Colorata)
+        // colored bar
         groups.append("rect")
             .attr("y", labelHeight)
-            .attr("width", 0) // Parte da 0 per animazione
+            .attr("width", 0) // starts at 0 for animation
             .attr("height", barHeight)
             .attr("fill", d => colorScale(d.type))
             .attr("rx", 3)
             .transition().duration(500)
             .attr("width", d => xScale(d.percent));
 
-        // 4. Testo Percentuale (A destra)
+        // Percentage text
         groups.append("text")
             .attr("x", chartW)
             .attr("y", labelHeight + barHeight - 2)
@@ -247,19 +251,17 @@ Promise.all([
         detailGroup.style("display", null);
     }
 
-    // --- 7. FUNZIONE RESET ---
+    // Reset function
     function resetView() {
-        // Ripristina mappa
         paths.transition().duration(300)
             .style("opacity", 1)
             .attr("stroke", "#fff")
             .attr("stroke-width", 1);
         
-        // Nascondi pannello
         detailGroup.style("display", "none");
     }
 
-    // --- 8. LEGENDA GLOBALE (In basso) ---
+    // legend
     const legendItemSize = 15;   
     const legendPadding = 30;    
     const legendY = height - 30; 
@@ -277,7 +279,6 @@ Promise.all([
         .attr("x", legendItemSize + 5).attr("y", 12)                  
         .text(d => d).attr("class", "legend-text");
 
-    // Centra la legenda
     let currentX = 0;
     legendGroups.each(function() {
         const w = this.getBBox().width; 
@@ -288,7 +289,7 @@ Promise.all([
 
 }).catch(function(error) {
     console.error("Error in Promise.all data loading/processing:", error);
-    const errSvg = d3.select("#geo-pie-multi-chart-container");
+    const errSvg = d3.select("#geo-categorical-container");
     errSvg.append("text")
         .attr("x", 500).attr("y", 300)
         .attr("text-anchor", "middle")
