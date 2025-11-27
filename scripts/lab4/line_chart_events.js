@@ -240,60 +240,30 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
         .attr("stroke-dasharray", "4,4") 
         .attr("display", "none"); 
 
-    /*
+    // Definition of the dot group (circle + box + text)
     const dot = svg.append("g")
         .attr("display", "none");
 
-    dot.append("circle")
-        .attr("r", 2.5)
-        .attr("fill", "black"); 
-    
-    dot.append("text")  
-        .attr("text-anchor", "middle")
-        .attr("y", -8)
-        .attr("fill", "black")
-        .attr("font-weight", "bold");
-    */
-    
-    // Added
-    // --- 1. Definisci il gradiente lineare per il box ---
-    const defs = svg.append("defs");
-
-    // Gradiente Base. Verrà aggiornato in `pointermoved` con il colore corretto.
-    defs.append("linearGradient")
-        .attr("id", "tooltip-gradient")
-        .attr("x1", "0%")
-        .attr("y1", "0%")
-        .attr("x2", "0%")
-        .attr("y2", "100%"); 
-        
-    // --- 2. Definisci il gruppo del dot (punto + box + testo valore) ---
-    const dot = svg.append("g")
-        .attr("display", "none");
-
-    // L'elemento RECT (il box bianco)
     const box = dot.append("rect") 
-        .attr("rx", 3) // Angoli arrotondati
+        .attr("rx", 3) 
         .attr("ry", 3)
-        .attr("fill", "white") // Box bianco fisso
-        .attr("stroke", "none") // Aggiungi un leggero bordo grigio per stacco
-        .attr("opacity", 0.8) // <--- Aggiunta trasparenza (80% opacità);    
+        .attr("fill", "white") 
+        .attr("stroke", "none") 
+        .attr("opacity", 0.7) 
     
-        // Il testo del valore (nero)
     const valueText = dot.append("text")  
         .attr("text-anchor", "middle")
-        .attr("fill", "black") // Testo nero
+        .attr("dominant-baseline", "central") 
+        .attr("fill", "black") 
         .attr("font-size", "12px")
         .attr("font-weight", "bold");
         
-    // Il cerchio del punto
     dot.append("circle")
         .attr("r", 3.5)
         .attr("fill", "black")
         .attr("class", "data-point-circle");
-    // -----------------------------------------------------
     
-    
+    // Definition of the date label at the bottom    
     const dateLabel = svg.append("text")
         .attr("class", "date-label-x")
         .attr("text-anchor", "middle")
@@ -323,95 +293,34 @@ d3.json("../../data/lab4/TimeSeries_Explosion_UKR.json").then(function(data) {
         // Apply opacity to the "selected line"
         legendGroups.style("opacity", d => d === k ? 1 : 0.3); 
         
-        /*
-        // Update position and text of the dot
-        dot.attr("transform", `translate(${px},${py})`);
-        dot.select("text").text(`${Math.round(value)}`);      // Visualize only the value
-        dot.attr("display", null);
-        */
-
-        // --- ADDED
-        // Aggiorna il gradiente con il colore della serie
-        const gradient = svg.select("#tooltip-gradient");
-        gradient.selectAll("stop").remove(); // Rimuove gli stop precedenti
-
-        // Colore all'inizio (solido)
-        gradient.append("stop")
-            .attr("offset", "0%")
-            .attr("stop-color", seriesColor);
-            
-        // Colore alla fine (più trasparente, per l'effetto gradiente)
-        gradient.append("stop")
-            .attr("offset", "100%")
-            .attr("stop-color", seriesColor)
-            .attr("stop-opacity", 0.5);
-
-        /*
-        // Aggiorna il testo e calcola le dimensioni del box
+        // Update box and text
         valueText.text(`${Math.round(value)}`);
         
-        // Questo è necessario per misurare il testo
+        // Box
         const bbox = valueText.node().getBBox();
-        const padding = 6; 
-        const boxWidth = bbox.width + padding * 2;
-        const boxHeight = bbox.height + padding * 2;
-        const textY = py - 18; // Posizione Y per il testo (sopra il punto)
+        const padding = 1.5; 
         
-        // Aggiorna la posizione e le dimensioni del box
-        box.attr("x", px - boxWidth / 2)
-            .attr("y", textY - boxHeight + padding) // Spostato sopra il punto
-            .attr("width", boxWidth)
-            .attr("height", boxHeight);
-            
-        // Posiziona il testo esattamente sopra il punto, centrato nel box
-        valueText.attr("x", px)
-            .attr("y", textY); 
+        // Position of the label        
+        const labelCenterY = py - 15; 
+        valueText
+            .attr("x", px)
+            .attr("y", labelCenterY); 
 
-        // Posiziona il punto (il cerchio)
+        // Position of the box
+        box
+            .attr("x", px - (bbox.width / 2) - padding)
+            .attr("y", labelCenterY - (bbox.height / 2) - padding) 
+            .attr("width", bbox.width + (padding * 2))
+            .attr("height", bbox.height + (padding * 2));
+            
+            
+        // Position and style of the dot
         dot.select(".data-point-circle").attr("r", 3.5).attr("fill", seriesColor);
         
-        // Aggiorna la posizione del gruppo dot (punto rimane a px, py)
+        // Reset any transform
         dot.attr("transform", `translate(0,0)`);
-        
-        dot.attr("display", null);
-        */
-       // Aggiorna il testo e calcola le dimensioni del box
-        valueText.text(`${Math.round(value)}`);
-        
-        // Questo è necessario per misurare il testo
-        const bbox = valueText.node().getBBox();
-        const padding = 1; // Manteniamo il padding ridotto a 3
-        const boxWidth = bbox.width + padding * 2;
-        const boxHeight = bbox.height + padding * 2;
-        
-        // Posizione Y del testo (baseline)
-        // La Y del testo è il punto in cui si trova la sua baseline.
-        const textBaselineY = py - 10; // Distanza verticale dal punto
-        
-        // Posiziona il testo
-        valueText.attr("x", px)
-            .attr("y", textBaselineY); 
-
-        // Aggiorna la posizione e le dimensioni del box
-        // La Y del box deve essere calcolata dall'altezza del testo (bbox.height)
-        // e dall'offset della baseline (bbox.y) per compensare lo spazio in alto.
-        box.attr("x", px - boxWidth / 2)
-            // Calcolo corretto della Y superiore del box:
-            // Sottraiamo l'altezza del testo (bbox.height) e aggiungiamo il padding.
-            .attr("y", textBaselineY - bbox.height - padding) 
-            .attr("width", boxWidth)
-            .attr("height", boxHeight);
-            
-        // Posiziona il punto (il cerchio)
-        dot.select(".data-point-circle").attr("r", 3.5).attr("fill", seriesColor);
-        
-        // Aggiorna la posizione del gruppo dot (punto rimane a px, py)
-        dot.attr("transform", `translate(0,0)`);
-        
         dot.attr("display", null);
         
-        // ... (il resto della funzione pointermoved, incluso trackerLine e dateLabel, rimane invariato)
-        // -------------------------------------
 
         // Update tracker line and date label
         trackerLine

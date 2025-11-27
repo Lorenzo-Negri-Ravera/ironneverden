@@ -7,58 +7,53 @@ Promise.all([
     d3.json(NODES_JSON_PATH),
     d3.json(LINKS_JSON_PATH)
 ]).then(function([rawNodes, rawLinks]) {
-    
-// --- INIZIALIZZAZIONE GLOBALE (Dichiarazione corretta) ---
-const width = 1000;
-const height = 800;
-const marginTop = 50;
-const marginBottom = 20;
-const marginLeft = 10;
-const marginRight = 135;
+        
+    // Definition of dimensions and margins
+    const width = 1000;
+    const height = 800;
+    const marginTop = 50;
+    const marginBottom = 20;
+    const marginLeft = 10;
+    const marginRight = 135;
 
-// Seleziona il contenitore SVG e imposta le dimensioni iniziali
-const svg = d3.select("#sankey-container")
-    .attr("width", width)
-    .attr("height", height)
-    .attr("viewBox", [0, 0, width, height])
-    .attr("style", "max-width: 100%; height: auto;");
+    // Build the SVG container
+    const svg = d3.select("#sankey-container")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("viewBox", [0, 0, width, height])
+        .attr("style", "max-width: 100%; height: auto;");
 
-// Inizializza il generatore di layout Sankey
-const sankey = d3.sankey()
-    .nodeId(d => d.index) 
-    .nodeWidth(15)       
-    .nodePadding(20)     
-    .extent([[marginLeft, marginTop], [width - marginRight, height - marginBottom]]); 
+    // Initialize the Sankey generator
+    const sankey = d3.sankey()
+        .nodeId(d => d.index) 
+        .nodeWidth(15)       
+        .nodePadding(20)     
+        .extent([[marginLeft, marginTop], [width - marginRight, height - marginBottom]]); 
 
-// Scala di colori standard
-const color = d3.scaleOrdinal(d3.schemeCategory10);
+    // Color scale
+    const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-
-
-    // !!! ATTENZIONE: Qui SOTTO ho RIMOVERSO le dichiarazioni 'const' duplicate !!!
-
-    // --- 1. Preparazione dei Dati ---
-
+    // Prepare data in the format required by d3-sankey
     const data = {
         nodes: rawNodes.map((d, i) => ({ ...d, index: i })), 
         links: rawLinks.map(d => ({ ...d }))
     };
-    
-    // --- 2. Calcolo del Layout Sankey (usa le variabili 'sankey' e 'data' globali) ---
     sankey(data);
 
-    // --- 3. Titolo del Grafico (usa la variabile 'svg' globale) ---
+    // Title
     svg.append("text")
         .attr("x", width / 2)
         .attr("y", marginTop / 2)
         .attr("text-anchor", "middle") 
         .style("font-size", "24px")
         .style("font-weight", "bold")
-        .text("**titolo**");
+        .text("Contribution of the Top 10 Countries to Disorder Events");
                 
 
 
-    // --- 4. Disegno dei Flussi (Links) ---
+    // --- Draw the Sankey diagram ---
+
+    // Links
     const link = svg.append("g")
         .attr("fill", "none")
         .attr("stroke-opacity", 0.5)
@@ -73,12 +68,11 @@ const color = d3.scaleOrdinal(d3.schemeCategory10);
         .attr("stroke-width", d => Math.max(1, d.width))
         .attr("class", "sankey-link");
 
-    // Aggiungi un tooltip al passaggio del mouse sui flussi
     link.append("title")
         .text(d => `${d.source.label} → ${d.target.label}\nTotale Eventi: ${d.value.toLocaleString()}`);
 
 
-    // --- 5. Disegno dei Nodi ---
+    // Nodes
     const node = svg.append("g")
         .attr("stroke", "#000")
       .selectAll("rect")
@@ -91,8 +85,8 @@ const color = d3.scaleOrdinal(d3.schemeCategory10);
         .attr("fill", d => color(d.label)) 
       .append("title")
         .text(d => `${d.label}\nTotale Flusso: ${d.value.toLocaleString()}`);
-
-    // --- 6. Etichette dei Nodi ---
+    
+    // Node Labels
     svg.append("g")
         .style("font", "10px sans-serif")
       .selectAll("text")
@@ -107,7 +101,6 @@ const color = d3.scaleOrdinal(d3.schemeCategory10);
 
 }).catch(function(error) {
     console.error("Errore critico nel caricamento o nell'elaborazione dei dati Sankey:", error);
-    // Nota: l'oggetto 'svg' è disponibile, quindi se il caricamento fallisce si può aggiungere un messaggio
     if (svg) {
         svg.append("text")
         .attr("x", width / 2).attr("y", height / 2)
