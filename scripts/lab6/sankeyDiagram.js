@@ -54,7 +54,8 @@ const color = d3.scaleOrdinal(d3.schemeCategory10);
         .attr("text-anchor", "middle") 
         .style("font-size", "24px")
         .style("font-weight", "bold")
-        .text("Flusso di Eventi: Regione → Paese → Tipo di Evento");
+        .text("**titolo**");
+                
 
 
     // --- 4. Disegno dei Flussi (Links) ---
