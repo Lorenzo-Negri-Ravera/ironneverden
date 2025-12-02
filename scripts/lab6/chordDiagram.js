@@ -1,112 +1,48 @@
-// chordDiagram.js
-
-/*
-const CHORD_PATH = '../../data/lab6/chord_data_fatalities_country.json';
-
-
-d3.json(CHORD_PATH).then(function(data) {
-
-    // Dimensioni
-    const width = 800;
-    const height = 800;
-    const innerRadius = 250;
-    const outerRadius = 270;
-
-    const svg = d3.select("#chord-container")
-        .attr("viewBox", [-width / 2, -height / 2, width, height])
-        .attr("width", width)
-        .attr("height", height)
-        .attr("style", "max-width: 100%; height: auto; font: 12px sans-serif;");
-
-    const matrix = data.matrix;
-    const names = data.names;
-    const numCountries = data.meta.num_countries; // Numero di paesi (i primi N elementi)
-
-    // Layout Chord
-    const chord = d3.chord()
-        .padAngle(0.05)
-        .sortSubgroups(d3.descending)
-        (matrix);
-
-    // Scala Colori:
-    // - I Paesi (primi N) avranno colori distinti
-    // - Gli Eventi (da N in poi) saranno grigi per non distrarre
-    const color = d3.scaleOrdinal()
-        .domain(names)
-        .range(names.map((d, i) => {
-            if (i < numCountries) return d3.schemeTableau10[i % 10]; // Colore per i Paesi
-            return "#ccc"; // Grigio per gli Eventi
-        }));
-
-    // Gruppo esterno (Archi)
-    const group = svg.append("g")
-        .selectAll("g")
-        .data(chord.groups)
-        .join("g");
-
-    // Disegna gli archi
-    group.append("path")
-        .attr("fill", d => color(names[d.index]))
-        .attr("stroke", d => d3.rgb(color(names[d.index])).darker())
-        .attr("d", d3.arc().innerRadius(innerRadius).outerRadius(outerRadius));
-
-    // Etichette (Testo)
-    group.append("text")
-        .each(d => { d.angle = (d.startAngle + d.endAngle) / 2; })
-        .attr("dy", ".35em")
-        .attr("transform", d => `
-            rotate(${(d.angle * 180 / Math.PI - 90)})
-            translate(${outerRadius + 10})
-            ${d.angle > Math.PI ? "rotate(180)" : ""}
-        `)
-        .attr("text-anchor", d => d.angle > Math.PI ? "end" : "start")
-        .text(d => names[d.index])
-        .style("font-weight", "bold");
-
-    // Corde (Ribbons)
-    svg.append("g")
-        .attr("fill-opacity", 0.7)
-        .selectAll("path")
-        .data(chord)
-        .join("path")
-        .attr("d", d3.ribbon().radius(innerRadius))
-        .attr("fill", d => color(names[d.source.index])) // Colora la corda come il paese d'origine
-        .attr("stroke", d => d3.rgb(color(names[d.source.index])).darker());
-
-}).catch(err => console.error("Errore caricamento JSON:", err));
-*/
-
 // File: chordDiagram.js
 
-// 1. MODIFICA IL PERCORSO: Punta al file generato per l'Ucraina (Events vs Regions)
 const CHORD_PATH = '../../data/lab6/chord_data_ukraine_events.json'; 
 
 d3.json(CHORD_PATH).then(function(data) {
 
-    // --- CONTROLLO DI SICUREZZA ---
-    console.log("Dati caricati:", data);
-    if (!data.meta) {
-        console.error("ERRORE: Manca il campo 'meta'. Hai generato il JSON nuovo?");
-        return; 
-    }
-
-    // Dimensioni del grafico
-    const width = 800;
+    // Definitions of dimensions
+    const width = 1100; 
     const height = 800;
     const innerRadius = 250;
     const outerRadius = 270;
 
+    // Build the SVG container
     const svg = d3.select("#chord-container")
-        .attr("viewBox", [-width / 2, -height / 2, width, height])
+        .attr("viewBox", [-width / 2, -height / 2, width, height]) 
         .attr("width", width)
         .attr("height", height)
         .attr("style", "max-width: 100%; height: auto; font: 12px sans-serif;");
 
-    const matrix = data.matrix;
-    const names = data.names;
     
-    // 2. RECUPERA IL NUOVO METADATO
-    // "num_event_types" ci dice quanti sono gli eventi nella lista, prima che inizino le regioni.
+    // Group for the diagram (left side)
+    const chartGroup = svg.append("g")
+        .attr("transform", "translate(-150, 0)");
+
+    // Group for the panel (right side)
+    const infoGroup = svg.append("g")
+        .attr("transform", "translate(180, -300)");
+
+    // Definition of the panel
+    const infoBg = infoGroup.append("rect")
+        .attr("width", 300)
+        .attr("height", 600)
+        .attr("fill", "#f9f9f9")
+        .attr("stroke", "#ccc")
+        .attr("rx", 10) 
+        .attr("opacity", 0); 
+
+    // Text container inside the panel
+    const infoText = infoGroup.append("text")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "14px");
+
+    // Recovering data from the JSON
+    const matrix = data.matrix;
+    const names = data.names;    
     const numEventTypes = data.meta.num_event_types; 
 
     // Layout Chord
@@ -115,33 +51,37 @@ d3.json(CHORD_PATH).then(function(data) {
         .sortSubgroups(d3.descending)
         (matrix);
 
-    // 3. LOGICA COLORI AGGIORNATA
-    // - I Tipi di Evento (i primi N elementi) avranno colori diversi.
-    // - Le Regioni (da N in poi) saranno tutte grigio chiaro.
+    // Color scale
     const color = d3.scaleOrdinal()
         .domain(names)
         .range(names.map((d, i) => {
-            if (i < numEventTypes) {
-                // Usa una palette vivida per i tipi di evento (Explosions, Battles, ecc.)
-                return d3.schemeCategory10[i % 10]; 
-            }
-            // Usa grigio per le Regioni (Donetsk, Kyiv, ecc.) per non confondere
+            if (i < numEventTypes) return d3.schemeCategory10[i % 10]; 
             return "#ccc"; 
         }));
 
-    // --- DISEGNO DEGLI ARCHI ESTERNI (LABEL) ---
-    const group = svg.append("g")
+    
+    // Ribbons - inside connections
+    const ribbons = chartGroup.append("g")
+        .attr("fill-opacity", 0.7)
+        .selectAll("path")
+        .data(chord)
+        .join("path")
+        .attr("d", d3.ribbon().radius(innerRadius))
+        .attr("fill", d => color(names[d.source.index])) 
+        .attr("stroke", d => d3.rgb(color(names[d.source.index])).darker());
+
+    // Group - outer arcs
+    const group = chartGroup.append("g")
         .selectAll("g")
         .data(chord.groups)
         .join("g");
 
-    // L'arco colorato
     group.append("path")
         .attr("fill", d => color(names[d.index]))
         .attr("stroke", d => d3.rgb(color(names[d.index])).darker())
         .attr("d", d3.arc().innerRadius(innerRadius).outerRadius(outerRadius));
 
-    // Il testo (Label)
+    // Labels 
     group.append("text")
         .each(d => { d.angle = (d.startAngle + d.endAngle) / 2; })
         .attr("dy", ".35em")
@@ -154,19 +94,83 @@ d3.json(CHORD_PATH).then(function(data) {
         .text(d => names[d.index])
         .style("font-weight", "bold");
 
-    // --- DISEGNO DELLE CORDE INTERNE (RIBBONS) ---
-    svg.append("g")
-        .attr("fill-opacity", 0.7)
-        .selectAll("path")
-        .data(chord)
-        .join("path")
-        .attr("d", d3.ribbon().radius(innerRadius))
-        // Colora la corda in base alla sorgente (l'Evento)
-        .attr("fill", d => color(names[d.source.index])) 
-        .attr("stroke", d => d3.rgb(color(names[d.source.index])).darker())
+
+
+    // Interaction part
+    
+    // Draw the panel
+    function updateInfoPanel(d) {
+        infoBg.attr("opacity", 1);        
+        infoText.selectAll("*").remove();
+
+        // Compute connections
+        let connections = [];
+        chord.forEach(c => {
+            if (c.source.index === d.index && c.source.value > 0) {
+                connections.push({ name: names[c.target.index], value: c.source.value });
+            } else if (c.target.index === d.index && c.source.value > 0) {
+                connections.push({ name: names[c.source.index], value: c.source.value });
+            }
+        });
+        connections.sort((a, b) => b.value - a.value);
+
+        // Title
+        infoText.append("tspan")
+            .attr("x", 15)
+            .attr("y", 30)
+            .attr("font-weight", "bold")
+            .attr("font-size", "18px")
+            .attr("fill", color(names[d.index]))
+            .text(names[d.index]);
+
+        // Separator line
+        let currentY = 0; 
+
+        // List of connections
+        const lineHeight = 20;
+        const maxItems = 20; 
         
-        // Tooltip semplice
-        .append("title")
-        .text(d => `${names[d.source.index]} -> ${names[d.target.index]}\nEventi: ${d.source.value}`);
+        connections.slice(0, maxItems).forEach((c, i) => {
+            // Label text
+            infoText.append("tspan")
+                .attr("x", 15)
+                .attr("dy", i === 0 ? "2.5em" : "1.2em") // Più spazio per il primo elemento
+                .attr("font-weight", "normal")
+                .attr("fill", "#000")
+                .text(c.name);
+
+            // Label value
+            infoText.append("tspan")
+                .attr("x", 250) 
+                .attr("font-weight", "bold")
+                .text(c.value);
+        });
+
+        /* In case of too many connections, show how many are excluded
+        if (connections.length > maxItems) {
+            infoText.append("tspan")
+                .attr("x", 15)
+                .attr("dy", "1.5em")
+                .attr("font-style", "italic")
+                .attr("fill", "#666")
+                .text(`...altri ${connections.length - maxItems} esclusi`);
+        }
+        */
+    }
+
+    // Mouseover and mouseout events
+    group
+        .on("mouseover", function(event, d) {
+            ribbons.transition().duration(200)
+                .style("opacity", ribbon => 
+                    (ribbon.source.index === d.index || ribbon.target.index === d.index) ? 0.7 : 0.05
+                );
+            updateInfoPanel(d);
+        })
+        .on("mouseout", function() {
+            ribbons.transition().duration(200).style("opacity", 0.7);            
+            infoBg.attr("opacity", 0);
+            infoText.selectAll("*").remove();
+        });
 
 }).catch(err => console.error("Errore caricamento JSON:", err));
