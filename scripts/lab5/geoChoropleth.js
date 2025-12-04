@@ -168,13 +168,13 @@ Promise.all([
     svg.select(".legend-axis .domain").remove();
 
     
-    
+
      // --- HOW TO READ THE CHART? ---
 
     const helpButtonGroup = svg.append("g")
         .attr("class", "help-button")
         .attr("cursor", "pointer") // Indica che è interattivo
-        .attr("transform", `translate(20, ${height - 60})`); 
+        .attr("transform", `translate(20, ${height - 20})`); 
 
     helpButtonGroup.append("circle")
         .attr("r", 9)
