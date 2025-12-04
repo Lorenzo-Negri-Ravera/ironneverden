@@ -106,8 +106,8 @@ Promise.all([
 
             // 2. Tooltip content
             const htmlContent = `
-                <div class="tooltip-header">${d.source.label} $\to$ ${d.target.label}</div>
-                <div>Totale Eventi: <b>${d.value.toLocaleString()}</b></div>
+                <div class="tooltip-header">${d.source.label} to ${d.target.label}</div>
+                <div>Total Events: <b>${d.value.toLocaleString()}</b></div>
             `;
 
             // 3. Show Tooltip
@@ -141,9 +141,7 @@ Promise.all([
         .attr("height", d => d.y1 - d.y0)
         .attr("width", d => d.x1 - d.x0)
         .attr("fill", d => color(d.label));
-      // .append("title") // *** RIMOSSO: Usiamo il tooltip personalizzato ora
 
-    // *** NUOVO: Interazione sui NODI ***
     nodes
         .on("mouseover", function(event, d) {
             // 1. Highlight: Evidenzia i link connessi a questo nodo
@@ -161,7 +159,7 @@ Promise.all([
 
             let htmlContent = `
                 <div class="tooltip-header" style="border-color: ${color(d.label)}">${d.label}</div>
-                <div>Valore Totale: <b>${d.value.toLocaleString()}</b></div>
+                <div>Total values: <b>${d.value.toLocaleString()}</b></div>
             `;
 
             if (incoming.length > 0) {
