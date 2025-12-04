@@ -27,10 +27,19 @@ d3.json(CHORD_PATH).then(function(data) {
         .style("font-family", "sans-serif")
         .text("Relations between Events and Ukraine regions"); 
 
-    
+    const rotationAngle = -60; 
+
+    // Convertiamo in radianti per i calcoli successivi
+    const rotationRad = rotationAngle * Math.PI / 180;
+
     // Group for the diagram (left side)
+    // Aggiungiamo 'rotate(...)' alla trasformazione
     const chartGroup = svg.append("g")
-        .attr("transform", "translate(-150, -50)");
+        .attr("transform", `translate(-150, -50) rotate(${rotationAngle})`);
+
+    // Group for the diagram (left side)
+    //const chartGroup = svg.append("g")
+        //.attr("transform", "translate(-150, -50)");
 
     // Group for the panel (right side)
     const infoGroup = svg.append("g")
@@ -92,6 +101,7 @@ d3.json(CHORD_PATH).then(function(data) {
         .attr("d", d3.arc().innerRadius(innerRadius).outerRadius(outerRadius));
 
     // Labels 
+    /*
     group.append("text")
         .each(d => { d.angle = (d.startAngle + d.endAngle) / 2; })
         .attr("dy", ".35em")
@@ -101,6 +111,45 @@ d3.json(CHORD_PATH).then(function(data) {
             ${d.angle > Math.PI ? "rotate(180)" : ""}
         `)
         .attr("text-anchor", d => d.angle > Math.PI ? "end" : "start")
+        .text(d => names[d.index])
+        .style("font-weight", "bold");
+    */
+    // Labels 
+    group.append("text")
+        .each(d => { 
+            d.angle = (d.startAngle + d.endAngle) / 2; 
+        })
+        .attr("dy", ".35em")
+        .attr("transform", d => {
+            // 1. Rotazione base del testo (radiale)
+            // Questa rimane basata sull'angolo originale dei dati perché 
+            // il gruppo padre è già ruotato fisicamente.
+            let str = `rotate(${(d.angle * 180 / Math.PI - 90)}) translate(${outerRadius + 10})`;
+            
+            // 2. Calcolo dell'Angolo Visivo Effettivo
+            // Sommiamo l'angolo del dato + la rotazione globale del grafico
+            let visualAngle = d.angle + rotationRad;
+            
+            // Normalizziamo l'angolo tra 0 e 2PI (gestione numeri negativi e giri completi)
+            visualAngle = visualAngle % (2 * Math.PI);
+            if (visualAngle < 0) visualAngle += 2 * Math.PI;
+
+            // 3. Decisione di ribaltamento
+            // Se l'angolo visivo è nella metà sinistra (tra 180° e 360°, ovvero > PI)
+            // dobbiamo ruotare il testo di 180° per renderlo leggibile.
+            if (visualAngle > Math.PI) {
+                str += " rotate(180)";
+            }
+            return str;
+        })
+        .attr("text-anchor", d => {
+            // Stessa logica di sopra per l'ancoraggio (start vs end)
+            let visualAngle = d.angle + rotationRad;
+            visualAngle = visualAngle % (2 * Math.PI);
+            if (visualAngle < 0) visualAngle += 2 * Math.PI;
+            
+            return visualAngle > Math.PI ? "end" : "start";
+        })
         .text(d => names[d.index])
         .style("font-weight", "bold");
 
