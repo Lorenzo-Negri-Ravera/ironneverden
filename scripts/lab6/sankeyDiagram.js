@@ -3,8 +3,7 @@
 const NODES_JSON_PATH = '../../data/lab6/sankey_nodes_EU_top.json';
 const LINKS_JSON_PATH = '../../data/lab6/sankey_links_EU_top.json';
 
-// *** NUOVO: Stili CSS per il tooltip fluttuante ***
-// Lo iniettiamo dinamicamente per non dipendere da file CSS esterni
+// CSS style for tooltip
 const tooltipStyle = document.createElement('style');
 tooltipStyle.innerHTML = `
     .sankey-tooltip {
@@ -27,7 +26,6 @@ tooltipStyle.innerHTML = `
 `;
 document.head.appendChild(tooltipStyle);
 
-// *** NUOVO: Creazione del DIV del tooltip ***
 const tooltip = d3.select("body").append("div")
     .attr("class", "sankey-tooltip");
 
@@ -83,10 +81,10 @@ Promise.all([
 
     // --- Draw the Sankey diagram ---
 
-    // --- LINKS (Flussi) ---
+    // --- LINKS ---
     const linkGroup = svg.append("g")
         .attr("fill", "none")
-        .attr("stroke-opacity", 0.5) // Opacità base
+        .attr("stroke-opacity", 0.5) 
         .style("mix-blend-mode", "multiply");
 
     const links = linkGroup.selectAll("path")
@@ -95,41 +93,38 @@ Promise.all([
         .attr("d", d3.sankeyLinkHorizontal())
         .attr("stroke", d => color(d.source.label)) 
         .attr("stroke-width", d => Math.max(1, d.width))
-        .attr("class", "sankey-link"); // Classe utile per la selezione
+        .attr("class", "sankey-link"); 
 
-    // *** NUOVO: Interazione sui LINKS ***
     links
         .on("mouseover", function(event, d) {
-            // 1. Highlight: Oscura gli altri links
             links.transition().duration(200)
                 .attr("stroke-opacity", link => link === d ? 0.7 : 0.1);
 
-            // 2. Tooltip content
+            // Tooltip content
             const htmlContent = `
                 <div class="tooltip-header">${d.source.label} to ${d.target.label}</div>
                 <div>Total Events: <b>${d.value.toLocaleString()}</b></div>
             `;
 
-            // 3. Show Tooltip
+            // Show Tooltip
             tooltip.transition().duration(200).style("opacity", 1);
             tooltip.html(htmlContent)
                 .style("left", (event.pageX + 15) + "px")
                 .style("top", (event.pageY - 28) + "px");
         })
         .on("mousemove", function(event) {
-            // Tooltip segue il mouse
             tooltip
                 .style("left", (event.pageX + 15) + "px")
                 .style("top", (event.pageY - 28) + "px");
         })
         .on("mouseout", function() {
-            // Reset Highlight e Tooltip
+            // Reset Highlight and Tooltip
             links.transition().duration(200).attr("stroke-opacity", 0.5);
             tooltip.transition().duration(200).style("opacity", 0);
         });
 
 
-    // --- NODES (Rettangoli) ---
+    // --- NODES ---
     const nodeGroup = svg.append("g")
         .attr("stroke", "#000");
 
@@ -144,16 +139,12 @@ Promise.all([
 
     nodes
         .on("mouseover", function(event, d) {
-            // 1. Highlight: Evidenzia i link connessi a questo nodo
-            // D3 Sankey aggiunge automaticamente sourceLinks e targetLinks a ogni nodo
             const connectedLinks = new Set([...d.sourceLinks, ...d.targetLinks]);
 
             links.transition().duration(200)
                 .attr("stroke-opacity", link => connectedLinks.has(link) ? 0.7 : 0.05);
 
-            // 2. Tooltip content per il NODO (più complesso)
-            
-            // Ordiniamo i flussi per valore
+                // Tooltip content             
             const incoming = d.targetLinks.sort((a,b) => b.value - a.value);
             const outgoing = d.sourceLinks.sort((a,b) => b.value - a.value);
 
@@ -176,7 +167,7 @@ Promise.all([
                 });
             }
 
-            // 3. Show Tooltip
+            // Show Tooltip
             tooltip.transition().duration(200).style("opacity", 1);
             tooltip.html(htmlContent)
                 .style("left", (event.pageX + 15) + "px")
@@ -188,7 +179,7 @@ Promise.all([
                 .style("top", (event.pageY - 28) + "px");
         })
         .on("mouseout", function() {
-             // Reset Highlight e Tooltip
+             // Reset Highlight and Tooltip
             links.transition().duration(200).attr("stroke-opacity", 0.5);
             tooltip.transition().duration(200).style("opacity", 0);
         });
@@ -211,7 +202,7 @@ Promise.all([
     console.error("Errore critico nel caricamento o nell'elaborazione dei dati Sankey:", error);
     if (d3.select("#sankey-container")) {
         d3.select("#sankey-container").append("text")
-        .attr("x", 500).attr("y", 400) // Coordinate fisse basate su width/height
+        .attr("x", 500).attr("y", 400) 
         .attr("text-anchor", "middle")
         .style("fill", "red")
         .text("Errore nel grafico: verificare i file JSON o la console.");

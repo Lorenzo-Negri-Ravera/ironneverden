@@ -6,7 +6,7 @@ d3.json(CHORD_PATH).then(function(data) {
 
     // Definitions of dimensions
     const width = 1100; 
-    const height = 800;
+    const height = 950; 
     const innerRadius = 250;
     const outerRadius = 270;
 
@@ -17,10 +17,20 @@ d3.json(CHORD_PATH).then(function(data) {
         .attr("height", height)
         .attr("style", "max-width: 100%; height: auto; font: 12px sans-serif;");
 
+    // Add title
+    svg.append("text")
+        .attr("x", 0)             
+        .attr("y", -height / 2 + 40) 
+        .attr("text-anchor", "middle")
+        .style("font-size", "24px")
+        .style("font-weight", "bold")
+        .style("font-family", "sans-serif")
+        .text("Relations between Events and Ukraine regions"); 
+
     
     // Group for the diagram (left side)
     const chartGroup = svg.append("g")
-        .attr("transform", "translate(-150, 0)");
+        .attr("transform", "translate(-150, -50)");
 
     // Group for the panel (right side)
     const infoGroup = svg.append("g")
@@ -29,7 +39,7 @@ d3.json(CHORD_PATH).then(function(data) {
     // Definition of the panel
     const infoBg = infoGroup.append("rect")
         .attr("width", 300)
-        .attr("height", 600)
+        .attr("height", 0)
         .attr("fill", "#f9f9f9")
         .attr("stroke", "#ccc")
         .attr("rx", 10) 
@@ -56,7 +66,7 @@ d3.json(CHORD_PATH).then(function(data) {
         .domain(names)
         .range(names.map((d, i) => {
             if (i < numEventTypes) return d3.schemeCategory10[i % 10]; 
-            return "#ccc"; 
+            return "#404040ff"; 
         }));
 
     
@@ -95,13 +105,12 @@ d3.json(CHORD_PATH).then(function(data) {
         .style("font-weight", "bold");
 
 
-
     // Interaction part
     
     // Draw the panel
     function updateInfoPanel(d) {
-        infoBg.attr("opacity", 1);        
         infoText.selectAll("*").remove();
+        infoBg.attr("opacity", 1);        
 
         // Compute connections
         let connections = [];
@@ -114,28 +123,26 @@ d3.json(CHORD_PATH).then(function(data) {
         });
         connections.sort((a, b) => b.value - a.value);
 
-        // Title
+
+        // Title inside tooltip
         infoText.append("tspan")
             .attr("x", 15)
-            .attr("y", 30)
+            .attr("y", 30) 
             .attr("font-weight", "bold")
             .attr("font-size", "18px")
             .attr("fill", color(names[d.index]))
             .text(names[d.index]);
 
-        // Separator line
-        let currentY = 0; 
-
         // List of connections
-        const lineHeight = 20;
         const maxItems = 20; 
         
         connections.slice(0, maxItems).forEach((c, i) => {
             // Label text
             infoText.append("tspan")
                 .attr("x", 15)
-                .attr("dy", i === 0 ? "2.5em" : "1.2em") // Più spazio per il primo elemento
+                .attr("dy", i === 0 ? "2.5em" : "1.2em") 
                 .attr("font-weight", "normal")
+                .attr("font-size", "14px")
                 .attr("fill", "#000")
                 .text(c.name);
 
@@ -146,16 +153,11 @@ d3.json(CHORD_PATH).then(function(data) {
                 .text(c.value);
         });
 
-        /* In case of too many connections, show how many are excluded
-        if (connections.length > maxItems) {
-            infoText.append("tspan")
-                .attr("x", 15)
-                .attr("dy", "1.5em")
-                .attr("font-style", "italic")
-                .attr("fill", "#666")
-                .text(`...altri ${connections.length - maxItems} esclusi`);
-        }
-        */
+        // Adactive resize of the panel 
+        const bBox = infoText.node().getBBox();        
+        const paddingBottom = 20;
+        const dynamicHeight = bBox.y + bBox.height + paddingBottom;
+        infoBg.attr("height", dynamicHeight);
     }
 
     // Mouseover and mouseout events
