@@ -174,7 +174,7 @@ Promise.all([
     const helpButtonGroup = svg.append("g")
         .attr("class", "help-button")
         .attr("cursor", "pointer") // Indica che è interattivo
-        .attr("transform", `translate(20, ${height - 20})`); 
+        .attr("transform", `translate(20, ${height - 30})`); 
 
     helpButtonGroup.append("circle")
         .attr("r", 9)
