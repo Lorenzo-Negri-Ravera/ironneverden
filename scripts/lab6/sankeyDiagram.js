@@ -72,11 +72,10 @@ Promise.all([
     // Title
     svg.append("text")
         .attr("x", width / 2)
-        .attr("y", marginTop / 2)
+        .attr("y", marginTop / 3)
         .attr("text-anchor", "middle") 
-        .style("font-size", "24px")
-        .style("font-weight", "bold")
-        .text("Contribution of the Top 10 Countries to Disorder Events");
+        .attr("class", "graph-title")
+        .text("Composition and Distribution of Disorder Events in the Top 10 Countries");
                 
 
     // --- Draw the Sankey diagram ---

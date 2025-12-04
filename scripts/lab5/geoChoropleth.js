@@ -167,6 +167,101 @@ Promise.all([
     // Remove the axis line (domain)
     svg.select(".legend-axis .domain").remove();
 
+    
+    
+     // --- HOW TO READ THE CHART? ---
+
+    const helpButtonGroup = svg.append("g")
+        .attr("class", "help-button")
+        .attr("cursor", "pointer") // Indica che è interattivo
+        .attr("transform", `translate(20, ${height - 60})`); 
+
+    helpButtonGroup.append("circle")
+        .attr("r", 9)
+        .attr("fill", "black");
+
+    helpButtonGroup.append("text")
+        .attr("text-anchor", "middle")
+        .attr("dy", "0.35em") 
+        .style("fill", "white")
+        .style("font-size", "12px")
+        .style("font-family", "serif") 
+        .style("font-weight", "bold")
+        .text("i");
+
+    helpButtonGroup.append("text")
+        .attr("x", 15) 
+        .attr("dy", "0.35em")
+        .style("font-size", "16px")
+        .style("font-weight", "bold")
+        .style("fill", "black")
+        .text("How to read the chart?");
+
+    // 2. IL POPUP (Nascosto di default)
+    const popupGroup = svg.append("g")
+        .attr("class", "info-popup")
+        .style("display", "none")
+        // IMPORTANTE: pointer-events none fa sì che il mouse "ignori" il popup
+        // impedendo sfarfallii se il popup si sovrappone al bottone
+        .style("pointer-events", "none"); 
+
+    // Sfondo semitrasparente (puramente visivo ora)
+    popupGroup.append("rect")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("fill", "rgba(255, 255, 255, 0.6)");
+
+    // Box bianco
+    const popupWidth = 400;
+    const popupHeight = 200;
+    
+    const popupContent = popupGroup.append("g")
+        .attr("transform", `translate(${(width - popupWidth) / 2}, ${(height - popupHeight) / 2})`);
+
+    popupContent.append("rect")
+        .attr("width", popupWidth)
+        .attr("height", popupHeight)
+        .attr("fill", "white")
+        .attr("stroke", "#333")
+        .attr("stroke-width", 2)
+        .attr("rx", 8)
+        .style("filter", "drop-shadow(0px 4px 6px rgba(0,0,0,0.3))");
+
+    // Titolo Popup
+    popupContent.append("text")
+        .attr("x", popupWidth / 2)
+        .attr("y", 40)
+        .attr("text-anchor", "middle")
+        .style("font-size", "18px")
+        .style("font-weight", "bold")
+        .text("How to interpret this map");
+
+    // Istruzioni
+    const instructions = [
+        "1. Darker colors indicate a higher number of attacks.",
+        "2. Hover over a region to see the exact count.",
+        "3. Use the legend on the right for reference."
+    ];
+
+    instructions.forEach((line, i) => {
+        popupContent.append("text")
+            .attr("x", 30)
+            .attr("y", 80 + (i * 30))
+            .style("font-size", "14px")
+            .style("fill", "#333")
+            .text(line);
+    });
+
+    // 3. LOGICA HOVER (Mouseover / Mouseout)
+    helpButtonGroup
+        .on("mouseover", function() {
+            popupGroup.style("display", null); // Mostra
+            popupGroup.raise(); // Porta in primo piano
+        })
+        .on("mouseout", function() {
+            popupGroup.style("display", "none"); // Nascondi
+        });
+
 }).catch(function(error) {
     console.error("Error loading data:", error);
 });
