@@ -1,7 +1,7 @@
 // File: conflictMap.js
 
-const UKR_PATH = "../../data/proj/countries/UKR.json";
-const RUS_PATH = "../../data/proj/countries/RUS.json";
+const UKR_PATH = "../../data/final/geojson/countries/UKR.json";
+const RUS_PATH = "../../data/final/geojson/countries/RUS.json";
 // const BATTLES_PATH = "../../data/lab5/battles.json"; // <--- DECOMMENTA QUANDO AVRAI IL FILE
 
 Promise.all([
@@ -36,9 +36,11 @@ Promise.all([
 
     // --- 3. PREPARAZIONE DATI ---
     const westernRussiaIds = [
-        "RUMOS", "RUMOW", "RUKL", "RUKLU", "RUTUL", "RURYA", "RUVLA", "RUYAR", "RUTVE", 
-        "RUSMO", "RUORL", "RUBEL", "RUKRS", "RUBRY", "RUVOR", "RUROS",
-        "RULIP", "RUTAM", "RUPNZ", "RUVGG", "RUSAR", "RUIVA"
+        "RUORL", "RUBEL", "RUKRS", "RUBRY", "RUVOR", "RUROS", "RUVGG", "RUTAM", "RULIP",
+        "RUMOS", "RUMOW", // Mosca
+        "RUKL", "RUKLU", "RUTUL", "RURYA" // Regioni per collegare Mosca
+        //"RUVLA", "RUYAR", "RUTVE", 
+        //"RUSMO", //"RUPNZ", , //"RUSAR", "RUIVA"  
     ]; 
 
     const rusFeatures = rusGeo.features.filter(d => westernRussiaIds.includes(d.properties.id));

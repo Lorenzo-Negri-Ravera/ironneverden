@@ -284,9 +284,9 @@ Promise.all([
 
 */
 
-const GENERAL_GEOJSON_PATH = "../../data/proj/europe.geojson";
-const COUNTRIES_EVENTS_PATH = "../../data/proj/df_country_summary.json";
-const ADMIN_EVENTS_PATH = "../../data/proj/df_admin_summary.json";
+const GENERAL_GEOJSON_PATH = "../../data/final/geojson/europe.geojson";
+const COUNTRIES_EVENTS_PATH = "../../data/final/df_country_summary.json";
+const ADMIN_EVENTS_PATH = "../../data/final/df_admin_summary.json";
 
 Promise.all([
     d3.json(GENERAL_GEOJSON_PATH),
