@@ -8,3 +8,5 @@
 
 # Cartella di output di Jekyll (il sito costruito)
 /_site/
+
+.DS_Store
