@@ -420,7 +420,7 @@ Promise.all([
 
     function loadDetail(iso, countryName) {
         d3.select(".map-filters").style("visibility", "hidden");
-        const path = `../../data/proj/countries/${iso}.json`;
+        const path = `../../data/final/geojson/countries/${iso}.json`;
 
         if (geoCache.has(iso)) {
             renderCountryDetail(geoCache.get(iso), countryName);
