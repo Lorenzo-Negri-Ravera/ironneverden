@@ -140,3 +140,64 @@ h4, h5, h6 {
   font-size: 15px;
   fill: #25282A; 
 }
+
+
+
+/* ------------- NEW ------------- */
+
+/* Styles to fix the size of the map containers */
+#geo-container, #front-map-container {
+    width: 1000px; 
+    height: 700px; 
+    max-width: 1000px;
+    max-height: 700px;
+    margin: 0 auto; 
+    display: block;
+}
+
+/* ---- Style for the map menu ---- */
+
+#map-wrapper {
+    margin: 0 auto;
+}
+
+/* Position: right corner */
+.map-filters {
+    position: absolute;
+    top: 50px;   
+    right: 20px;  
+    z-index: 20;  
+    display: flex;
+    flex-direction: column; 
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.9); 
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.filter-item {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.filter-item label {
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #555;
+    margin-bottom: 3px;
+}
+
+.filter-item select {
+    padding: 4px 8px;
+    font-size: 13px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: white;
+}
+
+/* -------------------------------------------------------------- */
