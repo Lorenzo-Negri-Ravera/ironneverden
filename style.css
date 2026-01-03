@@ -201,3 +201,17 @@ h4, h5, h6 {
 }
 
 /* -------------------------------------------------------------- */
+
+.filter-btn {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    padding: 8px 15px;
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+.filter-btn.active {
+    background: #343a40;
+    color: white;
+    border-color: #343a40;
+}

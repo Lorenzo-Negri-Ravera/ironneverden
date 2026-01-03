@@ -10,8 +10,6 @@
     <link rel="stylesheet" href="../../style.css"> 
     <link rel="icon" href="./favicon.ico">
 
-    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-    <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12"></script>
 </head>
 
 <body>
@@ -65,12 +63,16 @@
             <section id="front-map-section" class="text-center">
                 <div id="tooltip" style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 4px; pointer-events: none; font-family: Arial; font-size: 12px; z-index: 10;"></div>
                 
-                <svg id="front-map-container"></svg>
-                
-                <div id="controls" style="text-align: center; margin-top: 20px; margin-bottom: 20px;">
-                    <button id="play-button" class="btn btn-outline-primary">Play</button>
-                    <input type="range" id="year-slider" min="2022" max="2025" value="2022" step="1" style="width: 300px;">
-                    <span id="year-display" style="font-weight: bold; margin-left: 10px;">2022</span>
+                <div id="front-map-container"></div>
+                <div id="filter-container" style="text-align: center; margin-bottom: 10px;">
+                    <button class="filter-btn active" data-type="all">Tutti gli eventi</button>
+                    <button class="filter-btn" data-type="Battles">Battaglie</button>
+                    <button class="filter-btn" data-type="Explosions/Remote violence">Esplosioni/Artiglieria</button>
+                </div>
+                <div id="controls" style="text-align: center; margin-top: 20px; font-family: sans-serif;">
+                    <button id="play-button" style="padding: 10px 20px; font-size: 16px;">Play</button>
+                    <input type="range" id="time-slider" style="width: 60%; margin: 0 15px;">
+                    <div id="current-date-display" style="font-size: 18px; font-weight: bold; margin-top: 10px; color: #333;"></div>
                 </div>
             </section>
         
