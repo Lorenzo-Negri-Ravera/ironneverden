@@ -1,6 +1,6 @@
 // File: geoChoropleth.js 
 
-const GENERAL_GEOJSON_PATH = "../../data/final/geojson/europe.geojson";
+const GENERAL_GEOJSON_PATH = "../../data/final/geojson/map.geojson";
 const COUNTRIES_EVENTS_PATH = "../../data/final/df_country_summary.json";
 const ADMIN_EVENTS_PATH = "../../data/final/df_admin_summary.json";
 
@@ -97,7 +97,7 @@ Promise.all([
         colorScale.domain([0, d3.max(Array.from(countsMap.values())) || 1]);
 
         // Adjust projection for the visualization
-        projection.fitExtent([[10, 10], [width * 0.8, height - 100]], geojson);
+        projection.fitExtent([[10, 10], [width * 0.7, height - 100]], geojson);
 
         // Draw countries
         const countries = mapGroup.selectAll("path")
