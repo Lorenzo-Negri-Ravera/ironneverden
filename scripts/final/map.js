@@ -33,7 +33,7 @@ Promise.all([
         .style("font-weight", "bold")
         .text("Disorders in Europe");
 
-    // Map setup
+    // Map setup (Global Projection for Europe)
     const projection = d3.geoMercator();
     const pathGenerator = d3.geoPath().projection(projection);
     const mapGroup = svg.append("g").attr("transform", `translate(0, ${marginTop})`);
@@ -61,7 +61,7 @@ Promise.all([
 
     const colorScale = d3.scaleSqrt().range(["#fee5d9", "#C8102E"]);
 
-    // Populate year and event type selectors of the menu
+    // Populate year and event type selectors
     const getYear = (d) =>  d.YEAR;
     const getEvents = (d) => d.EVENTS;
 
@@ -80,7 +80,7 @@ Promise.all([
     // Cache for loaded geojsons
     const geoCache = new Map();
 
-    // Function to update the map visualization
+    // Function to update the main map visualization
     function updateVisualization() {
         const selYear = yearSelect.property("value");
         const selEvent = eventSelect.property("value");
@@ -96,7 +96,7 @@ Promise.all([
         const countsMap = d3.rollup(filtered, v => d3.sum(v, d => getEvents(d)), d => d.COUNTRY);
         colorScale.domain([0, d3.max(Array.from(countsMap.values())) || 1]);
 
-        // Adjust projection for the visualization
+        // Adjust projection for the visualization (Main Europe Map)
         projection.fitExtent([[10, 10], [width * 0.7, height - 100]], geojson);
 
         // Draw countries
@@ -135,20 +135,22 @@ Promise.all([
                 tooltip.style("opacity", 0);
             })
             .on("click", (event, d) => {
+                // Support multiple standard ISO property names
                 const isoCode = d.properties.ISO3 || d.properties.ISO_A3 || d.id;
                 console.log("Clicked on:", d.properties.NAME, "Code:", isoCode);
                 
-                // Upload detail only if not zoomed and isoCode is valid
                 if (!isZoomed && isoCode) {
                     loadDetail(isoCode, d.properties.NAME);
                 }
             });
     }
 
-    // Function to load country detail (zoomed view on regions)
+    // Function to load country detail
     function loadDetail(iso, countryName) {
         d3.select(".map-filters").style("visibility", "hidden");
-        const path = `../../data/final/geojson/countries/${iso}.json`;
+        
+        // FIX: Aggiornato percorso ed estensione a .geojson
+        const path = `../../data/final/geojson/countriesv2/${iso}.geojson`;
 
         if (geoCache.has(iso)) {
             renderCountryDetail(geoCache.get(iso), countryName);
@@ -173,26 +175,51 @@ Promise.all([
         detailGroup.selectAll("*").remove();
         detailGroup.style("display", "block").style("opacity", 1);
 
-        // Filter admin data for the selected country
+        // --- FIX CRUCIALE: USARE GEOIDENTITY ---
+        // geoIdentity tratta la mappa come un disegno piatto 2D, non come una sfera.
+        // Questo risolve il problema del "Winding Order" (il quadrato gigante)
+        // e risolve il problema del "puntino piccolo" perché fitExtent funziona sempre sui dati grezzi.
+        const localProjection = d3.geoIdentity().reflectY(true);
+        
+        const localPath = d3.geoPath().projection(localProjection);
+
+        // Pulizia dati (manteniamo il filtro per sicurezza, ma geoIdentity è molto più tollerante)
+        const europeanFeatures = geo.features.filter(d => {
+            if (!d.geometry) return false;
+            // Calcolo baricentro geometrico semplice
+            const centroid = d3.geoCentroid(d); 
+            const lon = centroid[0];
+            const lat = centroid[1];
+            return lat > 25 && lat < 75 && lon > -35 && lon < 50;
+        });
+
+        // Usa le feature filtrate o tutto se il filtro fallisce
+        const featuresToUse = europeanFeatures.length > 0 ? europeanFeatures : geo.features;
+
+        const cleanGeo = {
+            type: "FeatureCollection",
+            features: featuresToUse
+        };
+
+        // Adatta la proiezione identity al riquadro disponibile
+        // geoIdentity calcolerà automaticamente la scala corretta per riempire lo schermo
+        localProjection.fitExtent([[120, 50], [width * 0.75, height - 150]], cleanGeo);
+
+        // --- Logica Dati (invariata) ---
         const selYear = yearSelect.property("value");
         const selEvent = eventSelect.property("value");
 
-        // Filter admin data based on selections
         const filteredAdmin = admin_data.filter(d => 
             d.COUNTRY === name &&
             (selYear === "All" || (getYear(d) && getYear(d).toString() === selYear)) &&
             (selEvent === "All" || d.EVENT_TYPE === selEvent)
         );
 
-        // Compute counts per administrative region
         const adminCounts = d3.rollup(filteredAdmin, v => d3.sum(v, d => getEvents(d)), d => d.ADMIN1);
         const adminMax = d3.max(Array.from(adminCounts.values())) || 1;
         const adminColor = d3.scaleSqrt().domain([0, adminMax]).range(["#fff5f0", "#99000d"]);
 
-        // Adjust projection for the detail view
-        projection.fitExtent([[120, 50], [width * 0.75, height - 150]], geo);
-
-        // Draw detail map
+        // --- Disegno Elementi ---
         detailGroup.append("text")
             .attr("x", width/2).attr("y", 40)
             .attr("text-anchor", "middle").attr("fill", "white")
@@ -206,22 +233,19 @@ Promise.all([
         close.append("circle").attr("r", 15).attr("fill", "white");
         close.append("text").attr("text-anchor", "middle").attr("dy", "0.35em").text("X");
 
-        // Draw regions
         const g = detailGroup.append("g"); 
         g.selectAll("path")
-            .data(geo.features)
+            .data(cleanGeo.features)
             .join("path")
-            .attr("d", pathGenerator)
+            .attr("d", localPath) // Usa il path generator collegato a geoIdentity
             .attr("stroke", "#444")
             .attr("fill", d => {
-                const reg = d.properties.name;
+                const reg = d.properties.NAME_1 || d.properties.name || d.properties.COUNTRY;
                 const count = adminCounts.get(reg) || 0;
                 return count > 0 ? adminColor(count) : "#ffffff";
             })
-
-            // Interactivity for regions
             .on("mouseover", function(event, d) {
-                const reg = d.properties.name;
+                const reg = d.properties.NAME_1 || d.properties.name || d.properties.COUNTRY;
                 const count = adminCounts.get(reg) || 0;
                 d3.select(this).attr("fill", "orange").attr("stroke", "#000").attr("stroke-width", 2);
                 tooltip.style("opacity", 1)
@@ -233,14 +257,13 @@ Promise.all([
                 tooltip.style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 15) + "px");
             })
             .on("mouseout", function(event, d) {
-                const reg = d.properties.name;
+                const reg = d.properties.NAME_1 || d.properties.name || d.properties.COUNTRY;
                 const count = adminCounts.get(reg) || 0;
                 d3.select(this).attr("stroke", "#444").attr("stroke-width", 1)
                     .attr("fill", count > 0 ? adminColor(count) : "#ffffff");
                 tooltip.style("opacity", 0);
             });
     }
-
     // Function to close detail view
     function closeDetail() {
         isZoomed = false;
@@ -248,7 +271,7 @@ Promise.all([
         detailGroup.style("display", "none");
         d3.select(".map-filters").style("visibility", "visible");
         tooltip.style("opacity", 0);
-        updateVisualization();
+        updateVisualization(); // Ridisegna la mappa principale se necessario
     }
 
     // Initial visualization
@@ -256,18 +279,19 @@ Promise.all([
     eventSelect.on("change", updateVisualization);
     updateVisualization();
 
-
     // --- HOW TO READ THE CHART? ---
-    setupHelpButton(svg, width, height, {
-        x: 30,
-        y: height-20,
-        title: "Disorders in Europe",
-        instructions: [
-            "1. Dark intensity means more events.",
-            "2. Hover on a country to see the number of events.",
-            "3. Click on a country to see details on its regions.",
-            "4. Click the 'X' to return to the main map."
-        ]
-    });
+    if (typeof setupHelpButton === "function") {
+         setupHelpButton(svg, width, height, {
+            x: 30,
+            y: height-20,
+            title: "Disorders in Europe",
+            instructions: [
+                "1. Dark intensity means more events.",
+                "2. Hover on a country to see the number of events.",
+                "3. Click on a country to see details on its regions.",
+                "4. Click the 'X' to return to the main map."
+            ]
+        });
+    }
 
 }).catch(err => console.error("Errore Caricamento:", err));
