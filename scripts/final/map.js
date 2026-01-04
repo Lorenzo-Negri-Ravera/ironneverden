@@ -1,6 +1,6 @@
 // File: geoChoropleth.js 
 
-const GENERAL_GEOJSON_PATH = "../../data/final/geojson/map.geojson";
+const GENERAL_GEOJSON_PATH = "../../data/final/geojson/europe.geojson";
 const COUNTRIES_EVENTS_PATH = "../../data/final/df_country_summary.json";
 const ADMIN_EVENTS_PATH = "../../data/final/df_admin_summary.json";
 
