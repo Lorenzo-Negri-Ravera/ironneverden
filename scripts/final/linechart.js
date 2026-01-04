@@ -135,7 +135,7 @@ function initFoodChart() {
                 .on("change", function() {
                     const opacity = this.checked ? 1 : 0;
                     d3.select("#line-" + safeId)
-                      .transition().duration(500)
+                      .transition().duration(50)
                       .style("opacity", opacity);
                 });
 
