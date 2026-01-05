@@ -11,6 +11,9 @@
 
     const width = 1000;
     const height = 650;
+    
+    // Configurazione Spike
+    const SPIKE_WIDTH = 8; 
 
     const svg = d3.select("#spike-container")
         .attr("viewBox", [0, 0, width, height])
@@ -46,14 +49,13 @@
 
     const path = d3.geoPath().projection(projection);
 
-    // --- SCALE (LOGARITMICA) ---
-    // Range [3, 200]: Parte da 3px per rendere visibili anche i valori minimi
-    const lenScale = d3.scaleLog().range([3, 200]); 
-    const widScale = d3.scaleLinear().range([2, 30]);  
+    // --- SCALE ---
+    const lenScale = d3.scaleSqrt().range([5, 150]); 
 
     // Layers
     const mapLayer = g.append("g").attr("class", "map-layer");
     const spikeLayer = g.append("g").attr("class", "spike-layer"); 
+    const legendLayer = svg.append("g").attr("class", "legend-layer");
 
     console.log("Inizio caricamento dati mappa...");
 
@@ -83,57 +85,46 @@
         // 3. Proiezione
         projection.fitSize([width, height], geoReg);
 
-        // 4. DISEGNO MAPPA (REGIONI / OBLAST)
+        // 4. DISEGNO MAPPA (STILE "GRIGETTINO")
         mapLayer.selectAll("path")
             .data(geoReg.features) 
             .join("path")
             .attr("d", path)
-            .attr("fill", "#f8f9fa")       
-            .attr("stroke", "#d1d1d1")     
+            .attr("fill", "#e0e0e0")       
+            .attr("stroke", "#ffffff")     
             .attr("stroke-width", 1.0) 
             .attr("vector-effect", "non-scaling-stroke")
-            // Mouseover REGIONI
             .on("mouseover", function(e, d) {
                 d3.select(this)
                     .attr("stroke", "#333") 
-                    .attr("stroke-width", 2.0)
-                    .attr("fill", "#e2e6ea") 
+                    .attr("stroke-width", 1.5)
+                    .attr("fill", "#cccccc") 
                     .raise(); 
-                
                 const name = d.properties.shapeName || d.properties.NAME_1 || d.properties.name || "Regione";
-                
-                tooltip.style("visibility", "visible").html(`
-                    <div style="font-weight:bold;">${name}</div>
-                `);
+                tooltip.style("visibility", "visible").html(`<div style="font-weight:bold;">${name}</div>`);
             })
             .on("mousemove", e => tooltip.style("top", (e.pageY-20)+"px").style("left", (e.pageX+20)+"px"))
             .on("mouseout", function() {
                 d3.select(this)
-                    .attr("stroke", "#d1d1d1")
+                    .attr("stroke", "#ffffff")
                     .attr("stroke-width", 1.0)
-                    .attr("fill", "#f8f9fa");
+                    .attr("fill", "#e0e0e0"); 
                 tooltip.style("visibility", "hidden");
             });
 
-        // 5. Mappatura Centroidi (SENZA CORREZIONI MANUALI)
+        // 5. Centroidi
         const csvDistNames = [...new Set(csvDist.map(d => d.admin2))];
         const districtCentroids = new Map();
-        
-        // Helper normalizzazione
         const normalize = str => str ? str.toLowerCase().trim().replace(/['`’]/g, "") : "";
 
         geoDist.features.forEach(f => {
             let geoName = f.properties.shapeName || f.properties.NAME_2 || f.properties.name || ""; 
-            
             if (geoName) {
                 const normGeo = normalize(geoName);
-                
-                // Match diretto tra GeoJSON e CSV
                 const match = csvDistNames.find(c => {
                     const normCsv = normalize(c);
                     return normCsv === normGeo || normCsv.includes(normGeo) || normGeo.includes(normCsv);
                 });
-
                 if (match) {
                     const c = path.centroid(f);
                     if (!isNaN(c[0]) && !isNaN(c[1])) {
@@ -143,13 +134,63 @@
             }
         });
 
-        // 6. Scale Domains
+        // 6. Dominio Scale
         const districtTotals = d3.rollup(csvDist, v => d3.sum(v, d => d.fatalities), d => d.admin2);
         const globalMax = d3.max(Array.from(districtTotals.values())) || 1000;
-        
-        // LOGARITMICA: Da 1 a Max (Log(0) non esiste)
         lenScale.domain([1, Math.max(globalMax, 1)]);
-        widScale.domain([0, globalMax]);
+
+        // --- 7. DISEGNO LEGENDA ---
+        drawLegend(globalMax);
+
+        function drawLegend(maxValue) {
+            const legX = 30; 
+            const legY = height - 60; 
+
+            const legGroup = legendLayer.append("g")
+                .attr("transform", `translate(${legX}, ${legY})`);
+
+            // Definizione Classi (Unione 0-100 e 1k-5k)
+            const legendSteps = [
+                { label: "0 - 100", value: 100 }, 
+                { label: "1k - 5k", value: 5000 }
+            ];
+            
+            const stepsToDraw = legendSteps.filter(s => s.value <= maxValue || (s.value === 5000 && maxValue >= 1000));
+            
+            if (maxValue > 7500) {
+                stepsToDraw.push({ label: d3.format(".1s")(maxValue), value: maxValue });
+            }
+
+            let curX = 0; 
+            const baseLine = 0; 
+            const stepWidth = 85; 
+
+            // Spike & Label
+            stepsToDraw.forEach(step => {
+                const h = lenScale(step.value);
+                const w = SPIKE_WIDTH;
+
+                legGroup.append("path")
+                    .attr("d", spikePath(curX + 10, baseLine, h, w)) 
+                    .attr("fill", "#dc3545").attr("stroke", "#8e0000").attr("stroke-width", 0.5);
+
+                legGroup.append("text")
+                    .attr("x", curX + 20) 
+                    .attr("y", baseLine)
+                    .attr("font-family", "sans-serif").attr("font-size", "11px").attr("fill", "#555")
+                    .text(step.label);
+
+                curX += stepWidth; 
+            });
+
+            // Titolo Legenda
+            legGroup.append("text")
+                .attr("x", 0)
+                .attr("y", 25) 
+                .attr("font-family", "sans-serif").attr("font-size", "12px")
+                .attr("font-weight", "bold").attr("fill", "#333")
+                .text("Vittime (Altezza spike)");
+        }
 
         // --- UPDATE FUNCTION ---
         function updateSpikes() {
@@ -171,12 +212,9 @@
             };
 
             const aggregated = new Map(); 
-            
             csvDist.forEach(d => {
                 if (filterFn(d)) {
-                    // NESSUNA CORREZIONE NOME QUI
                     let distName = d.admin2; 
-                    
                     if (!aggregated.has(distName)) {
                         aggregated.set(distName, { value: 0, details: {} });
                     }
@@ -194,91 +232,56 @@
                         name: distName,
                         value: data.value,
                         details: data.details,
-                        x: centroid[0],
-                        y: centroid[1]
+                        x: centroid[0], y: centroid[1]
                     });
                 }
             });
 
-            // --- DISEGNO CON GRUPPI (HITBOX) ---
-            const groups = spikeLayer.selectAll(".spike-group")
-                .data(spikeData, d => d.name);
-
-            groups.exit()
-                .transition().duration(500)
-                .attr("opacity", 0)
-                .remove();
-
-            const enterGroups = groups.enter().append("g")
-                .attr("class", "spike-group");
+            const groups = spikeLayer.selectAll(".spike-group").data(spikeData, d => d.name);
+            groups.exit().transition().duration(500).attr("opacity", 0).remove();
             
-            // 1. Spike Visibile (Rosso)
-            enterGroups.append("path")
-                .attr("class", "spike-visual")
-                .attr("fill", "#dc3545")
-                .attr("stroke", "#8e0000")
-                .attr("stroke-width", 0.5)
-                .attr("fill-opacity", 0.8);
-
-            // 2. Hitbox (Invisibile e largo)
-            enterGroups.append("path")
-                .attr("class", "spike-hitbox")
-                .attr("fill", "transparent")
-                .attr("stroke", "transparent")
-                .attr("stroke-width", 25) // Area cliccabile estesa
-                .style("cursor", "pointer");
+            const enterGroups = groups.enter().append("g").attr("class", "spike-group");
+            enterGroups.append("path").attr("class", "spike-visual")
+                .attr("fill", "#dc3545").attr("stroke", "#8e0000").attr("stroke-width", 0.5).attr("fill-opacity", 0.8);
+            enterGroups.append("path").attr("class", "spike-hitbox")
+                .attr("fill", "transparent").attr("stroke", "transparent").attr("stroke-width", 15).style("cursor", "pointer");
 
             const allGroups = enterGroups.merge(groups);
 
-            // Update Visibile
-            allGroups.select(".spike-visual")
-                .transition().duration(500)
-                .attr("d", d => {
-                    const valSafe = Math.max(1, d.value); // Protezione logaritmo
-                    const h = lenScale(valSafe);
-                    const w = widScale(d.value);
-                    return spikePath(d.x, d.y, h, w);
-                });
-
-            // Update Hitbox (minimo 20px altezza)
-            allGroups.select(".spike-hitbox")
+            allGroups.select(".spike-visual").transition().duration(500)
                 .attr("d", d => {
                     const valSafe = Math.max(1, d.value);
+                    const h = lenScale(valSafe);
+                    return spikePath(d.x, d.y, h, SPIKE_WIDTH);
+                });
+
+            allGroups.select(".spike-hitbox").attr("d", d => {
+                    const valSafe = Math.max(1, d.value);
                     let h = lenScale(valSafe);
-                    let w = widScale(d.value);
-                    if (h < 20) { h = 20; w = 10; }
-                    return spikePath(d.x, d.y, h, w);
+                    if (h < 20) h = 20;
+                    return spikePath(d.x, d.y, h, SPIKE_WIDTH);
                 });
 
-            // Mouse Events su Spike
-            allGroups
-                .on("mouseover", function(e, d) {
-                    d3.select(this).select(".spike-visual")
-                        .attr("fill", "#a71d2a")
-                        .attr("fill-opacity", 1);
-                    
-                    const b = d.details["Battles"] || 0;
-                    const ex = d.details["Explosions/Remote violence"] || 0;
-                    const max = Math.max(b, ex, 1); 
-
-                    tooltip.style("visibility", "visible").html(`
-                        <div style="font-weight:bold;border-bottom:1px solid #ccc;margin-bottom:8px;padding-bottom:4px;font-size:16px;">${d.name}</div>
-                        <div style="margin-bottom:8px;">Vittime: <strong style="font-size:16px;">${d.value.toLocaleString()}</strong></div>
-                        <svg width="180" height="50">
-                            <rect x="0" y="5" width="${(b/max)*100}" height="10" fill="#007bff"></rect> 
-                            <text x="${(b/max)*100+5}" y="14" font-size="11">Bat: ${b}</text>
-                            <rect x="0" y="25" width="${(ex/max)*100}" height="10" fill="#dc3545"></rect>
-                            <text x="${(ex/max)*100+5}" y="34" font-size="11">Exp: ${ex}</text>
-                        </svg>
-                    `);
-                })
-                .on("mousemove", e => tooltip.style("top", (e.pageY-20)+"px").style("left", (e.pageX+20)+"px"))
-                .on("mouseout", function() {
-                    d3.select(this).select(".spike-visual")
-                        .attr("fill", "#dc3545")
-                        .attr("fill-opacity", 0.8);
-                    tooltip.style("visibility", "hidden");
-                });
+            allGroups.on("mouseover", function(e, d) {
+                d3.select(this).select(".spike-visual").attr("fill", "#a71d2a").attr("fill-opacity", 1);
+                const b = d.details["Battles"] || 0;
+                const ex = d.details["Explosions/Remote violence"] || 0;
+                const max = Math.max(b, ex, 1); 
+                tooltip.style("visibility", "visible").html(`
+                    <div style="font-weight:bold;border-bottom:1px solid #ccc;margin-bottom:8px;padding-bottom:4px;font-size:16px;">${d.name}</div>
+                    <div style="margin-bottom:8px;">Vittime: <strong style="font-size:16px;">${d.value.toLocaleString()}</strong></div>
+                    <svg width="180" height="50">
+                        <rect x="0" y="5" width="${(b/max)*100}" height="10" fill="#007bff"></rect> 
+                        <text x="${(b/max)*100+5}" y="14" font-size="11">Bat: ${b}</text>
+                        <rect x="0" y="25" width="${(ex/max)*100}" height="10" fill="#dc3545"></rect>
+                        <text x="${(ex/max)*100+5}" y="34" font-size="11">Exp: ${ex}</text>
+                    </svg>`);
+            })
+            .on("mousemove", e => tooltip.style("top", (e.pageY-20)+"px").style("left", (e.pageX+20)+"px"))
+            .on("mouseout", function() {
+                d3.select(this).select(".spike-visual").attr("fill", "#dc3545").attr("fill-opacity", 0.8);
+                tooltip.style("visibility", "hidden");
+            });
         }
 
         function spikePath(x, y, h, w) { 
@@ -291,8 +294,5 @@
 
         updateSpikes();
 
-    }).catch(err => {
-        console.error("ERRORE CARICAMENTO:", err);
-    });
-
+    }).catch(err => { console.error("ERRORE CARICAMENTO:", err); });
 })();
