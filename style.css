@@ -288,3 +288,157 @@ h4, h5, h6 {
 .checkbox-wrapper span {
     margin-left: 8px;
 }
+
+
+/* ############spiek */
+
+/* --- CONTENITORE CONTROLLI --- */
+.spike-ui-container {
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 25px; /* Spazio aumentato */
+    background: #ffffff;
+    padding: 15px 35px; /* Box più grande */
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 16px; /* Font base più grande */
+    margin-top: 20px; /* Margine SOPRA (per staccarlo dalla mappa) */
+    box-shadow: none;
+}
+
+.ui-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.ui-label {
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    font-size: 13px; /* Etichetta più leggibile */
+    letter-spacing: 0.5px;
+    margin-right: 8px;
+}
+
+/* --- SELETTORE LIVELLO (Radio) --- */
+.toggle-switch {
+    display: flex;
+    background: #f3f4f6;
+    border-radius: 8px;
+    padding: 4px; /* Più spazio interno */
+}
+
+.toggle-option {
+    position: relative;
+    cursor: pointer;
+    margin: 0;
+}
+
+.toggle-option input { display: none; }
+
+.toggle-option span {
+    display: block;
+    padding: 10px 24px; /* BOTTONI MOLTO PIÙ GRANDI */
+    border-radius: 6px;
+    color: #6b7280;
+    transition: all 0.2s ease;
+    font-weight: 600;
+    font-size: 16px; /* Testo più grande */
+}
+
+.toggle-option span:hover { color: #111; }
+
+.toggle-option input:checked + span {
+    background: #ffffff;
+    color: #111827;
+    font-weight: 700;
+    border: 1px solid #d1d5db;
+    box-shadow: none;
+}
+
+/* --- SEPARATORE --- */
+.ui-separator {
+    width: 1px;
+    height: 35px; /* Più alto */
+    background: #e5e7eb;
+    margin: 0 15px;
+}
+
+/* --- FILTRI (Checkbox) --- */
+.filter-chip {
+    cursor: pointer;
+    position: relative;
+    margin: 0;
+}
+
+.filter-chip input { display: none; }
+
+.filter-chip span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 24px; /* CHIP PIÙ GRANDI */
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    color: #4b5563;
+    transition: all 0.2s ease;
+    background: #fff;
+    font-weight: 600;
+    font-size: 16px; /* Testo più grande */
+    min-width: 120px;
+}
+
+.filter-chip span:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.filter-chip input:checked + span {
+    background-color: #374151;
+    border-color: #374151;
+    color: white;
+    box-shadow: none;
+}
+
+/* --- BARRA ZOOM (Più Grande) --- */
+.zoom-bar {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Più spazio tra i tasti */
+    background: white;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    z-index: 100;
+}
+
+.zoom-btn {
+    width: 44px;  /* Tasti più grandi */
+    height: 44px;
+    border: 1px solid #eee;
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 24px; /* Icona + / - più grande */
+    font-weight: bold;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.zoom-btn:hover { background: #f0f0f0; color: #000; }
+.zoom-btn:active { background: #e0e0e0; }
+
+/* Tooltip Labels */
+.tooltip-bar-label { font-family: sans-serif; font-size: 12px; font-weight: 700; fill: #000 !important; }

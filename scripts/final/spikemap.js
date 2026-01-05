@@ -1,15 +1,16 @@
 
+
 (function() { 
     
     // --- 1. CONFIGURAZIONE PERCORSI ---
     const PATHS = {
-        geoRegion: "../../data/final/geojson/countries/UKR.json", 
-        geoDistrict: "../../data/final/geojson/dinstrict/Ukraine_ADM2.topojson",
-        geoComuni: "../../data/final/geojson/municipals/Ukraine_ADM3.topojson", 
+        geoRegion: "../../data/final/spike/region/UKR.json", 
+        geoDistrict: "../../data/final/spike/district/Ukraine_ADM2.topojson",
+        geoComuni: "../../data/final/spike/municipals/Ukraine_ADM3.topojson", 
         
-        dataRegion: "../../data/final/spikemap_ukr_regioni.csv", 
-        dataDistrict: "../../data/final/spikemap_ukr_province.csv",
-        dataComuni: "../../data/final/spikemap_ukr_comuni.csv"
+        dataRegion: "../../data/final/spike/region/spikemap_ukr_region.csv", 
+        dataDistrict: "../../data/final/spike/district/spikemap_ukr_province.csv",
+        dataComuni: "../../data/final/spike/municipals/spikemap_ukr_municipal.csv"
     };
 
     const width = 1000;
@@ -30,24 +31,41 @@
         "crimea": "krym"
     };
 
-    // --- 3. SETUP INTERFACCIA ---
+    // Helper per capitalizzare
+    const capitalize = (s) => s && s[0].toUpperCase() + s.slice(1);
+    const getCleanNameFromGeo = (geoName) => {
+        if (!geoName) return "Region";
+        const lowerGeo = geoName.toLowerCase();
+        const foundKey = Object.keys(NAME_MAPPING).find(key => lowerGeo.includes(NAME_MAPPING[key]));
+        if (foundKey) return foundKey.split(/[\s-]/).map(capitalize).join(foundKey.includes("-") ? "-" : " ");
+        return geoName;
+    };
+
+    // --- 3. SETUP INTERFACCIA (SPOSTATA SOTTO) ---
     d3.select("#back-button").remove();
     d3.select("#btn-back").remove();
 
     let controls = d3.select("#spike-controls");
+    
+    // Creazione contenitore controlli SOTTO la mappa
     if (controls.empty()) {
         const svgNode = d3.select("#spike-container").node();
         if (svgNode && svgNode.parentNode) {
-            d3.select(svgNode.parentNode)
-              .insert("div", function() { return svgNode; })
-              .attr("id", "spike-controls")
-              .attr("class", "map-controls")
-              .style("text-align", "center").style("margin-bottom", "20px");
-            controls = d3.select("#spike-controls");
+            // Inserisce il div DOPO l'elemento SVG
+            svgNode.parentNode.insertBefore(document.createElement("div"), svgNode.nextSibling);
+            
+            // Selezioniamo il div appena creato (che ora è il nextSibling dell'SVG)
+            const newDiv = d3.select(svgNode.nextSibling)
+                .attr("id", "spike-controls")
+                .attr("class", "map-controls")
+                .style("text-align", "center")
+                .style("margin-top", "25px"); // Margine per staccarlo dalla mappa
+            
+            controls = newDiv;
         }
     }
     
-    // CREAZIONE CONTROLLI
+    // CREAZIONE CONTROLLI HTML
     if (!controls.empty()) {
         controls.html(""); 
         const container = controls.append("div").attr("class", "spike-ui-container");
@@ -86,10 +104,36 @@
         lblExp.append("span").attr("class", "chip-explosions").html("Explosions");
     }
 
-    // --- 4. SETUP SVG ---
-    const svg = d3.select("#spike-container").attr("viewBox", [0, 0, width, height]).style("overflow", "visible");
+    // --- 4. SETUP SVG & ZOOM ---
+    d3.select("#spike-container").style("position", "relative");
+    const svg = d3.select("#spike-container")
+        .attr("viewBox", [0, 0, width, height])
+        .style("overflow", "hidden")
+        .style("cursor", "move");
+
     svg.selectAll("*").remove();
     const g = svg.append("g");
+
+    const zoom = d3.zoom()
+        .scaleExtent([1, 8])
+        .on("zoom", (event) => {
+            g.attr("transform", event.transform);
+            g.selectAll(".map-layer path").attr("stroke-width", 1.5 / event.transform.k);
+        });
+
+    svg.call(zoom);
+
+    // BARRA ZOOM
+    d3.select(".zoom-bar").remove();
+    const wrapper = d3.select("#spike-container").node().parentNode;
+    
+    // Nota: La barra zoom deve stare SOPRA la mappa, quindi la appendiamo al wrapper ma con position absolute
+    // Assicurati che il wrapper abbia position: relative nel CSS se non funziona
+    const zoomBar = d3.select(wrapper).append("div").attr("class", "zoom-bar");
+
+    zoomBar.append("button").attr("class", "zoom-btn").text("+").on("click", () => { svg.transition().duration(500).call(zoom.scaleBy, 1.3); });
+    zoomBar.append("button").attr("class", "zoom-btn").text("−").on("click", () => { svg.transition().duration(500).call(zoom.scaleBy, 0.7); });
+    zoomBar.append("button").attr("class", "zoom-btn").style("font-size", "14px").text("Rst").on("click", () => { svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity); });
 
     // Tooltip
     let tooltip = d3.select("body").select(".shared-tooltip");
@@ -142,10 +186,8 @@
         // Proiezione
         projection.fitSize([width, height], geoReg);
 
-        // --- CALCOLO CENTROIDI ---
-        const normalize = str => str ? String(str).toLowerCase().trim()
-            .replace(/['`’.]/g, "")
-            .replace(/\s+/g, " ") : "";
+        // --- CALCOLO CENTROIDI ROBUSTO ---
+        const normalize = str => str ? String(str).toLowerCase().trim().replace(/['`’.]/g, "").replace(/\s+/g, " ") : "";
 
         const calculateCentroids = (features, data, nameFieldData, geoPropertyName) => {
             const centroidMap = new Map();
@@ -166,10 +208,9 @@
                     
                     const match = uniqueNames.find(c => {
                         const normCsv = normalize(c);
-                        if (NAME_MAPPING[normCsv]) {
-                            return normGeo.includes(NAME_MAPPING[normCsv]);
-                        }
+                        if (NAME_MAPPING[normCsv]) return normGeo.includes(NAME_MAPPING[normCsv]);
                         if (normCsv === "kyiv" && normGeo.includes("city")) return false; 
+                        if (normCsv === "kyiv city" && !normGeo.includes("city")) return false;
                         return normCsv === normGeo || normGeo.includes(normCsv) || normCsv.includes(normGeo);
                     });
 
@@ -182,11 +223,11 @@
             return centroidMap;
         };
 
-        const regionCentroids = calculateCentroids(geoReg.features, csvRegion, "admin1", "NAME_1", "REGIONS");
-        const distCentroids = calculateCentroids(geoDist ? geoDist.features : [], csvDist, "admin2", "NAME_2", "DISTRICTS");
-        const comCentroids = calculateCentroids(geoComuni ? geoComuni.features : [], csvComuni, "admin3", "NAME_3", "COMUNI");
+        const regionCentroids = calculateCentroids(geoReg.features, csvRegion, "admin1", "NAME_1");
+        const distCentroids = calculateCentroids(geoDist ? geoDist.features : [], csvDist, "admin2", "NAME_2");
+        const comCentroids = calculateCentroids(geoComuni ? geoComuni.features : [], csvComuni, "admin3", "NAME_3");
 
-        // --- 5. DISEGNO MAPPA BASE (FISSO) ---
+        // --- 5. DISEGNO MAPPA BASE ---
         mapLayer.selectAll("path")
             .data(geoReg.features)
             .join("path")
@@ -196,14 +237,21 @@
             .attr("stroke-width", 1.5)
             .on("mouseover", function(e, d) {
                 d3.select(this).attr("fill", "#dee2e6");
-                const name = d.properties.NAME_1 || d.properties.name || "Region";
-                tooltip.style("visibility", "visible").html(`<div style="padding:4px 8px; font-weight:700; font-size:16px;">${name}</div>`);
+                // Nome Regione
+                const rawName = d.properties.NAME_1 || d.properties.name || "Region";
+                const cleanName = getCleanNameFromGeo(rawName); // Usa il mapping inverso
+                
+                tooltip.style("visibility", "visible").html(`
+                    <div style="padding:6px 10px; font-weight:700; font-size:16px; color:#333;">
+                        ${cleanName}
+                    </div>
+                `);
             })
             .on("mousemove", e => tooltip.style("top", (e.pageY-20)+"px").style("left", (e.pageX+20)+"px"))
             .on("mouseout", function() { d3.select(this).attr("fill", "#e9ecef"); tooltip.style("visibility", "hidden"); });
 
 
-        // --- 6. UPDATE FUNCTION (CON TRANSIZIONI FLUIDE) ---
+        // --- 6. UPDATE FUNCTION ---
         function updateSpikes() {
             const radioNode = d3.select('input[name="mapLevel"]:checked').node();
             const level = radioNode ? radioNode.value : "district";
@@ -258,7 +306,6 @@
                         const c = currentCentroids.get(k);
                         [px, py] = c;
                     }
-                    
                     if (px !== undefined) {
                         data.push({ name: k, value: v.val, count: v.count, details: v.dets, x: px, y: py });
                         if (v.val > maxVal) maxVal = v.val;
@@ -266,55 +313,32 @@
                 }
             });
 
-            // Disegno Spike con Animazione
             const dMax = Math.max(maxVal, 100);
             lenScale.domain([0, dMax]);
             drawLegend(dMax);
 
             const spikes = spikeLayer.selectAll(".spike-group").data(data, d => d.name);
 
-            // --- EXIT: Rimpicciolisci e rimuovi ---
+            // Exit
             const exit = spikes.exit();
-            
-            exit.select(".spike-visual")
-                .transition().duration(100)
-                .attr("d", d => spikePath(d.x, d.y, 0, SPIKE_WIDTH)) // Altezza 0
-                .attr("fill-opacity", 0);
+            exit.select(".spike-visual").transition().duration(200).attr("d", d => spikePath(d.x, d.y, 0, SPIKE_WIDTH)).attr("fill-opacity", 0);
+            exit.transition().duration(200).remove();
 
-            exit.transition().duration(100).remove();
-
-            // --- ENTER: Crea a zero e prepara ---
+            // Enter
             const enter = spikes.enter().append("g").attr("class", "spike-group");
-            
-            enter.append("path").attr("class", "spike-visual")
-                .attr("fill", "#dc3545").attr("stroke", "#8e0000").attr("stroke-width", 0.5)
-                .attr("fill-opacity", 0) // Inizia invisibile
-                .attr("d", d => spikePath(d.x, d.y, 0, SPIKE_WIDTH)); // Inizia piatto
+            enter.append("path").attr("class", "spike-visual").attr("fill", "#dc3545").attr("stroke", "#8e0000").attr("stroke-width", 0.5).attr("fill-opacity", 0).attr("d", d => spikePath(d.x, d.y, 0, SPIKE_WIDTH));
+            enter.append("path").attr("class", "spike-hitbox").attr("fill", "transparent").attr("stroke-width", 20).style("cursor", "pointer").attr("d", d => spikePath(d.x, d.y, 0, SPIKE_WIDTH));
 
-            enter.append("path").attr("class", "spike-hitbox")
-                .attr("fill", "transparent").attr("stroke-width", 20).style("cursor", "pointer")
-                .attr("d", d => spikePath(d.x, d.y, 0, SPIKE_WIDTH)); // Hitbox segue
-
-            // --- UPDATE: Unisci e Anima crescita ---
+            // Update
             const all = enter.merge(spikes);
-            
-            const getHeight = (val) => {
-                const h = lenScale(val);
-                return (h < 2 && val === 0) ? 5 : h;
-            };
+            const getHeight = (val) => { return (h = lenScale(val)) < 2 && val === 0 ? 5 : h; };
 
-            all.select(".spike-visual")
-                .transition().duration(600).ease(d3.easeCubicOut) // Transizione fluida
+            all.select(".spike-visual").transition().duration(600).ease(d3.easeCubicOut)
                 .attr("fill-opacity", 0.85)
                 .attr("d", d => spikePath(d.x, d.y, getHeight(d.value), SPIKE_WIDTH));
             
-            all.select(".spike-hitbox")
-                .attr("d", d => {
-                    let h = getHeight(d.value);
-                    return spikePath(d.x, d.y, h < 25 ? 25 : h, SPIKE_WIDTH);
-                });
+            all.select(".spike-hitbox").attr("d", d => spikePath(d.x, d.y, getHeight(d.value) < 25 ? 25 : getHeight(d.value), SPIKE_WIDTH));
 
-            // Tooltip (SENZA EVENTI)
             all.on("mouseover", (e, d) => {
                 d3.select(e.currentTarget).select(".spike-visual").attr("fill", "#a71d2a").attr("fill-opacity", 1);
                 const b = d.details["Battles"] || 0;
@@ -322,20 +346,12 @@
                 const m = Math.max(b, ex, 1);
                 
                 tooltip.style("visibility", "visible").html(`
-                    <div style="border-bottom:2px solid #ddd; font-weight:800; margin-bottom:10px; padding-bottom:5px; font-size:18px; color:#222;">
-                        ${d.name}
-                    </div>
-                    <div style="display:flex; justify-content:space-between; font-size:15px; color:#333; margin-bottom:12px;">
-                        <span>Victims:</span> <strong>${d.value.toLocaleString()}</strong>
-                    </div>
-                    <div style="font-size:12px; font-weight:600; color:#777; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">
-                        Victims Type
-                    </div>
+                    <div style="border-bottom:2px solid #ddd; font-weight:800; margin-bottom:10px; padding-bottom:5px; font-size:18px; color:#222;">${d.name}</div>
+                    <div style="display:flex; justify-content:space-between; font-size:15px; color:#333; margin-bottom:12px;"><span>Victims:</span> <strong>${d.value.toLocaleString()}</strong></div>
+                    <div style="font-size:12px; font-weight:600; color:#777; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Victims Type</div>
                     <svg width="260" height="50" style="background:#f0f0f0; border-radius:6px; margin-top:5px;">
-                        <rect x="0" y="0" width="${(b/m)*100}%" height="25" fill="#007bff"></rect>
-                        <text x="8" y="18" class="tooltip-bar-label">Bat: ${b}</text>
-                        <rect x="0" y="25" width="${(ex/m)*100}%" height="25" fill="#dc3545"></rect>
-                        <text x="8" y="43" class="tooltip-bar-label">Exp: ${ex}</text>
+                        <rect x="0" y="0" width="${(b/Math.max(b,ex,1))*100}%" height="25" fill="#007bff"></rect><text x="8" y="18" class="tooltip-bar-label">Bat: ${b}</text>
+                        <rect x="0" y="25" width="${(ex/Math.max(b,ex,1))*100}%" height="25" fill="#dc3545"></rect><text x="8" y="43" class="tooltip-bar-label">Exp: ${ex}</text>
                     </svg>
                 `);
             }).on("mousemove", e => tooltip.style("top", (e.pageY-20)+"px").style("left", (e.pageX+20)+"px"))
