@@ -83,11 +83,11 @@ Promise.all([
 
     // Helpers
     function getGeoName(d) {
-        return d.properties.name || d.properties.NAME || d.properties.admin || d.properties.sovereignt;
+        return d.properties.NAME;
     }
 
     function getGeoISO(d) {
-        return d.properties.iso_a3 || d.properties.adm0_a3 || d.properties.ISO_A3 || d.id || d.properties.ISO3;
+        return d.properties.ISO3;
     }
 
     // Function to update the main map visualization
@@ -116,8 +116,8 @@ Promise.all([
                     type: "Polygon",
                     coordinates: [[
                         [-25, 30], // Sud-Ovest (Atlantico/Canarie)
-                        [45, 30],  // Sud-Est (Medio Oriente/Caucaso)
-                        [45, 75],  // Nord-Est (Artico russo/Urali)
+                        [70, 30],  // <--- MODIFICA QUI (Era 45): Allarga il confine Est (verso il Caucaso/Russia)
+                        [70, 75],  // <--- MODIFICA QUI (Era 45): Allarga il confine Est (verso gli Urali)
                         [-25, 75], // Nord-Ovest (Islanda/Groenlandia)
                         [-25, 30]  // Chiudi il poligono
                     ]]
