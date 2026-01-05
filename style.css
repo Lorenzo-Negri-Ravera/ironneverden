@@ -291,154 +291,107 @@ h4, h5, h6 {
 
 
 /* ############spiek */
+/* --- 1. PULIZIA E LAYOUT GENERALE --- */
 
-/* --- CONTENITORE CONTROLLI --- */
-.spike-ui-container {
-    display: inline-flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: center;
-    gap: 25px; /* Spazio aumentato */
-    background: #ffffff;
-    padding: 15px 35px; /* Box più grande */
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+/* Nasconde eventuali vecchi controlli generati da JS per errore */
+#spike-controls {
+    display: none !important;
+}
+
+/* Container dei controlli statici */
+#static-spike-controls {
+    user-select: none; /* Evita che il testo venga selezionato cliccando ripetutamente */
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 16px; /* Font base più grande */
-    margin-top: 20px; /* Margine SOPRA (per staccarlo dalla mappa) */
-    box-shadow: none;
 }
 
-.ui-group {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.ui-label {
+/* Etichette LEVEL / FILTER */
+.control-label {
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: #6c757d;
     font-weight: 700;
-    color: #6b7280;
-    text-transform: uppercase;
-    font-size: 13px; /* Etichetta più leggibile */
-    letter-spacing: 0.5px;
-    margin-right: 8px;
 }
 
-/* --- SELETTORE LIVELLO (Radio) --- */
-.toggle-switch {
-    display: flex;
-    background: #f3f4f6;
-    border-radius: 8px;
-    padding: 4px; /* Più spazio interno */
-}
+/* --- 2. STILE BOTTONI (RADIO & CHECKBOX) --- */
 
-.toggle-option {
-    position: relative;
+/* L'elemento <label> che funge da contenitore clikkabile */
+.spike-btn {
     cursor: pointer;
     margin: 0;
 }
 
-.toggle-option input { display: none; }
+/* Nascondiamo il vero input (il pallino o la spunta di default) */
+.spike-btn input {
+    display: none;
+}
 
-.toggle-option span {
-    display: block;
-    padding: 10px 24px; /* BOTTONI MOLTO PIÙ GRANDI */
-    border-radius: 6px;
-    color: #6b7280;
-    transition: all 0.2s ease;
+/* L'aspetto visivo del bottone (lo SPAN) */
+.spike-btn span {
+    display: inline-block;
+    padding: 8px 18px;          /* Spaziatura interna */
+    background-color: #fff;     /* Sfondo bianco di base */
+    border: 1px solid #dee2e6;  /* Bordo grigio chiaro */
+    border-radius: 4px;         /* Angoli leggermente smussati */
+    color: #333;                /* Testo scuro */
+    font-size: 14px;
     font-weight: 600;
-    font-size: 16px; /* Testo più grande */
+    transition: all 0.2s ease-in-out; /* Animazione fluida */
 }
 
-.toggle-option span:hover { color: #111; }
-
-.toggle-option input:checked + span {
-    background: #ffffff;
-    color: #111827;
-    font-weight: 700;
-    border: 1px solid #d1d5db;
-    box-shadow: none;
+/* Stato ATTIVO: Quando l'input è selezionato (Checked) */
+.spike-btn input:checked + span {
+    background-color: #343a40;  /* Grigio Scuro (Bootstrap Dark) */
+    color: #fff;                /* Testo bianco */
+    border-color: #343a40;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15); /* Leggera ombra */
 }
 
-/* --- SEPARATORE --- */
-.ui-separator {
-    width: 1px;
-    height: 35px; /* Più alto */
-    background: #e5e7eb;
-    margin: 0 15px;
+/* Stato HOVER: Quando passi il mouse sopra (su bottone inattivo) */
+.spike-btn:hover span {
+    background-color: #f8f9fa;
+    border-color: #c6c7c8;
 }
 
-/* --- FILTRI (Checkbox) --- */
-.filter-chip {
-    cursor: pointer;
-    position: relative;
-    margin: 0;
+/* Stato HOVER su ATTIVO: Quando passi sopra un bottone già selezionato */
+.spike-btn input:checked:hover + span {
+    background-color: #23272b; /* Diventa ancora più scuro */
+    border-color: #1d2124;
 }
 
-.filter-chip input { display: none; }
+/* --- 3. STILE BARRA ZOOM --- */
 
-.filter-chip span {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 24px; /* CHIP PIÙ GRANDI */
-    border-radius: 6px;
-    border: 1px solid #d1d5db;
-    color: #4b5563;
-    transition: all 0.2s ease;
-    background: #fff;
-    font-weight: 600;
-    font-size: 16px; /* Testo più grande */
-    min-width: 120px;
-}
-
-.filter-chip span:hover {
-    background: #f9fafb;
-    border-color: #9ca3af;
-}
-
-.filter-chip input:checked + span {
-    background-color: #374151;
-    border-color: #374151;
-    color: white;
-    box-shadow: none;
-}
-
-/* --- BARRA ZOOM (Più Grande) --- */
 .zoom-bar {
-    position: absolute;
+    position: absolute; /* FONDAMENTALE: Posiziona la barra sopra la mappa */
     top: 20px;
     right: 20px;
     display: flex;
     flex-direction: column;
-    gap: 8px; /* Più spazio tra i tasti */
+    gap: 5px;
     background: white;
-    padding: 8px;
-    border-radius: 8px;
+    padding: 5px;
+    border-radius: 6px;
     border: 1px solid #ccc;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    z-index: 100;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    z-index: 100; /* Assicura che stia sopra al grafico SVG */
 }
 
 .zoom-btn {
-    width: 44px;  /* Tasti più grandi */
-    height: 44px;
+    width: 30px; 
+    height: 30px;
     border: 1px solid #eee;
     background: #fff;
-    border-radius: 6px;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 24px; /* Icona + / - più grande */
     font-weight: bold;
     color: #333;
-    display: flex;
-    align-items: center;
+    display: flex; 
+    align-items: center; 
     justify-content: center;
     transition: all 0.2s;
+    font-size: 18px; /* Dimensione del + e - */
 }
 
-.zoom-btn:hover { background: #f0f0f0; color: #000; }
-.zoom-btn:active { background: #e0e0e0; }
-
-/* Tooltip Labels */
-.tooltip-bar-label { font-family: sans-serif; font-size: 12px; font-weight: 700; fill: #000 !important; }
+.zoom-btn:hover { 
+    background: #f0f0f0; 
+    color: #000;
+}

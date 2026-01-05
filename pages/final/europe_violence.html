@@ -5,34 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ukraine-Russia Conflict Study</title>
 
-     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">    
     
     <link rel="stylesheet" href="../../style.css"> 
     <link rel="icon" href="./favicon.ico">
+
+   
 
 </head>
 
 <body>
     <div class="container bg-white shadow-sm rounded py-4">
+        
         <header class="text-center border-bottom pb-4 mb-5 px-4">
             <h1 class="display-4">Conflict and Human Suffering</h1>
             <div class="team-members">
                 <h2>IronNeverden</h2>
-
-                <p><em>
-                    Luca Barbati, Lorenzo Negri Ravera, Tommaso Viotti
-                </em></p>
+                <p><em>Luca Barbati, Lorenzo Negri Ravera, Tommaso Viotti</em></p>
             </div>
         </header>
 
         <main>
+            
             <section id="geo-section" class="text-center">
-                <div class="text-container">
-                    <p></p> 
-                </div>
+                <div class="text-container"><p></p></div>
 
                 <div id="map-wrapper" style="position: relative; display: block; width: 100%; max-width: 1000px; margin: 0 auto;">
-                    
                     <div class="map-filters">
                         <div class="filter-item">
                             <label for="select-event">Event Type</label>
@@ -40,7 +38,6 @@
                                 <option value="All">All Events</option>
                             </select>
                         </div>
-                        
                         <div class="filter-item">
                             <label for="select-year">Year</label>
                             <select id="select-year">
@@ -48,29 +45,26 @@
                             </select>
                         </div>
                     </div>
-
                     <svg id="geo-container"></svg>
                 </div>
-
-                <div class="text-container mt-5">
-                    <p></p>
-                </div>
+                <div class="text-container mt-5"><p></p></div>
             </section>
 
 
-            <section id="front-map-section" class="text-center">
+            <section id="front-map-section" class="text-center border-top pt-5 mt-5">
                 <div id="tooltip" style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 4px; pointer-events: none; font-family: Arial; font-size: 12px; z-index: 10;"></div>
                 
                 <div id="front-map-container" style="width: 100%; max-width: 1000px; margin: 0 auto;"></div>
                 
-                <div id="filter-container" style="text-align: center; margin-bottom: 10px;">
-                    <button class="filter-btn active" data-type="all">Tutti gli eventi</button>
-                    <button class="filter-btn" data-type="Battles">Battaglie</button>
-                    <button class="filter-btn" data-type="Explosions/Remote violence">Esplosioni/Artiglieria</button>
+                <div id="filter-container" style="text-align: center; margin-bottom: 10px; margin-top: 20px;">
+                    <button class="filter-btn active" data-type="all">All events</button>
+                    <button class="filter-btn" data-type="Battles">Battles</button>
+                    <button class="filter-btn" data-type="Explosions/Remote violence">Explosions</button>
                 </div>
                 <div id="controls" style="text-align: center; margin-top: 20px; font-family: sans-serif;">
                     <button id="play-button" style="padding: 10px 20px; font-size: 16px;">Play</button>
                     <input type="range" id="time-slider" style="width: 60%; margin: 0 15px;">
+                    <span id="current-date-display" style="font-weight: bold; margin-left: 10px;"></span>
                 </div>
             </section>
             
@@ -84,11 +78,46 @@
                     </p> 
                 </div>
 
-                <div class="map-wrapper border rounded bg-light p-2" style="position: relative; overflow: hidden; width: 100%; max-width: 1000px; margin: 0 auto;">
-                    <svg id="spike-container" style="width: 100%; height: auto; min-height: 600px; overflow: visible;"></svg>
+                <div class="map-wrapper border rounded bg-light p-2" style="position: relative; overflow: hidden; width: 100%; max-width: 1000px; margin: 0 auto; height: 650px;">
+                    <svg id="spike-container" style="width: 100%; height: 100%; overflow: visible;"></svg>
+                    </div>
+
+                <div id="static-spike-controls" class="d-flex justify-content-center align-items-center flex-wrap gap-4 mt-4 mb-4">
+                    
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="control-label fw-bold text-uppercase me-2">LEVEL:</span>
+                        
+                        <label class="spike-btn">
+                            <input type="radio" name="mapLevel" value="region">
+                            <span>Regions</span>
+                        </label>
+                        <label class="spike-btn">
+                            <input type="radio" name="mapLevel" value="district" checked>
+                            <span>Districts</span>
+                        </label>
+                        <label class="spike-btn">
+                            <input type="radio" name="mapLevel" value="comuni">
+                            <span>Municipals</span>
+                        </label>
+                    </div>
+
+                    <div class="vr mx-3 text-muted" style="height: 20px;"></div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="control-label fw-bold text-uppercase me-2">FILTER:</span>
+
+                        <label class="spike-btn">
+                            <input type="checkbox" id="check-battles" checked>
+                            <span>Battles</span>
+                        </label>
+                        <label class="spike-btn">
+                            <input type="checkbox" id="check-explosions" checked>
+                            <span>Explosions</span>
+                        </label>
+                    </div>
                 </div>
 
-                <div class="text-container mt-3">
+                <div class="text-container mt-2">
                     <small class="text-muted">Passa il cursore sulle punte rosse per visualizzare i dettagli numerici.</small>
                 </div>
             </section>
@@ -98,9 +127,9 @@
                 <div class="chart-container" style="width: 100%; max-width: 1000px; margin: 0 auto;">
                     <h2 class="text-center mb-4">Andamento Indice Prezzi Cibo (FAO)</h2>
                     
-                    <div id="chart-controls-inner" class="controls-container"></div>
-                    
                     <div id="chart"></div>
+                    
+                    <div id="chart-controls-inner" class="controls-container"></div>
                     
                     <div id="chart-tooltip"></div>
                 </div>
@@ -115,9 +144,9 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://unpkg.com/topojson@3"></script> 
+    
     <script src="../../scripts/final/utils.js"></script>
     <script src="../../scripts/final/map.js"></script>
     <script src="../../scripts/final/front_map.js"></script>

@@ -43,9 +43,19 @@ Promise.all([
     allBattlesData.sort((a, b) => a.date - b.date);
     const days = d3.timeDays(d3.min(allBattlesData, d => d.date), d3.max(allBattlesData, d => d.date));
 
-    // --- 4. SETUP CONTENITORI (ORDINE INVERTITO PER LIVELLI) ---
+    // --- 4. SETUP CONTENITORI ---
     const container = d3.select("#front-map-container");
-    container.style("position", "relative").style("width", width + "px").style("height", height + "px");
+    
+    // Stile "Card" (Sfondo grigio, bordo, radius)
+    container
+        .style("position", "relative") // Necessario per posizionare la zoom bar assoluta
+        .style("width", width + "px")
+        .style("height", height + "px")
+        .style("background-color", "#f8f9fa") 
+        .style("border", "1px solid #dee2e6")  
+        .style("border-radius", "8px")         
+        .style("margin", "0 auto")
+        .style("overflow", "hidden"); // Evita che mappa esca dai bordi arrotondati
 
     // A. SVG PER LA MAPPA (LIVELLO SOTTO - z-index: 1)
     const svg = container.append("svg")
@@ -58,10 +68,18 @@ Promise.all([
     const mapGroup = svg.append("g");
     const pathGenerator = d3.geoPath().projection(projection);
 
+    // Colori Mappa
     mapGroup.append("g").selectAll("path").data(ukrGeo.features).join("path")
-        .attr("d", pathGenerator).attr("fill", "#d9d9d9").attr("stroke", "#ffffff").attr("stroke-width", 0.5);
+        .attr("d", pathGenerator)
+        .attr("fill", "#e9ecef")       
+        .attr("stroke", "#ffffff")     
+        .attr("stroke-width", 1.5);    
+
     mapGroup.append("g").selectAll("path").data(rusFeatures).join("path")
-        .attr("d", pathGenerator).attr("fill", "#f0f0f0").attr("stroke", "#ffffff").attr("stroke-width", 0.5);
+        .attr("d", pathGenerator)
+        .attr("fill", "#e9ecef")       
+        .attr("stroke", "#ffffff")
+        .attr("stroke-width", 1.5);
 
     // B. CANVAS PER I PUNTI (LIVELLO SOPRA - z-index: 2)
     const canvas = container.append("canvas")
@@ -71,7 +89,7 @@ Promise.all([
         .style("top", 0)
         .style("left", 0)
         .style("z-index", 2)
-        .style("pointer-events", "none"); // Importante: i click passano all'SVG sotto per lo zoom
+        .style("pointer-events", "none"); 
     
     const ctx = canvas.node().getContext("2d");
 
@@ -123,7 +141,7 @@ Promise.all([
         render();
     }
 
-    // --- 6. INTERAZIONI (Attaccate all'SVG) ---
+    // --- 6. INTERAZIONI E ZOOM ---
     const zoom = d3.zoom()
         .scaleExtent([1, 25])
         .on("zoom", (event) => {
@@ -132,6 +150,39 @@ Promise.all([
             render();
         });
     svg.call(zoom);
+
+    // --- MODIFICA: BARRA ZOOM ---
+    // Rimuoviamo eventuali barre precedenti
+    container.selectAll(".zoom-bar").remove();
+
+    // Creiamo la barra DENTRO al container (che ha position: relative)
+    // Usiamo le stesse classi CSS 'zoom-bar' e 'zoom-btn' della Spike Map
+    const zoomBar = container.append("div")
+        .attr("class", "zoom-bar")
+        .style("position", "absolute")
+        .style("top", "20px")   // Posizione in alto a destra
+        .style("right", "20px")
+        .style("z-index", "10") // Assicura che stia sopra al canvas (che è z-index: 2)
+        .style("display", "flex")
+        .style("flex-direction", "column")
+        .style("gap", "5px");
+
+    zoomBar.append("button")
+        .attr("class", "zoom-btn")
+        .text("+")
+        .on("click", () => { svg.transition().duration(500).call(zoom.scaleBy, 1.3); });
+    
+    zoomBar.append("button")
+        .attr("class", "zoom-btn")
+        .text("−")
+        .on("click", () => { svg.transition().duration(500).call(zoom.scaleBy, 0.7); });
+    
+    zoomBar.append("button")
+        .attr("class", "zoom-btn")
+        .style("font-size", "14px")
+        .text("Rst")
+        .on("click", () => { svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity); });
+
 
     // Bottoni Filtro
     d3.selectAll(".filter-btn").on("click", function() {
@@ -166,5 +217,20 @@ Promise.all([
     });
 
     updateVisibleData();
+
+    // --- BOTTONE AIUTO ---
+    if (typeof setupHelpButton === "function") {
+        setupHelpButton(svg, width, height, {
+            x: 30, // Posizione X (Basso Sinistra)
+            y: height - 30, // Posizione Y (Basso Sinistra)
+            title: "How to read the Front Line Map",
+            instructions: [
+                "1. Use the Time Slider or Play button to navigate through time.",
+                "2. Red dots indicate Battles, Yellow dots indicate Explosions.",
+                "3. Use the Zoom buttons on the top-right.",
+                "4. Filter events using the buttons above the map."
+            ]
+        });
+    }
 
 }).catch(err => console.error(err));
