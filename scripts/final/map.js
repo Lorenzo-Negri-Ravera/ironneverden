@@ -165,6 +165,7 @@ Promise.all([
             })
             .on("click", (event, d) => {
                 const isoCode = getGeoISO(d);
+                console.log("Clicked ISO:", isoCode);
                 const name = getGeoName(d);
                 
                 if (!isZoomed && isoCode) {
