@@ -1,6 +1,6 @@
 // File: geoChoropleth.js 
 
-const GENERAL_GEOJSON_PATH = "../../data/final/geojson/europe.geojson";
+const GENERAL_GEOJSON_PATH = "../../data/final/geojson/europe_crop.geojson";
 const COUNTRIES_EVENTS_PATH = "../../data/final/df_country_summary.json";
 const ADMIN_EVENTS_PATH = "../../data/final/df_admin_summary.json";
 
@@ -33,9 +33,12 @@ Promise.all([
         .style("font-weight", "bold")
         .text("Disorders in Europe");
 
-    // Map setup (Global Projection for Europe)
-    const projection = d3.geoMercator();
+    // --- FIX PROIEZIONE ---
+    // Usiamo geoIdentity invece di geoMercator.
+    // Questo risolve il problema del "Quadrato Arancione Gigante" (Winding Order).
+    const projection = d3.geoIdentity().reflectY(true);
     const pathGenerator = d3.geoPath().projection(projection);
+    
     const mapGroup = svg.append("g").attr("transform", `translate(0, ${marginTop})`);
     
     const overlay = svg.append("rect")
@@ -76,30 +79,55 @@ Promise.all([
 
     // Variable to track zoom state
     let isZoomed = false;
-
-    // Cache for loaded geojsons
     const geoCache = new Map();
+
+    // Helpers
+    function getGeoName(d) {
+        return d.properties.name || d.properties.NAME || d.properties.admin || d.properties.sovereignt;
+    }
+
+    function getGeoISO(d) {
+        return d.properties.iso_a3 || d.properties.adm0_a3 || d.properties.ISO_A3 || d.id;
+    }
 
     // Function to update the main map visualization
     function updateVisualization() {
         const selYear = yearSelect.property("value");
         const selEvent = eventSelect.property("value");
 
-        // Filter data and event based on selections
         const filtered = country_data.filter(d => {
             const y = getYear(d);
             return (selYear === "All" || (y && y.toString() === selYear)) &&
                    (selEvent === "All" || d.EVENT_TYPE === selEvent);
         });
 
-        // Compute counts per country
         const countsMap = d3.rollup(filtered, v => d3.sum(v, d => getEvents(d)), d => d.COUNTRY);
         colorScale.domain([0, d3.max(Array.from(countsMap.values())) || 1]);
 
-        // Adjust projection for the visualization (Main Europe Map)
-        projection.fitExtent([[10, 10], [width * 0.7, height - 100]], geojson);
+        // --- FIX ZOOM EUROPA ---
+        // Invece di adattare la vista su tutto il geojson (che include la Russia asiatica),
+        // creiamo un poligono invisibile che rappresenta i confini dell'Europa "visiva"
+        // (dal Portogallo agli Urali) e diciamo alla proiezione di adattarsi a quello.
+        const europeFocus = {
+            type: "FeatureCollection",
+            features: [{
+                type: "Feature",
+                geometry: {
+                    type: "Polygon",
+                    coordinates: [[
+                        [-25, 30], // Sud-Ovest (Atlantico/Canarie)
+                        [45, 30],  // Sud-Est (Medio Oriente/Caucaso)
+                        [45, 75],  // Nord-Est (Artico russo/Urali)
+                        [-25, 75], // Nord-Ovest (Islanda/Groenlandia)
+                        [-25, 30]  // Chiudi il poligono
+                    ]]
+                }
+            }]
+        };
 
-        // Draw countries
+    // Adatta la proiezione al riquadro dell'Europa, non a tutto il mondo
+    projection.fitExtent([[10, 10], [width * 0.9, height - 100]], europeFocus);
+
         const countries = mapGroup.selectAll("path")
             .data(geojson.features)
             .join("path")
@@ -108,20 +136,20 @@ Promise.all([
             .attr("stroke-width", 0.5)
             .style("cursor", "pointer");
 
-        // Apply colors with transition
         countries.transition().duration(400)
             .attr("fill", d => {
-                const c = countsMap.get(d.properties.NAME) || 0;
+                const name = getGeoName(d);
+                const c = countsMap.get(name) || 0;
                 return c > 0 ? colorScale(c) : "#eee";
             });
 
-        // Interactivity part
         countries
             .on("mouseover", function(event, d) {
-                const count = countsMap.get(d.properties.NAME) || 0;
+                const name = getGeoName(d);
+                const count = countsMap.get(name) || 0;
                 d3.select(this).attr("fill", "orange").attr("stroke", "#000").attr("stroke-width", 1);
                 tooltip.style("opacity", 1)
-                    .html(`<strong>Country:</strong> ${d.properties.NAME}<br><strong>#Events:</strong> ${count}`)
+                    .html(`<strong>Country:</strong> ${name}<br><strong>#Events:</strong> ${count}`)
                     .style("left", (event.pageX + 15) + "px")
                     .style("top", (event.pageY - 15) + "px");
             })
@@ -129,18 +157,18 @@ Promise.all([
                 tooltip.style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 15) + "px");
             })
             .on("mouseout", function(event, d) {
-                const count = countsMap.get(d.properties.NAME) || 0;
+                const name = getGeoName(d);
+                const count = countsMap.get(name) || 0;
                 d3.select(this).attr("stroke", "#fff").attr("stroke-width", 0.5)
                     .attr("fill", count > 0 ? colorScale(count) : "#eee");
                 tooltip.style("opacity", 0);
             })
             .on("click", (event, d) => {
-                // Support multiple standard ISO property names
-                const isoCode = d.properties.ISO3 || d.properties.ISO_A3 || d.id;
-                console.log("Clicked on:", d.properties.NAME, "Code:", isoCode);
+                const isoCode = getGeoISO(d);
+                const name = getGeoName(d);
                 
                 if (!isZoomed && isoCode) {
-                    loadDetail(isoCode, d.properties.NAME);
+                    loadDetail(isoCode, name);
                 }
             });
     }
@@ -148,19 +176,18 @@ Promise.all([
     // Function to load country detail
     function loadDetail(iso, countryName) {
         d3.select(".map-filters").style("visibility", "hidden");
-        
-        // FIX: Aggiornato percorso ed estensione a .geojson
-        const path = `../../data/final/geojson/countriesv2/${iso}.geojson`;
+        const upperISO = iso.toUpperCase();
+        const path = `../../data/final/geojson/countriesv2/${upperISO}.geojson`;
 
-        if (geoCache.has(iso)) {
-            renderCountryDetail(geoCache.get(iso), countryName);
+        if (geoCache.has(upperISO)) {
+            renderCountryDetail(geoCache.get(upperISO), countryName);
         } else {
             d3.json(path).then(detailGeojson => {
-                geoCache.set(iso, detailGeojson);
+                geoCache.set(upperISO, detailGeojson);
                 renderCountryDetail(detailGeojson, countryName);
             }).catch(err => {
                 console.error("Loading error:", path, err);
-                alert("Regional data not found for: " + countryName + " (Code: " + iso + ")");
+                alert("Regional data missing for: " + countryName);
                 d3.select(".map-filters").style("visibility", "visible");
             });
         }
@@ -169,43 +196,20 @@ Promise.all([
     // Function to render country detail view
     function renderCountryDetail(geo, name) {
         isZoomed = true;
-
-        // Show overlay and detail group
         overlay.style("display", "block").style("opacity", 1);
         detailGroup.selectAll("*").remove();
         detailGroup.style("display", "block").style("opacity", 1);
 
-        // --- FIX CRUCIALE: USARE GEOIDENTITY ---
-        // geoIdentity tratta la mappa come un disegno piatto 2D, non come una sfera.
-        // Questo risolve il problema del "Winding Order" (il quadrato gigante)
-        // e risolve il problema del "puntino piccolo" perché fitExtent funziona sempre sui dati grezzi.
         const localProjection = d3.geoIdentity().reflectY(true);
-        
         const localPath = d3.geoPath().projection(localProjection);
 
-        // Pulizia dati (manteniamo il filtro per sicurezza, ma geoIdentity è molto più tollerante)
-        const europeanFeatures = geo.features.filter(d => {
-            if (!d.geometry) return false;
-            // Calcolo baricentro geometrico semplice
-            const centroid = d3.geoCentroid(d); 
-            const lon = centroid[0];
-            const lat = centroid[1];
-            return lat > 25 && lat < 75 && lon > -35 && lon < 50;
-        });
+        // Basic Filter logic for detail
+        const featuresToUse = geo.features; // Use raw features for now
 
-        // Usa le feature filtrate o tutto se il filtro fallisce
-        const featuresToUse = europeanFeatures.length > 0 ? europeanFeatures : geo.features;
-
-        const cleanGeo = {
-            type: "FeatureCollection",
-            features: featuresToUse
-        };
-
-        // Adatta la proiezione identity al riquadro disponibile
-        // geoIdentity calcolerà automaticamente la scala corretta per riempire lo schermo
+        const cleanGeo = { type: "FeatureCollection", features: featuresToUse };
         localProjection.fitExtent([[120, 50], [width * 0.75, height - 150]], cleanGeo);
 
-        // --- Logica Dati (invariata) ---
+        // Data logic
         const selYear = yearSelect.property("value");
         const selEvent = eventSelect.property("value");
 
@@ -219,7 +223,6 @@ Promise.all([
         const adminMax = d3.max(Array.from(adminCounts.values())) || 1;
         const adminColor = d3.scaleSqrt().domain([0, adminMax]).range(["#fff5f0", "#99000d"]);
 
-        // --- Disegno Elementi ---
         detailGroup.append("text")
             .attr("x", width/2).attr("y", 40)
             .attr("text-anchor", "middle").attr("fill", "white")
@@ -237,7 +240,7 @@ Promise.all([
         g.selectAll("path")
             .data(cleanGeo.features)
             .join("path")
-            .attr("d", localPath) // Usa il path generator collegato a geoIdentity
+            .attr("d", localPath)
             .attr("stroke", "#444")
             .attr("fill", d => {
                 const reg = d.properties.NAME_1 || d.properties.name || d.properties.COUNTRY;
@@ -264,22 +267,20 @@ Promise.all([
                 tooltip.style("opacity", 0);
             });
     }
-    // Function to close detail view
+
     function closeDetail() {
         isZoomed = false;
         overlay.style("display", "none");
         detailGroup.style("display", "none");
         d3.select(".map-filters").style("visibility", "visible");
         tooltip.style("opacity", 0);
-        updateVisualization(); // Ridisegna la mappa principale se necessario
+        updateVisualization(); 
     }
 
-    // Initial visualization
     yearSelect.on("change", updateVisualization);
     eventSelect.on("change", updateVisualization);
     updateVisualization();
 
-    // --- HOW TO READ THE CHART? ---
     if (typeof setupHelpButton === "function") {
          setupHelpButton(svg, width, height, {
             x: 30,
