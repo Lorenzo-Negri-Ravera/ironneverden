@@ -1,6 +1,6 @@
 // File: geoChoropleth.js 
 
-const GENERAL_GEOJSON_PATH = "../../data/final/geojson/europe_crop.geojson";
+const GENERAL_GEOJSON_PATH = "../../data/final/geojson/europe3.geojson";
 const COUNTRIES_EVENTS_PATH = "../../data/final/df_country_summary.json";
 const ADMIN_EVENTS_PATH = "../../data/final/df_admin_summary.json";
 
@@ -87,7 +87,7 @@ Promise.all([
     }
 
     function getGeoISO(d) {
-        return d.properties.iso_a3 || d.properties.adm0_a3 || d.properties.ISO_A3 || d.id;
+        return d.properties.iso_a3 || d.properties.adm0_a3 || d.properties.ISO_A3 || d.id || d.properties.ISO3;
     }
 
     // Function to update the main map visualization
