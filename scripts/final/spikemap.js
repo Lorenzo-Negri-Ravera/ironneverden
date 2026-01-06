@@ -11,7 +11,7 @@
     };
     const width = 1000;
     const height = 650;
-    const SPIKE_WIDTH = 8; 
+    const SPIKE_WIDTH = 8; // Larghezza base della spike
 
     // --- 2. HELPERS ---
     const NAME_MAPPING = {
@@ -35,8 +35,8 @@
         return geoName;
     };
 
-    // --- 3. PULIZIA VECCHI ELEMENTI (Se presenti per errore) ---
-    d3.select("#spike-controls").remove(); // Rimuove vecchi controlli JS se esistono
+    // --- 3. PULIZIA VECCHI ELEMENTI ---
+    d3.select("#spike-controls").remove();
 
     // --- 4. SETUP SVG & ZOOM ---
     d3.select("#spike-container").style("position", "relative");
@@ -48,22 +48,18 @@
     svg.selectAll("*").remove();
     const g = svg.append("g");
 
-    const zoom = d3.zoom()
-        .scaleExtent([1, 8])
-        .on("zoom", (event) => {
-            g.attr("transform", event.transform);
-            g.selectAll(".map-layer path").attr("stroke-width", 1.5 / event.transform.k);
-        });
+    // Inizializziamo lo zoom, ma definiremo il comportamento .on("zoom") dopo aver caricato i dati
+    const zoom = d3.zoom().scaleExtent([1, 8]);
 
     svg.call(zoom);
 
-    // --- BARRA ZOOM (JS la inserisce nel wrapper grigio) ---
+    // --- BARRA ZOOM ---
     d3.select(".zoom-bar-spike").remove();
     const wrapper = d3.select("#spike-container").node().parentNode;
-    d3.select(wrapper).style("position", "relative"); // Sicurezza
+    d3.select(wrapper).style("position", "relative");
 
     const zoomBar = d3.select(wrapper).append("div")
-        .attr("class", "zoom-bar zoom-bar-spike") // Classe specifica per evitare conflitti
+        .attr("class", "zoom-bar zoom-bar-spike")
         .style("position", "absolute")
         .style("top", "20px")
         .style("right", "20px")
@@ -106,6 +102,9 @@
         d3.csv(PATHS.dataDistrict), 
         d3.csv(PATHS.dataComuni)
     ]).then(([geoReg, topoDist, geoComuniRaw, csvRegion, csvDist, csvComuni]) => {
+
+        // --- Variabile per tracciare lo zoom corrente ---
+        let currentK = 1; 
 
         // Geometrie
         const getGeo = (topo) => (topo && topo.type === "Topology") ? topojson.feature(topo, topo.objects[Object.keys(topo.objects)[0]]) : topo;
@@ -158,9 +157,40 @@
             .on("mousemove", e => tooltip.style("top", (e.pageY-20)+"px").style("left", (e.pageX+20)+"px"))
             .on("mouseout", function() { d3.select(this).attr("fill", "#e9ecef"); tooltip.style("visibility", "hidden"); });
 
+        // --- Helper per disegnare la Spike ---
+        function spikePath(x, y, h, w) { return `M${x-w/2},${y} L${x},${y-h} L${x+w/2},${y} Z`; }
+        function getHeight(val) { const h = lenScale(val); return (h < 2 && val === 0) ? 5 : h; }
+
+        // --- GESTIONE ZOOM PROPORZIONALE ---
+        // Definiamo il comportamento dello zoom QUI, dove abbiamo accesso ai dati e alle funzioni spike
+        zoom.on("zoom", (event) => {
+            currentK = event.transform.k; // Aggiorna il fattore di zoom
+            
+            // 1. Trasforma il contenitore mappa
+            g.attr("transform", event.transform);
+            
+            // 2. Assottiglia i bordi dei distretti/regioni
+            g.selectAll(".map-layer path").attr("stroke-width", 1.5 / currentK);
+
+            // 3. Ridisegna le spike "al volo" per mantenerle sottili
+            // Calcoliamo la nuova larghezza: Larghezza Base / Fattore Zoom
+            const scaledWidth = SPIKE_WIDTH / currentK;
+
+            spikeLayer.selectAll(".spike-group").each(function(d) {
+                const h = getHeight(d.value);
+                
+                // Aggiorna parte visiva (triangolo rosso)
+                d3.select(this).select(".spike-visual")
+                    .attr("d", spikePath(d.x, d.y, h, scaledWidth));
+                
+                // Aggiorna hitbox (area invisibile cliccabile) - minimo 5px o scala proporzionale
+                d3.select(this).select(".spike-hitbox")
+                    .attr("d", spikePath(d.x, d.y, h < 25 ? 25 : h, Math.max(scaledWidth, 5/currentK))); 
+            });
+        });
+
         // --- UPDATE FUNCTION ---
         function updateSpikes() {
-            // Lettura input da HTML statico
             const radioNode = d3.select('input[name="mapLevel"]:checked').node();
             const level = radioNode ? radioNode.value : "district";
             const showBat = d3.select("#check-battles").property("checked");
@@ -206,20 +236,33 @@
             lenScale.domain([0, dMax]);
             drawLegend(dMax);
 
+            // Larghezza calcolata in base allo zoom attuale
+            const currentSpikeWidth = SPIKE_WIDTH / currentK;
+
             const spikes = spikeLayer.selectAll(".spike-group").data(data, d => d.name);
             const exit = spikes.exit();
-            exit.select(".spike-visual").transition().duration(200).attr("d", d => spikePath(d.x, d.y, 0, SPIKE_WIDTH)).attr("fill-opacity", 0);
+            exit.select(".spike-visual")
+                .transition().duration(200)
+                .attr("d", d => spikePath(d.x, d.y, 0, currentSpikeWidth)) // Si restringe usando width attuale
+                .attr("fill-opacity", 0);
             exit.transition().duration(200).remove();
 
             const enter = spikes.enter().append("g").attr("class", "spike-group");
-            enter.append("path").attr("class", "spike-visual").attr("fill", "#dc3545").attr("stroke", "#8e0000").attr("stroke-width", 0.5).attr("fill-opacity", 0).attr("d", d => spikePath(d.x, d.y, 0, SPIKE_WIDTH));
-            enter.append("path").attr("class", "spike-hitbox").attr("fill", "transparent").attr("stroke-width", 20).style("cursor", "pointer").attr("d", d => spikePath(d.x, d.y, 0, SPIKE_WIDTH));
+            enter.append("path").attr("class", "spike-visual")
+                .attr("fill", "#dc3545").attr("stroke", "#8e0000").attr("stroke-width", 0.5).attr("fill-opacity", 0)
+                .attr("d", d => spikePath(d.x, d.y, 0, currentSpikeWidth));
+            enter.append("path").attr("class", "spike-hitbox")
+                .attr("fill", "transparent").attr("stroke-width", 20).style("cursor", "pointer")
+                .attr("d", d => spikePath(d.x, d.y, 0, currentSpikeWidth));
 
             const all = enter.merge(spikes);
-            const getHeight = (val) => { return (h = lenScale(val)) < 2 && val === 0 ? 5 : h; };
 
-            all.select(".spike-visual").transition().duration(600).ease(d3.easeCubicOut).attr("fill-opacity", 0.85).attr("d", d => spikePath(d.x, d.y, getHeight(d.value), SPIKE_WIDTH));
-            all.select(".spike-hitbox").attr("d", d => spikePath(d.x, d.y, getHeight(d.value) < 25 ? 25 : getHeight(d.value), SPIKE_WIDTH));
+            all.select(".spike-visual").transition().duration(600).ease(d3.easeCubicOut)
+                .attr("fill-opacity", 0.85)
+                .attr("d", d => spikePath(d.x, d.y, getHeight(d.value), currentSpikeWidth));
+
+            all.select(".spike-hitbox")
+                .attr("d", d => spikePath(d.x, d.y, getHeight(d.value) < 25 ? 25 : getHeight(d.value), currentSpikeWidth));
 
             all.on("mouseover", (e, d) => {
                 d3.select(e.currentTarget).select(".spike-visual").attr("fill", "#a71d2a").attr("fill-opacity", 1);
@@ -242,6 +285,7 @@
             const steps = [{l:"0-100",v:100}, {l:"1k-5k",v:5000}];
             if (mx > 7500) steps.push({l: d3.format(".1s")(mx), v: mx});
             let cx = 0;
+            // La legenda NON deve scalare con lo zoom, usiamo SPIKE_WIDTH fisso
             steps.forEach(s => {
                 if (s.v <= mx || (s.v===5000 && mx>=1000)) {
                     const h = lenScale(s.v) * 0.6; 
@@ -252,8 +296,6 @@
             });
             g.append("text").attr("x",0).attr("y",30).text("Victims (Spike height)").attr("font-size","14px").attr("font-weight","bold").attr("fill","#333").attr("font-family", "sans-serif");
         }
-
-        function spikePath(x, y, h, w) { return `M${x-w/2},${y} L${x},${y-h} L${x+w/2},${y} Z`; }
 
         // --- ASSEGNAZIONE EVENTI AI BOTTONI STATICI ---
         d3.selectAll('input[name="mapLevel"]').on("change", updateSpikes);
