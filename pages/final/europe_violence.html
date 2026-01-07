@@ -27,10 +27,13 @@
 
         <main>
             
-            <section id="geo-section" class="text-center">
+           <section id="geo-section" class="text-center">
                 <div class="text-container"><p></p></div>
 
-                <div id="map-wrapper" style="position: relative; display: block; width: 100%; max-width: 1000px; margin: 0 auto;">
+                <div id="map-wrapper" style="position: relative; display: block; width: 100%; max-width: 1000px; margin: 0 auto; overflow: hidden;">
+                    
+                    <svg id="geo-container" style="width: 100%; height: 600px; background: #f9f9f9;"></svg>
+
                     <div class="map-filters">
                         <div class="filter-item">
                             <label for="select-event">Event Type</label>
@@ -44,8 +47,14 @@
                                 <option value="All">All Years</option>
                             </select>
                         </div>
+                        <div class="filter-item">
+                            <label for="select-country">Country</label>
+                            <select id="select-country">
+                                <option value="All">All Countries</option>
+                            </select>
+                        </div>
                     </div>
-                    <svg id="geo-container"></svg>
+
                 </div>
                 <div class="text-container mt-5"><p></p></div>
             </section>
