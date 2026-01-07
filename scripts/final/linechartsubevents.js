@@ -1,12 +1,11 @@
 document.addEventListener("DOMContentLoaded", function() {
-    // Debug: Controllo se lo script parte
-    console.log("Script caricato. Attesa IntersectionObserver...");
+    console.log("Script inizializzato...");
 
     const options = { root: null, threshold: 0.1 };
     const observer = new IntersectionObserver((entries, obs) => {
         entries.forEach(entry => {
             if (entry.isIntersecting && entry.target.id === "sub-event-line-section") {
-                console.log("Sezione visibile! Avvio grafico...");
+                console.log("Sezione visibile! Avvio initSubEventLineChart...");
                 initSubEventLineChart();
                 obs.unobserve(entry.target);
             }
@@ -15,7 +14,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const target = document.querySelector("#sub-event-line-section");
     if (target) observer.observe(target);
-    else if(document.querySelector("#sub-event-line-chart-container")) initSubEventLineChart();
+    else if(document.querySelector("#sub-event-line-chart-container")) {
+        initSubEventLineChart();
+    } else {
+        console.error("ERRORE: Non trovo il container #sub-event-line-section");
+    }
 });
 
 function initSubEventLineChart() {
@@ -27,13 +30,13 @@ function initSubEventLineChart() {
         if (!section.empty()) {
             mainContainer = section.append("div").attr("id", "sub-event-line-chart-container");
         } else {
-            console.error("ERRORE: Nessun container #sub-event-line-section trovato nell'HTML.");
+            console.error("ERRORE CRITICO: Container non creato.");
             return; 
         }
     }
 
-    // 1. PULIZIA E STRUTTURA
-    mainContainer.html("").style("position", "relative");
+    // PULIZIA
+    mainContainer.html("").style("position", "relative").style("min-height", "400px");
 
     const chartBox = mainContainer.append("div").attr("class", "chart-grey-box");
     
@@ -56,45 +59,53 @@ function initSubEventLineChart() {
             <ul>
                 <li>X-axis: Time (Monthly).</li>
                 <li>Y-axis: Number of events.</li>
-                <li><strong>Hover on a line</strong> to highlight it.</li>
-                <li><strong>Click legend</strong> to toggle lines.</li>
+                <li><strong>Click legend</strong> to focus on one event type.</li>
+                <li><strong>Click again</strong> to reset.</li>
             </ul>
         `);
 
-    // 2. DIMENSIONI
     const margin = {top: 50, right: 30, bottom: 80, left: 50};
     const width = 1000 - margin.left - margin.right;
     const height = 550 - margin.top - margin.bottom;
 
-    // 3. CARICAMENTO DATI
+    // CARICAMENTO DATI
+    console.log("Caricamento CSV...");
     d3.csv("../../data/final/front_UKR.csv").then(function(raw_data) {
         
-        console.log("Dati caricati:", raw_data.length, "righe");
+        console.log("CSV caricato. Righe:", raw_data.length);
 
-        // --- PRE-PROCESSING ---
+        // --- FILTRI ---
+        const TARGET_SUB_EVENTS = [
+            "Shelling/artillery/missile attack",
+            "Air/drone strike",
+            "Armed clash"
+        ];
+        
+        const START_DATE = new Date("2022-02-24"); 
         const parseDate = d3.timeParse("%Y-%m-%d");
+
         const data = raw_data.map(d => ({
             ...d,
             date: parseDate(d.event_date),
             year: +d.year
-        })).filter(d => d.year >= 2020);
+        })).filter(d => {
+            return d.date >= START_DATE && TARGET_SUB_EVENTS.includes(d.sub_event_type);
+        });
 
         if (data.length === 0) {
-            console.error("Nessun dato trovato dopo il filtro 2020");
+            console.error("Nessun dato dopo i filtri. Controlla nomi eventi o date.");
+            mainContainer.html("<p style='color:red; text-align:center;'>Nessun dato trovato. Vedi console.</p>");
             return;
         }
 
-        const typeCounts = d3.rollup(data, v => v.length, d => d.sub_event_type);
-        const topKeys = Array.from(typeCounts)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 5)
-            .map(d => d[0]);
+        const availableTypes = new Set(data.map(d => d.sub_event_type));
+        const keys = TARGET_SUB_EVENTS.filter(k => availableTypes.has(k));
 
         const monthlyDataMap = d3.rollup(
             data,
             v => {
                 const counts = {};
-                topKeys.forEach(key => {
+                keys.forEach(key => {
                     counts[key] = v.filter(d => d.sub_event_type === key).length;
                 });
                 return counts;
@@ -106,20 +117,16 @@ function initSubEventLineChart() {
             return { Date: date, ...values };
         }).sort((a, b) => a.Date - b.Date);
 
-        const keys = topKeys;
-
-        // --- CONFIGURAZIONE GRAFICO ---
+        // --- GRAFICO ---
         const x = d3.scaleTime().domain(d3.extent(processedData, d => d.Date)).range([0, width]);
-        const maxY = d3.max(processedData, d => Math.max(...keys.map(k => d[k])));
+        const maxY = d3.max(processedData, d => Math.max(...keys.map(k => d[k] || 0)));
         const y = d3.scaleLinear().domain([0, maxY * 1.1]).range([height, 0]);
 
-        const PALETTE = ["#003f5c", "#58508d", "#bc5090", "#ff6361", "#ffa600"];
+        const PALETTE = ["#d62728", "#ff7f0e", "#1f77b4"];
         const color = d3.scaleOrdinal().domain(keys).range(PALETTE);
 
-        const visibilityState = {};
-        keys.forEach(k => visibilityState[k] = true);
+        let activeFocusKey = null; 
 
-        // --- SVG ---
         const svg = chartBox.append("svg")
             .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
             .style("max-width", "100%")
@@ -131,29 +138,24 @@ function initSubEventLineChart() {
         // Titolo
         svg.append("text")
             .attr("x", width / 2).attr("y", -20).attr("text-anchor", "middle")
-            .style("font-family", "'Roboto Slab', serif")
-            .style("font-size", "20px").style("font-weight", "700").style("fill", "#25282A")
-            .text("Monthly Trends of Top 5 Sub-Events");
+            .style("font-family", "'Roboto Slab', serif").style("font-size", "20px").style("font-weight", "700").style("fill", "#25282A")
+            .text("Monthly Trends: Shelling, Air Strikes & Clashes");
 
         // Assi
         svg.append("g").attr("transform", `translate(0,${height})`)
-            .call(d3.axisBottom(x).ticks(10).tickSizeOuter(0).tickPadding(10))
-            .selectAll("text").style("font-family", "'Fira Sans', sans-serif").style("font-size", "14px");
-
+            .call(d3.axisBottom(x).ticks(10).tickSizeOuter(0).tickPadding(10));
+        
         svg.append("g")
             .call(d3.axisLeft(y).ticks(8).tickPadding(10).tickSize(0))
-            .call(g => g.select(".domain").remove())
-            .selectAll("text").style("font-family", "'Fira Sans', sans-serif").style("font-size", "12px");
-
+            .call(g => g.select(".domain").remove());
+        
         // Griglia
         svg.append("g").attr("class", "grid")
             .call(d3.axisLeft(y).ticks(8).tickSize(-width).tickFormat(""))
             .call(g => g.select(".domain").remove())
             .selectAll("line").style("stroke", "#b0b0b0").style("stroke-opacity", "0.5").style("stroke-dasharray", "6,10");
 
-
-        // --- 1. TOOLTIP LAYER (DISEGNATO SOTTO LE LINEE) ---
-        // Lo disegniamo PRIMA delle linee così le linee stanno "sopra" (Z-Index) e prendono il mouseover.
+        // --- TOOLTIP ---
         let tooltip = d3.select("#sub-event-tooltip");
         if (tooltip.empty()) {
             tooltip = d3.select("body").append("div").attr("id", "sub-event-tooltip")
@@ -163,19 +165,17 @@ function initSubEventLineChart() {
                 .style("border-radius", "4px").style("pointer-events", "none")
                 .style("z-index", "100").style("font-family", "sans-serif").style("font-size", "12px");
         }
-
+        
         const mouseG = svg.append("g").attr("class", "mouse-over-effects");
         const mouseLine = mouseG.append("path")
-            .style("stroke", "#555").style("stroke-width", "1px")
-            .style("stroke-dasharray", "4,4").style("opacity", "0");
+            .style("stroke", "#555").style("stroke-width", "1px").style("stroke-dasharray", "4,4").style("opacity", "0");
 
         const bisectDate = d3.bisector(d => d.Date).left;
 
-        // Questo rettangolo gestisce SOLO il tooltip generico
         svg.append("rect")
             .attr("width", width).attr("height", height)
             .attr("fill", "transparent")
-            .attr("pointer-events", "all") // Cattura il mouse dove non ci sono linee
+            .attr("pointer-events", "all")
             .on("mouseout", () => { tooltip.style("display", "none"); mouseLine.style("opacity", "0"); })
             .on("mouseover", () => { tooltip.style("display", "block"); mouseLine.style("opacity", "1"); })
             .on("mousemove", function(event) {
@@ -187,133 +187,90 @@ function initSubEventLineChart() {
                 if (!d) return;
 
                 mouseLine.attr("d", `M${x(d.Date)},0 L${x(d.Date)},${height}`);
-
+                
                 let html = `<strong>${d3.timeFormat("%B %Y")(d.Date)}</strong><br>`;
                 keys.forEach(k => {
-                    if (visibilityState[k]) {
-                        html += `<span style="color:${color(k)}">● ${k}:</span> <b>${d[k]}</b><br>`;
-                    }
+                    let opacity = (activeFocusKey && activeFocusKey !== k) ? 0.3 : 1;
+                    html += `<div style="opacity:${opacity}"><span style="color:${color(k)}">●</span> ${k}: <b>${d[k] || 0}</b></div>`;
                 });
-
-                tooltip.html(html)
-                    .style("left", (event.pageX + 15) + "px")
-                    .style("top", (event.pageY - 15) + "px");
+                tooltip.html(html).style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 15) + "px");
             });
 
-        // --- 2. DISEGNO LINEE (SOPRA IL LAYER TOOLTIP) ---
-        const lineGenerator = (key) => d3.line()
-            .curve(d3.curveMonotoneX)
-            .x(d => x(d.Date))
-            .y(d => y(d[key]));
+        // --- LINEE ---
+        const lineGenerator = (key) => d3.line().curve(d3.curveMonotoneX).x(d => x(d.Date)).y(d => y(d[key] || 0));
 
-        keys.forEach((key) => {
-            // ID univoco e sicuro (rimuove spazi e caratteri speciali)
+        keys.forEach(key => {
             const safeIdLine = "line-" + key.replace(/[^a-zA-Z0-9]/g, '-');
-            const safeIdBtn = "btn-" + key.replace(/[^a-zA-Z0-9]/g, '-');
             
             const path = svg.append("path")
                 .datum(processedData)
                 .attr("id", safeIdLine)
-                .attr("class", "line-trace") // Classe comune per selezionarle tutte
+                .attr("class", "line-trace")
                 .attr("fill", "none")
                 .attr("stroke", color(key))
                 .attr("stroke-width", 2.5)
                 .attr("d", lineGenerator(key))
-                .style("cursor", "pointer")
-                // Fondamentale: permette alla linea di catturare il mouse sopra il rettangolo
-                .style("pointer-events", "stroke"); 
+                .style("transition", "opacity 0.3s");
 
-            // Animazione entrata
-            const totalLength = path.node().getTotalLength();
-            path.attr("stroke-dasharray", totalLength + " " + totalLength)
-                .attr("stroke-dashoffset", totalLength)
-                .transition().duration(2000).ease(d3.easeCubicOut)
-                .attr("stroke-dashoffset", 0);
-
-            // --- LOGICA HIGHLIGHT (HOVER SULLA LINEA) ---
             path.on("mouseenter", function() {
-                // 1. Rendi tutte le altre linee trasparenti
-                d3.selectAll(".line-trace")
-                    .transition().duration(200)
-                    .style("opacity", 0.1)
-                    .attr("stroke-width", 2.5);
-
-                // 2. Evidenzia QUESTA linea
-                d3.select(this)
-                    .transition().duration(200)
-                    .style("opacity", 1)
-                    .attr("stroke-width", 5); // Molto più spessa
-
-                // 3. Evidenzia il bottone corrispondente
-                d3.selectAll(".legend-card-btn").style("opacity", 0.3); // Spegni tutti i bottoni
-                d3.select("#" + safeIdBtn)
-                    .style("opacity", 1)
-                    .style("font-weight", "bold")
-                    .style("transform", "scale(1.1)");
-            })
-            .on("mouseleave", function() {
-                // RIPRISTINA TUTTO
-                keys.forEach(k => {
-                    const id = "line-" + k.replace(/[^a-zA-Z0-9]/g, '-');
-                    d3.select("#" + id)
-                        .transition().duration(200)
-                        .style("opacity", visibilityState[k] ? 1 : 0) // Rispetta se era nascosto
-                        .attr("stroke-width", 2.5);
-                });
-
-                d3.selectAll(".legend-card-btn")
-                    .style("opacity", 1)
-                    .style("font-weight", "normal")
-                    .style("transform", "scale(1)");
+                if (activeFocusKey) return; 
+                d3.selectAll(".line-trace").style("opacity", 0.2);
+                d3.select(this).style("opacity", 1).style("stroke-width", 4);
+            }).on("mouseleave", function() {
+                if (activeFocusKey) return;
+                d3.selectAll(".line-trace").style("opacity", 1).style("stroke-width", 2.5);
             });
         });
 
-        // --- LEGENDA ---
+        // --- FUNZIONE UPDATE FOCUS ---
+        function updateFocusMode() {
+            if (!activeFocusKey) {
+                d3.selectAll(".line-trace").style("opacity", 1).style("stroke-width", 2.5);
+                d3.selectAll(".legend-card-btn").style("opacity", 1).style("background", "white").style("font-weight", "normal");
+            } else {
+                keys.forEach(k => {
+                    const safeIdLine = "line-" + k.replace(/[^a-zA-Z0-9]/g, '-');
+                    const safeIdBtn = "btn-" + k.replace(/[^a-zA-Z0-9]/g, '-');
+                    const isTarget = (k === activeFocusKey);
+
+                    d3.select("#" + safeIdLine).style("opacity", isTarget ? 1 : 0.15).style("stroke-width", isTarget ? 4 : 1.5);
+                    d3.select("#" + safeIdBtn)
+                        .style("opacity", isTarget ? 1 : 0.4)
+                        .style("background", isTarget ? "#f0f0f0" : "white")
+                        .style("font-weight", isTarget ? "bold" : "normal");
+                });
+            }
+        }
+
+        // --- LEGENDA (COLORE A SINISTRA) ---
         keys.forEach(key => {
             const itemColor = color(key);
-            const safeIdLine = "line-" + key.replace(/[^a-zA-Z0-9]/g, '-');
             const safeIdBtn = "btn-" + key.replace(/[^a-zA-Z0-9]/g, '-');
 
-            const btn = legendContainer.append("div")
+            legendContainer.append("div")
                 .attr("class", "legend-card-btn")
-                .attr("id", safeIdBtn) // ID per collegarlo alla linea
-                .style("border-left-color", itemColor)
+                .attr("id", safeIdBtn)
+                // Border Left = Pezzo colorato a sinistra (DEFAULT)
+                .style("border-left", `5px solid ${itemColor}`)
+                .style("border-right", "1px solid #ccc") 
+                .style("border-top", "1px solid #ccc")
+                .style("border-bottom", "1px solid #ccc")
+                
+                .style("padding", "5px 10px")
+                .style("background", "white").style("cursor", "pointer").style("transition", "all 0.3s")
                 .text(key)
                 .on("click", function() {
-                    visibilityState[key] = !visibilityState[key];
-                    const isVisible = visibilityState[key];
-
-                    // Nascondi/Mostra linea
-                    d3.select("#" + safeIdLine)
-                        .transition().duration(300)
-                        .style("opacity", isVisible ? 1 : 0);
-
-                    // Stile bottone attivo/inattivo
-                    d3.select(this)
-                        .classed("inactive", !isVisible)
-                        .style("background-color", isVisible ? "#fff" : "#f5f5f5");
-                })
-                // Hover sul bottone evidenzia la linea (simmetrico)
-                .on("mouseenter", function() {
-                    if(!visibilityState[key]) return;
-                    d3.selectAll(".line-trace").transition().style("opacity", 0.1);
-                    d3.select("#" + safeIdLine).transition().style("opacity", 1).attr("stroke-width", 5);
-                })
-                .on("mouseleave", function() {
-                    keys.forEach(k => {
-                        const id = "line-" + k.replace(/[^a-zA-Z0-9]/g, '-');
-                        d3.select("#" + id)
-                            .transition()
-                            .style("opacity", visibilityState[k] ? 1 : 0)
-                            .attr("stroke-width", 2.5);
-                    });
+                    if (activeFocusKey === key) activeFocusKey = null;
+                    else activeFocusKey = key;
+                    updateFocusMode();
                 });
         });
 
-        // --- HELP BUTTON ---
+        // --- HELP BUTTON (A SINISTRA) ---
         const helpGroup = svg.append("g")
             .attr("class", "help-button-trigger")
             .attr("cursor", "pointer")
+            // Posizione a SINISTRA
             .attr("transform", `translate(0, ${height + 60})`);
 
         helpGroup.append("rect")
@@ -332,7 +289,7 @@ function initSubEventLineChart() {
         helpGroup.on("mouseleave", () => helpOverlay.classed("active", false));
 
     }).catch(err => {
-        console.error("ERRORE CRITICO CARICAMENTO:", err);
-        mainContainer.html("<p style='color:red'>Errore nel caricamento del grafico. Controlla la console.</p>");
+        console.error("ERRORE D3:", err);
+        mainContainer.html("<p style='color:red; text-align:center'>Errore caricamento. Vedi console.</p>");
     });
 }

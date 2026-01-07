@@ -4,14 +4,14 @@ document.addEventListener("DOMContentLoaded", function() {
     const options = {
         root: null,
         rootMargin: '0px',
-        threshold: 0.2
+        threshold: 0.1
     };
 
     const observer = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 
-                // Se l'utente scrolla sul Grafico Linee
+                // Se l'utente scrolla sul Grafico Linee (Cibo)
                 if (entry.target.id === "chart-section") {
                     console.log("Avvio initFoodChart...");
                     initFoodChart();
@@ -41,7 +41,9 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 
-// --- 2. FUNZIONE GRAFICO LINEE (Cibo) ---
+// =============================================================================
+// 2. FUNZIONE GRAFICO LINEE (Cibo - Food Price Index)
+// =============================================================================
 function initFoodChart() {
     // Evita di ridisegnare se esiste già
     if (!d3.select("#chart").select("svg").empty()) return;
@@ -53,14 +55,15 @@ function initFoodChart() {
     // Spostiamo i controlli sotto
     container.append(() => controlsDiv.node());
 
-    // Stile contenitore
+    // 1. STILE CONTENITORE
     chartDiv
         .style("background-color", "#f8f9fa")
         .style("border", "1px solid #dee2e6")
         .style("border-radius", "8px")
-        .style("padding", "15px");
+        .style("padding", "15px")
+        .style("position", "relative");
 
-    // MARGINI AGGIORNATI (Bottom 100 per il bottone Help)
+    // 2. DIMENSIONI
     const margin = {top: 20, right: 30, bottom: 100, left: 50}, 
           width = 900 - margin.left - margin.right,
           height = 500 - margin.top - margin.bottom;
@@ -71,6 +74,29 @@ function initFoodChart() {
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
+    // 3. OVERLAY HELP (Creato dinamicamente per uniformità)
+    // Rimuoviamo eventuali vecchi overlay se presenti nel markup HTML statico per evitare duplicati
+    chartDiv.selectAll(".chart-help-overlay").remove(); 
+    
+    const helpOverlay = chartDiv.append("div")
+        .attr("class", "chart-help-overlay")
+        .on("click", function() { d3.select(this).classed("active", false); });
+
+    helpOverlay.append("div")
+        .attr("class", "chart-help-box")
+        .on("click", (e) => e.stopPropagation())
+        .html(`
+            <h4>Reading the Food Price Index</h4>
+            <ul>
+                <li>The X-axis represents time (up to 2025).</li>
+                <li>The Y-axis represents the FAO Price Index value.</li>
+                <li>Each colored line represents a commodity group.</li>
+                <li><strong>Click a legend button</strong> to isolate that line (click again to reset).</li>
+                <li><strong>Hover on a line</strong> to highlight it.</li>
+            </ul>
+        `);
+
+    // 4. DATI
     d3.csv("../../data/final/data_food.csv").then(function(data) {
 
         const parseTime = d3.timeParse("%Y-%m-%d");
@@ -81,11 +107,15 @@ function initFoodChart() {
             keys.forEach(k => d[k] = +d[k]);
         });
 
+        // Stato visibilità per la logica di isolamento
+        let visibilityState = {};
+        keys.forEach(k => visibilityState[k] = true);
+
         // Scale
         const x = d3.scaleTime().domain(d3.extent(data, d => d.Date)).range([0, width]);
         const maxY = d3.max(data, d => Math.max(...keys.map(k => d[k])));
         const y = d3.scaleLinear().domain([0, maxY * 1.15]).range([height, 0]);
-        const color = d3.scaleOrdinal().domain(keys).range(["#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f", "#edc948"]);
+        const color = d3.scaleOrdinal().domain(keys).range(["#003f5c", "#58508d", "#bc5090", "#ff6361", "#ffa600"]);
 
         // Assi
         svg.append("g")
@@ -106,97 +136,25 @@ function initFoodChart() {
             .call(g => g.select(".domain").remove())
             .attr("stroke-opacity", 0.1);
 
-        // Linee
-        const lineGenerator = (key) => d3.line()
-            .curve(d3.curveMonotoneX) 
-            .x(d => x(d.Date))
-            .y(d => y(d[key]));
+        // --- LAYER TOOLTIP (SOTTO LE LINEE) ---
+        // Questo rettangolo gestisce il mouseover generico per il tooltip
+        let tooltip = d3.select("#chart-tooltip");
+        if (tooltip.empty()) {
+             tooltip = d3.select("body").append("div").attr("id", "chart-tooltip")
+                .style("position", "absolute").style("display", "none")
+                .style("background", "rgba(255, 255, 255, 0.96)")
+                .style("border", "1px solid #ccc").style("padding", "10px")
+                .style("border-radius", "4px").style("pointer-events", "none")
+                .style("z-index", "100").style("font-family", "sans-serif").style("font-size", "12px");
+        }
 
-        keys.forEach((key) => {
-            const safeId = "line-" + key.replace(/\s+/g, '-');
-            const path = svg.append("path")
-                .datum(data)
-                .attr("id", safeId)
-                .attr("class", "line")
-                .attr("fill", "none")
-                .attr("stroke", color(key))
-                .attr("stroke-width", 2.5)
-                .attr("d", lineGenerator(key));
-
-            const totalLength = path.node().getTotalLength();
-            path.attr("stroke-dasharray", totalLength + " " + totalLength)
-                .attr("stroke-dashoffset", totalLength)
-                .transition().duration(4000).ease(d3.easeCubicOut)
-                .attr("stroke-dashoffset", 0);
-        });
-
-        // --- CONTROLLI (BOTTONI GRANDI E IN RIGA) ---
-        controlsDiv.html(""); 
-        
-        controlsDiv
-            .style("display", "flex")
-            .style("flex-wrap", "nowrap") // Forza una riga unica
-            .style("justify-content", "center")
-            .style("gap", "8px")
-            .style("margin-top", "15px")
-            .style("overflow-x", "auto");
-
-        keys.forEach(key => {
-            const safeId = "check-" + key.replace(/\s+/g, '-');
-            const lineColor = color(key);
-
-            const wrapper = controlsDiv.append("label")
-                .style("cursor", "pointer")
-                .style("display", "inline-flex")
-                .style("align-items", "center")
-                .style("padding", "10px 18px") // Bottoni più grandi
-                .style("background", "#fff")
-                .style("border", `1px solid #ccc`)
-                .style("border-left", `6px solid ${lineColor}`)
-                .style("border-radius", "6px") 
-                .style("font-family", "sans-serif")
-                .style("font-size", "15px") // Testo più grande
-                .style("font-weight", "600")
-                .style("color", "#555")
-                .style("white-space", "nowrap") // Testo non va a capo
-                .style("transition", "all 0.2s ease")
-                .on("mouseover", function() {
-                    d3.select(this).style("background", "#f0f0f0");
-                })
-                .on("mouseout", function() {
-                    const chk = d3.select(this).select("input").property("checked");
-                    d3.select(this).style("background", chk ? "#fff" : "#f9f9f9");
-                });
-            
-            const input = wrapper.append("input")
-                .attr("type", "checkbox")
-                .attr("checked", true)
-                .attr("id", safeId)
-                .style("margin-right", "8px")
-                .style("cursor", "pointer")
-                .style("transform", "scale(1.2)")
-                .on("change", function() {
-                    const isChecked = this.checked;
-                    d3.select("#line-" + key.replace(/\s+/g, '-'))
-                      .transition().duration(200)
-                      .style("opacity", isChecked ? 1 : 0);
-                    
-                    wrapper.style("opacity", isChecked ? "1" : "0.5");
-                    wrapper.style("background", isChecked ? "#fff" : "#eee");
-                });
-
-            wrapper.append("span").text(key);
-        });
-
-        // Tooltip
-        const tooltip = d3.select("#chart-tooltip");
         const bisectDate = d3.bisector(d => d.Date).left;
         const mouseG = svg.append("g").attr("class", "mouse-over-effects");
         const mouseLine = mouseG.append("path")
             .style("stroke", "#555").style("stroke-width", "1px").style("stroke-dasharray", "4,4").style("opacity", "0");
 
         svg.append("rect")
-            .attr("width", width).attr("height", height).attr("fill", "none").attr("pointer-events", "all")
+            .attr("width", width).attr("height", height).attr("fill", "transparent").attr("pointer-events", "all")
             .on("mouseout", () => { tooltip.style("display", "none"); mouseLine.style("opacity", "0"); })
             .on("mouseover", () => { tooltip.style("display", "block"); mouseLine.style("opacity", "1"); })
             .on("mousemove", function(event) {
@@ -208,10 +166,10 @@ function initFoodChart() {
                 if (!d) return;
 
                 mouseLine.attr("d", `M${x(d.Date)},0 L${x(d.Date)},${height}`);
+                
                 let tooltipHtml = `<div style="margin-bottom:5px; font-weight:bold; font-size:14px; border-bottom:1px solid #ddd; padding-bottom:3px; color:#333;">${d3.timeFormat("%B %Y")(d.Date)}</div>`;
                 keys.forEach(key => {
-                    const checkbox = document.getElementById("check-" + key.replace(/\s+/g, '-'));
-                    if (checkbox && checkbox.checked) {
+                    if (visibilityState[key]) {
                         tooltipHtml += `<div style="display:flex; justify-content:space-between; align-items:center; width:180px; margin-top:3px; font-size:12px;">
                             <span style="color:#555;"><span style="color:${color(key)}; font-size:14px;">●</span> ${key}</span>
                             <strong>${d[key].toFixed(1)}</strong>
@@ -221,49 +179,153 @@ function initFoodChart() {
                 tooltip.html(tooltipHtml).style("left", (event.pageX + 20) + "px").style("top", (event.pageY - 40) + "px");
             });
 
-        // Bottone Aiuto (posizionato in basso grazie al margin.bottom aumentato)
-        if (typeof setupHelpButton === "function") {
-            setupHelpButton(svg, width, height, {
-                x: 0, 
-                y: height + 70, 
-                title: "Reading the Food Price Index",
-                instructions: [
-                    "1. The X-axis represents time.",
-                    "2. The Y-axis represents the FAO Price Index value.",
-                    "3. Colored lines represent different commodity groups.",
-                    "4. Use the checkboxes below to show/hide specific lines.",
-                    "5. Hover over the chart to see exact monthly values."
-                ]
-            });
-        }
 
-    }).catch(err => { console.error("Errore dati grafico:", err); });
+        // --- DISEGNO LINEE (SOPRA IL LAYER TOOLTIP) ---
+        const lineGenerator = (key) => d3.line()
+            .curve(d3.curveMonotoneX) 
+            .x(d => x(d.Date))
+            .y(d => y(d[key]));
+
+        keys.forEach((key) => {
+            const safeId = "line-food-" + key.replace(/\s+/g, '-');
+            const safeIdBtn = "btn-food-" + key.replace(/\s+/g, '-');
+
+            const path = svg.append("path")
+                .datum(data)
+                .attr("id", safeId)
+                .attr("class", "line-trace-food") // Classe unica
+                .attr("fill", "none")
+                .attr("stroke", color(key))
+                .attr("stroke-width", 2.5)
+                .attr("d", lineGenerator(key))
+                .style("cursor", "pointer")
+                .style("pointer-events", "stroke"); // Fondamentale per catturare hover sopra il rect
+
+            // Animazione Iniziale
+            const totalLength = path.node().getTotalLength();
+            path.attr("stroke-dasharray", totalLength + " " + totalLength)
+                .attr("stroke-dashoffset", totalLength)
+                .transition().duration(4000).ease(d3.easeCubicOut)
+                .attr("stroke-dashoffset", 0);
+
+            // LOGICA HOVER SU LINEA
+            path.on("mouseenter", function() {
+                // 1. Diminuisci opacità delle ALTRE linee
+                d3.selectAll(".line-trace-food").transition().duration(200).style("opacity", 0.1);
+                
+                // 2. Evidenzia QUESTA linea
+                d3.select(this).transition().duration(200).style("opacity", 1).attr("stroke-width", 4.5);
+
+                // 3. Grassetto sul bottone corrispondente (la legenda NON sparisce)
+                d3.select("#" + safeIdBtn).style("font-weight", "bold").style("border-left-width", "8px");
+            })
+            .on("mouseleave", function() {
+                // Ripristino linee
+                keys.forEach(k => {
+                    const id = "line-food-" + k.replace(/\s+/g, '-');
+                    d3.select("#" + id).transition().duration(200)
+                        .style("opacity", visibilityState[k] ? 1 : 0)
+                        .attr("stroke-width", 2.5);
+                });
+                // Ripristino bottone
+                d3.select("#" + safeIdBtn).style("font-weight", "normal").style("border-left-width", "5px");
+            });
+        });
+
+        // --- CONTROLLI LEGENDA (STILE UNIFORMATO - CARDS) ---
+        controlsDiv.html(""); 
+        
+        controlsDiv
+            .attr("class", "legend-container-outer")
+            .style("display", "flex")
+            .style("flex-wrap", "wrap") // A capo se necessario
+            .style("justify-content", "center")
+            .style("gap", "10px")
+            .style("margin-top", "15px");
+
+        keys.forEach(key => {
+            const safeIdLine = "line-food-" + key.replace(/\s+/g, '-');
+            const safeIdBtn = "btn-food-" + key.replace(/\s+/g, '-');
+            const lineColor = color(key);
+
+            // Creiamo il DIV bottone (Stile Card)
+            const btn = controlsDiv.append("div")
+                .attr("id", safeIdBtn)
+                .attr("class", "legend-card-btn")
+                .style("cursor", "pointer")
+                .style("padding", "8px 12px")
+                .style("background", "#fff")
+                .style("border", "1px solid #ccc")
+                .style("border-left", `5px solid ${lineColor}`) // Bordo colorato
+                .style("border-radius", "4px") 
+                .style("font-family", "sans-serif")
+                .style("font-size", "13px")
+                .style("color", "#333")
+                .style("user-select", "none")
+                .text(key);
+
+            // LOGICA CLICK (ISOLAMENTO)
+            btn.on("click", function() {
+                const visibleCount = Object.values(visibilityState).filter(v => v).length;
+                const isCurrentlyVisible = visibilityState[key];
+
+                if (visibleCount === 1 && isCurrentlyVisible) {
+                    // Reset: Mostra tutto
+                    keys.forEach(k => visibilityState[k] = true);
+                } else {
+                    // Isola: Mostra solo questo
+                    keys.forEach(k => visibilityState[k] = (k === key));
+                }
+
+                // Applica modifiche
+                keys.forEach(k => {
+                    const idLine = "line-food-" + k.replace(/\s+/g, '-');
+                    const idBtn = "btn-food-" + k.replace(/\s+/g, '-');
+                    const isVisible = visibilityState[k];
+
+                    // Aggiorna Linea
+                    d3.select("#" + idLine)
+                        .transition().duration(300)
+                        .style("opacity", isVisible ? 1 : 0);
+                    
+                    // Aggiorna Bottone (stile attivo/inattivo)
+                    d3.select("#" + idBtn)
+                        .classed("inactive", !isVisible)
+                        .style("background", isVisible ? "#fff" : "#f5f5f5")
+                        .style("opacity", isVisible ? "1" : "0.6");
+                });
+            });
+        });
+
+        // HELP BUTTON
+        const helpGroup = svg.append("g")
+            .attr("class", "help-button-trigger")
+            .attr("cursor", "pointer")
+            .attr("transform", `translate(0, ${height + 60})`);
+
+        helpGroup.append("rect")
+            .attr("x", -20).attr("y", -25)
+            .attr("width", 260).attr("height", 50)
+            .attr("fill", "transparent");
+
+        helpGroup.append("circle").attr("r", 9).attr("fill", "black");
+        helpGroup.append("text").attr("text-anchor", "middle").attr("dy", "0.35em")
+            .attr("fill", "white").style("font-weight", "bold").style("font-family", "serif").text("i");
+        helpGroup.append("text").attr("x", 15).attr("dy", "0.35em")
+            .style("font-size", "14px").style("font-weight", "700").style("font-family", "'Fira Sans', sans-serif").style("fill", "#000")
+            .text("How to read the chart?");
+
+        helpGroup.on("mouseenter", () => helpOverlay.classed("active", true));
+        helpGroup.on("mouseleave", () => helpOverlay.classed("active", false));
+
+    }).catch(err => { console.error("Errore dati grafico Food:", err); });
 }
 
-// --- 3. FUNZIONE MAPPA (STRUTTURA) ---
+// =============================================================================
+// 3. FUNZIONE MAPPA (STRUTTURA)
+// =============================================================================
 function initMap() {
-    // 1. Seleziona il div della mappa (assicurati di avere un div con id="map" o simile nel tuo HTML)
     const mapContainer = d3.select("#map"); 
-
-    // 2. Controllo sicurezza: se la mappa è già disegnata o il div non esiste, esci
     if (mapContainer.empty() || !mapContainer.select("svg").empty()) return;
-
     console.log("Inizializzazione Mappa in corso...");
-
-    // ============================================================
-    // INCOLLA QUI SOTTO IL TUO CODICE D3 PER LA MAPPA
-    // Esempio: d3.json("path/to/geo.json").then(data => { ... })
-    // ============================================================
-    
-    /* Esempio di struttura (da completare con i tuoi dati):
-       
-       const width = 800, height = 600;
-       const svg = mapContainer.append("svg")
-           .attr("viewBox", `0 0 ${width} ${height}`);
-       
-       const projection = d3.geoMercator().fitSize([width, height], geoData);
-       const path = d3.geoPath().projection(projection);
-       
-       // ... resto del codice mappa ...
-    */
 }
