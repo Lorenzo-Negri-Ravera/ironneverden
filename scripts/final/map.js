@@ -1,8 +1,8 @@
 // File: geoChoropleth.js 
 
 const GENERAL_GEOJSON_PATH = "../../data/final/geojson/europe3.geojson";
-const COUNTRIES_EVENTS_PATH = "../../data/final/df_country_summary_v2.json";
-const ADMIN_EVENTS_PATH = "../../data/final/df_admin_summary_v2.json";
+const COUNTRIES_EVENTS_PATH = "../../data/final/df_country_summary_v3.json";
+const ADMIN_EVENTS_PATH = "../../data/final/df_admin_summary_v3.json";
 
 Promise.all([
     d3.json(GENERAL_GEOJSON_PATH),
