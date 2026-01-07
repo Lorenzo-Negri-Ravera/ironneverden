@@ -35,7 +35,7 @@ function initStackedBarChart() {
     const height = 550 - margin.top - margin.bottom;
 
     // 4. DATI - CARICAMENTO JSON
-    d3.json("../../data/final/stuckedbarchart/Year_Events_UKR.json").then(function(data) {
+    d3.json("../../data/final/stackedbarchart/Year_Events_UKR.json").then(function(data) {
         
         console.log("1. Dati caricati:", data[0]); // Debug per vedere la struttura
 
