@@ -356,8 +356,6 @@ Promise.all([
     // Dimensions
     const width = 1000;
     const height = 700;
-    // NOTA: marginTop rimosso dalla logica di traslazione manuale,
-    // lo gestiamo tutto dentro fitExtent per evitare salti.
 
     // Build SVG container
     const svg = d3.select("#geo-container")
@@ -372,18 +370,7 @@ Promise.all([
     const svgParent = d3.select(svg.node().parentNode);
     svgParent.style("position", "relative"); 
 
-    // Title
-    /*
-    svg.append("text")
-        .attr("class", "graph-title")
-        .attr("x", width / 2)
-        .attr("y", 30) // Posizionato in alto fisso
-        .attr("text-anchor", "middle")
-        .style("font-size", "18px")
-        .style("font-weight", "bold")
-        .text("Disorders in Europe");
-    */
-    // --- 1. DEFINIZIONE PROIEZIONE (Posizionamento Definitivo) ---
+    // --- 1. DEFINIZIONE PROIEZIONE ---
     const projection = d3.geoIdentity().reflectY(true);
     const pathGenerator = d3.geoPath().projection(projection);
 
@@ -393,45 +380,55 @@ Promise.all([
             type: "Feature",
             geometry: {
                 type: "Polygon",
-                // Box approssimativo dell'Europa per il fitting
                 coordinates: [[[-25, 30], [70, 30], [70, 75], [-25, 75], [-25, 30]]]
             }
         }]
     };
 
-    // --- CORREZIONE POSIZIONE ---
-    // Impostiamo [[20, 130], ...]
-    // 130px è lo spazio vuoto in alto. Disegniamo la mappa GIÀ spostata in basso.
-    // In questo modo il reset dello zoom (0,0) corrisponderà a questa posizione.
     projection.fitExtent([[0, 80], [width - 20, height - 20]], europeFocus);
 
-    // Gruppo Mappa
-    // NOTA: Non mettiamo più .attr("transform", ...) qui. Lasciamo che gestisca tutto lo zoom.
+    // --- GRUPPI SVG (MODIFICATO PER GESTIONE LAYERS) ---
+    
+    // 1. Gruppo Mappa Europa (Zoomabile nella vista principale)
     const mapGroup = svg.append("g");
     
+    // 2. Overlay Sfondo (Statico)
     const overlay = svg.append("rect")
         .attr("width", width)
         .attr("height", height)
         .attr("fill", "rgba(45, 45, 45, 0.9)")
         .style("display", "none")
         .style("pointer-events", "all")
-        .on("click", closeDetail);
+        // Rimosso click su overlay per evitare chiusure accidentali durante il pan/zoom, 
+        // ma puoi riabilitarlo se preferisci: .on("click", closeDetail);
+    
+    // 3. Gruppo Mappa Dettaglio (Zoomabile nella vista dettaglio)
+    const detailMapGroup = svg.append("g").style("display", "none");
 
-    const detailGroup = svg.append("g").style("display", "none");
+    // 4. Gruppo UI Dettaglio (Titoli e Bottoni - STATICO, NON ZOOMABILE)
+    const detailUiGroup = svg.append("g").style("display", "none");
 
-    // --- LEGENDA: POSIZIONATA IN BASSO A DESTRA ---
+    // Variabile di stato per lo zoom
+    let isDetailMode = false;
+
+    // --- LEGENDA ---
     const legendGroup = svg.append("g")
         .attr("class", "legend")
         .attr("transform", `translate(${width - 220}, ${height - 45})`); 
 
-    // --- DEFINIZIONE ZOOM ---
+    // --- DEFINIZIONE ZOOM (MODIFICATO) ---
     const zoom = d3.zoom()
         .scaleExtent([1, 12]) 
         .on("zoom", (event) => {
-            // Applica la trasformazione. Se event.transform è identity (0,0),
-            // la mappa resta nella posizione definita da projection.fitExtent (130px in giù)
-            mapGroup.attr("transform", event.transform);
-            detailGroup.attr("transform", event.transform);
+            if (isDetailMode) {
+                // Se siamo nel dettaglio, muovi SOLO la geometria del paese
+                detailMapGroup.attr("transform", event.transform);
+                // Il Titolo e la X (detailUiGroup) rimangono fermi!
+            } else {
+                // Se siamo in Europa, muovi la mappa generale
+                mapGroup.attr("transform", event.transform);
+            }
+            tooltip.style("opacity", 0); // Nasconde tooltip durante zoom
         });
 
     svg.call(zoom)
@@ -463,9 +460,13 @@ Promise.all([
         .style("font-size", "14px")
         .text("Rst")
         .on("click", () => { 
-            d3.select("#select-country").property("value", "All");
-            // Reset fluido: Torna a (0,0) che ora corrisponde alla mappa bassa
-            svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity); 
+            if(isDetailMode) {
+                // Reset zoom dettaglio (rimane nel dettaglio, ma resetta vista)
+                svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
+            } else {
+                d3.select("#select-country").property("value", "All");
+                svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity); 
+            }
         });
 
     // Tooltip
@@ -513,16 +514,20 @@ Promise.all([
     countrySelect.on("change", function() {
         const selectedCountry = this.value;
         if (selectedCountry === "All") {
-            svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
+            if(isDetailMode) closeDetail();
+            else svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
         } else {
             const feature = geojson.features.find(d => d.properties.NAME === selectedCountry);
             if (feature) {
+                // Se siamo già in detail mode su un altro paese, potremmo voler gestire il cambio diretto
+                // Per ora manteniamo il comportamento originale: zoom sulla mappa europa
+                if(isDetailMode) closeDetail();
                 zoomToBox(feature);
             }
         }
     });
 
-    // FUNZIONE ZOOM INTELLIGENTE
+    // FUNZIONE ZOOM INTELLIGENTE (Per Mappa Europa)
     function zoomToBox(feature) {
         const bounds = pathGenerator.bounds(feature);
         const dx = bounds[1][0] - bounds[0][0];
@@ -540,45 +545,36 @@ Promise.all([
             );
     }
 
-    let isZoomed = false; 
+    // Cache per GeoJSON dettagliati
     const geoCache = new Map();
 
     // Helpers
     function getGeoName(d) { return d.properties.NAME; }
     function getGeoISO(d) { return d.properties.ISO || d.properties.ISO3; }
 
-    // TOOLTIP CONTENT (Logica Sub-Event preservata)
+    // TOOLTIP CONTENT
     function generateTooltipContent(title, records) {
         if (!records || records.length === 0) {
             return `<div class='tooltip-header'><strong>${title}</strong></div>No events`;
         }
-
         const total = d3.sum(records, d => getEvents(d));
-        
         const selectedEventType = eventSelect.property("value");
         const isEventSpecific = selectedEventType !== "All";
-
-        const groupKey = isEventSpecific ? 
-            d => getSubEvents(d) : 
-            d => d.EVENT_TYPE;
-
+        const groupKey = isEventSpecific ? d => getSubEvents(d) : d => d.EVENT_TYPE;
         const breakdown = d3.rollup(records, v => d3.sum(v, d => getEvents(d)), groupKey);
         const sortedBreakdown = Array.from(breakdown).sort((a, b) => b[1] - a[1]);
 
         let html = `<div class='tooltip-header'><strong>${title}</strong></div>`;
         html += `<div><strong>Total Events: ${total}</strong></div>`;
-        
         if (isEventSpecific) {
             html += `<div style='font-size:11px; color:#888; margin-bottom:4px;'>Breakdown of ${selectedEventType}:</div>`;
         }
-
         html += `<ul class='tooltip-list' style='margin-top:5px; padding-left:0;'>`;
         sortedBreakdown.forEach(([type, count]) => {
             const label = type || "Unspecified";
             html += `<li><span>${label}</span> <span>${count}</span></li>`;
         });
         html += `</ul>`;
-        
         return html;
     }
 
@@ -632,6 +628,9 @@ Promise.all([
 
     // UPDATE VISUALIZATION
     function updateVisualization() {
+        // Se siamo in dettaglio, non aggiornare la mappa Europa sotto, evita calcoli inutili
+        if(isDetailMode) return;
+
         const selYear = yearSelect.property("value");
         const selEvent = eventSelect.property("value");
 
@@ -688,7 +687,7 @@ Promise.all([
             .on("click", (event, d) => {
                 const isoCode = getGeoISO(d);
                 const name = getGeoName(d);
-                if (!isZoomed && isoCode) {
+                if (isoCode) {
                     loadDetail(isoCode, name);
                 }
             });
@@ -716,23 +715,37 @@ Promise.all([
         }
     }
 
+    // --- RENDER COUNTRY DETAIL (MODIFICATO) ---
     function renderCountryDetail(geo, name, isoCode) {
-        isZoomed = true;
+        // 1. Attiviamo Flag
+        isDetailMode = true;
+
+        // 2. Resettiamo lo Zoom IMMEDIATAMENTE (senza transizione) per centrare il nuovo contenuto
+        // In questo modo il path parte centrato e lo zoom parte da k=1
         svg.call(zoom.transform, d3.zoomIdentity);
         
         d3.select(".zoom-bar").style("top", "90px");
 
+        // 3. Gestione Display Layers
         overlay.style("display", "block").style("opacity", 1);
-        detailGroup.selectAll("*").remove();
-        detailGroup.style("display", "block").style("opacity", 1);
+        
+        detailMapGroup.selectAll("*").remove();
+        detailMapGroup.style("display", "block").style("opacity", 1);
+        
+        detailUiGroup.selectAll("*").remove();
+        detailUiGroup.style("display", "block").style("opacity", 1);
+        
         legendGroup.style("opacity", 1); 
 
+        // Preparazione Proiezione Locale
         const localProjection = d3.geoIdentity().reflectY(true);
         const localPath = d3.geoPath().projection(localProjection);
         const cleanGeo = { type: "FeatureCollection", features: geo.features };
         
-        localProjection.fitExtent([[120, 50], [width * 0.75, height - 150]], cleanGeo);
+        // Fit Extent considerando spazio per il titolo
+        localProjection.fitExtent([[50, 80], [width - 50, height - 50]], cleanGeo);
 
+        // Logica dati (Invariata)
         const selYear = yearSelect.property("value");
         const selEvent = eventSelect.property("value");
 
@@ -770,25 +783,14 @@ Promise.all([
         colorScale.domain([0, totalMax || 1]);
         updateLegend(totalMax || 1);
 
-        detailGroup.append("text")
-            .attr("x", width/2).attr("y", 40)
-            .attr("text-anchor", "middle").attr("fill", "white") 
-            .style("font-size", "24px").text(name);
-
-        const close = detailGroup.append("g")
-            .attr("transform", `translate(${width - 40}, 40)`)
-            .style("cursor", "pointer")
-            .on("click", closeDetail);
-        
-        close.append("circle").attr("r", 15).attr("fill", "#333");
-        close.append("text").attr("text-anchor", "middle").attr("dy", "0.35em").attr("fill", "white").text("X");
-
-        const g = detailGroup.append("g"); 
-        g.selectAll("path")
+        // A. DISEGNO MAPPA (dentro detailMapGroup -> ZOOMABLE)
+        detailMapGroup.selectAll("path")
             .data(cleanGeo.features)
             .join("path")
             .attr("d", localPath)
             .attr("stroke", "#444")
+            .attr("stroke-width", 1) // Base stroke width
+            .attr("vector-effect", "non-scaling-stroke") // Mantiene il bordo sottile quando zoomi!
             .attr("fill", d => {
                 const regionGID = d.properties.GID_1; 
                 const regionRecords = regionDataMap.get(regionGID) || [];
@@ -804,7 +806,6 @@ Promise.all([
                 d3.select(this).attr("fill", "orange").attr("stroke", "#000").attr("stroke-width", 2);
                 
                 const htmlContent = generateTooltipContent(regionName, combinedRecords);
-                
                 tooltip.style("opacity", 1)
                     .html(htmlContent)
                     .style("left", (event.pageX + 15) + "px")
@@ -822,20 +823,39 @@ Promise.all([
                     .attr("fill", totalVal > 0 ? adminColor(totalVal) : "#ffffff");
                 tooltip.style("opacity", 0);
             });
+
+        // B. DISEGNO UI (dentro detailUiGroup -> STATIC)
+        detailUiGroup.append("text")
+            .attr("x", width/2).attr("y", 40)
+            .attr("text-anchor", "middle").attr("fill", "white") 
+            .style("font-size", "24px").text(name);
+
+        const close = detailUiGroup.append("g")
+            .attr("transform", `translate(${width - 40}, 40)`)
+            .style("cursor", "pointer")
+            .on("click", closeDetail);
+        
+        close.append("circle").attr("r", 15).attr("fill", "#333").attr("stroke", "#fff");
+        close.append("text").attr("text-anchor", "middle").attr("dy", "0.35em").attr("fill", "white").text("X");
     }
 
+    // --- CLOSE DETAIL (MODIFICATO) ---
     function closeDetail() {
-        isZoomed = false;
+        // 1. Reset Flag
+        isDetailMode = false;
         
-        // Transizione fluida che resetta lo zoom. 
-        // Poiché la mappa è disegnata a Y=130, d3.zoomIdentity (0,0) la mostrerà lì.
+        // 2. Reset Zoom con transizione per tornare alla vista Europa corretta
+        // Poiché mapGroup è disegnato a Y=130 (fitExtent), identity lo mostrerà lì.
         svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
         
         d3.select("#select-country").property("value", "All");
         d3.select(".zoom-bar").style("top", "20px");
 
+        // 3. Nascondi layers dettaglio
         overlay.style("display", "none");
-        detailGroup.style("display", "none");
+        detailMapGroup.style("display", "none");
+        detailUiGroup.style("display", "none");
+
         d3.select(".map-filters").style("visibility", "visible");
         tooltip.style("opacity", 0);
         legendGroup.style("opacity", 1);
