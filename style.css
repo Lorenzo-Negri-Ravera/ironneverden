@@ -1,104 +1,88 @@
-/* File: style.css (Aggiornato) */
+/* File: style.css (Versione Bootstrap-Responsive) */
 
+/* --- 1. FONTS & TYPOGRAPHY --- */
 body {
-    /* Fira Sans for the main text (Regular - 400) */
     font-family: 'Fira Sans', sans-serif;
     font-weight: 400;
-    background-color: #f8f9fa;
     color: #25282A;
+    background-color: #f8f9fa; /* Uniforme con Bootstrap */
 }
 
-/* roboto-slab-regular - latin */
-@font-face {
-  font-display: swap; 
-  font-family: 'Roboto Slab';
-  font-style: normal;
-  font-weight: 400;
-  src: url('fonts/roboto-slab-v36-latin-regular.woff2') format('woff2'); 
-}
+/* Definizioni Font (Invariate) */
+@font-face { font-family: 'Roboto Slab'; font-style: normal; font-weight: 400; src: url('fonts/roboto-slab-v36-latin-regular.woff2') format('woff2'); }
+@font-face { font-family: 'Roboto Slab'; font-style: normal; font-weight: 700; src: url('fonts/roboto-slab-v36-latin-700.woff2') format('woff2'); }
+@font-face { font-family: 'Fira Sans'; font-style: normal; font-weight: 400; src: url('fonts/fira-sans-v18-latin-regular.woff2') format('woff2'); }
+@font-face { font-family: 'Fira Sans'; font-style: italic; font-weight: 400; src: url('fonts/fira-sans-v18-latin-italic.woff2') format('woff2'); }
+@font-face { font-family: 'Fira Sans'; font-style: normal; font-weight: 700; src: url('fonts/fira-sans-v18-latin-700.woff2') format('woff2'); }
 
-/* roboto-slab-700 - latin */
-@font-face {
-  font-display: swap; 
-  font-family: 'Roboto Slab';
-  font-style: normal;
-  font-weight: 700;
-  src: url('fonts/roboto-slab-v36-latin-700.woff2') format('woff2'); 
-}
-
-/* fira-sans-regular - latin */
-@font-face {
-  font-display: swap; 
-  font-family: 'Fira Sans';
-  font-style: normal;
-  font-weight: 400;
-  src: url('fonts/fira-sans-v18-latin-regular.woff2') format('woff2'); 
-}
-
-/* fira-sans-italic - latin */
-@font-face {
-  font-display: swap; 
-  font-family: 'Fira Sans';
-  font-style: italic;
-  font-weight: 400;
-  src: url('fonts/fira-sans-v18-latin-italic.woff2') format('woff2');
-}
-
-/* fira-sans-700 - latin */
-@font-face {
-  font-display: swap; 
-  font-family: 'Fira Sans';
-  font-style: normal;
-  font-weight: 700;
-  src: url('fonts/fira-sans-v18-latin-700.woff2') format('woff2'); 
-}
-
-/* h1: Roboto Slab Bold */
-h1.display-4{
+h1, h1.display-4 {
     font-family: 'Roboto Slab', serif;
     font-weight: 700;
     color: #25282A;
 }
 
-
-h1 {
-    font-family: 'Roboto Slab', serif;
-    font-weight: 700;
-    font-size: 3rem;
-    color: #25282A;
-}
-
-/* h2: Roboto Slab Regular */
 h2 {
     font-family: 'Roboto Slab', serif;
     font-weight: 400;
     color: #25282A;
 }
 
-/* h3, h4, h5, h6: Fira Sans Bold */
-h3 {
+h3, h4, h5, h6 {
     font-family: 'Fira Sans', sans-serif;
-    font-weight: 700; /* Bold */
-    color: #25282A;
-    font-size: 2.2rem;
-}
-
-h4, h5, h6 {
-    font-family: 'Fira Sans', sans-serif;
-    font-weight: 700; /* Bold */
+    font-weight: 700;
     color: #25282A;
 }
 
-/* Class to define a readable website, 45-75ch rule */
 .text-container {
-    max-width: 70ch;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: left;
+    max-width: 75ch; /* Leggibilità ottimale */
+    margin: 0 auto;
+}
+
+/* --- 2. RESPONSIVE MAP CONTAINERS (CRUCIALE) --- */
+
+/* Forza gli SVG a riempire il container Bootstrap */
+#geo-container, 
+#front-map-container, 
+#spike-container, 
+#stacked-bar-chart-container,
+#sub-event-line-chart-container,
+#chart svg {
+    width: 100% !important;
+    height: auto !important;
+    display: block;
+    max-width: none; /* Rimuove il vecchio limite di 1000px */
+}
+
+/* Wrapper per gestire lo zoom relativo e l'overflow */
+.chart-wrapper-map {
+    width: 100%;
+    position: relative; /* Fondamentale per posizionare la zoom-bar dentro */
+    overflow: hidden;   /* Evita che la mappa esca dai bordi durante lo zoom */
+    border-radius: 8px;
+}
+
+/* --- 3. UI CONTROLS & FILTERS --- */
+
+/* Stile base per le label e select dei filtri (Cosmetica) */
+.filter-item label {
+    display: block;
+    color: #333;
+}
+
+.filter-item select {
+    cursor: pointer;
+}
+
+/* Bottoni Filtro (es. Timeline Map) */
+.filter-btn {
+    /* Stili base, il resto lo fa Bootstrap (btn-outline-dark) */
+    font-weight: 500;
 }
 
 
-/* Global Styles d3 graph */
+/* --- 4. D3 CHART STYLES (COMMON) --- */
+
+/* Titoli e testi interni agli SVG */
 .graph-title {
   font-family: 'Fira Sans', sans-serif;
   font-size: 16px;
@@ -113,384 +97,44 @@ h4, h5, h6 {
   fill: #25282A;
 }
 
-.domain {
-  stroke: #25282A;
-  stroke-width: 1px;
-}
-
-.tick line {
+/* Assi e Linee */
+.domain, .tick line {
   stroke: #25282A;
   stroke-width: 1px;
 }
 
 .tick text {
   font-family: 'Fira Sans', sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   fill: #25282A;
 }
 
 .legend text {
   font-family: 'Fira Sans', sans-serif;
-  font-size: 20px;
+  font-size: 12px;
   fill: #25282A;
 }
 
-.bar-value {
-  font-family: 'Fira Sans', sans-serif;
-  font-size: 15px;
-  fill: #25282A; 
-}
-
-
-
-/* ------------- NEW ------------- */
-
-/* Styles to fix the size of the map containers */
-#geo-container, #front-map-container {
-    width: 1000px; 
-    height: 700px; 
-    max-width: 1000px;
-    max-height: 700px;
-    margin: 0 auto; 
-    display: block;
-}
-
-/* ---- Style for the map menu ---- */
-
-/*
-#map-wrapper {
-    margin: 0 auto;
-}
-
-
-.map-filters {
-    position: absolute;
-    top: 50px;   
-    right: 20px;  
-    z-index: 20;  
-    display: flex;
-    flex-direction: column; 
-    gap: 12px;
-    background: rgba(255, 255, 255, 0.9); 
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #ddd;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.filter-item {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-}
-
-.filter-item label {
-    font-size: 10px;
-    font-weight: bold;
-    text-transform: uppercase;
-    color: #555;
-    margin-bottom: 3px;
-}
-
-.filter-item select {
-    padding: 4px 8px;
-    font-size: 13px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    cursor: pointer;
-    background-color: white;
-}
-
-*/
-
-
-    #map-wrapper {
-        overflow: hidden;
-    }
-
-    /* 
-    .map-filters {
-        position: absolute;
-        top: 20px;       
-        left: 20px;        
-        background-color: rgba(255, 255, 255, 0.95); 
-        padding: 15px;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        text-align: left;
-        border: 1px solid #ddd;
-    }
-
-    .filter-item label {
-        display: block;
-        font-size: 0.85rem;
-        font-weight: bold;
-        margin-bottom: 2px;
-        color: #333;
-    }
-
-    .filter-item select {
-        width: 100%;
-        min-width: 150px;
-        padding: 5px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
-    */
-
-    .map-filters {
-        position: absolute;
-        top: 20px;          
-        left: 20px;         
-        background-color: rgba(255, 255, 255, 0.95); 
-        padding: 10px 15px; /* Un po' meno padding verticale */
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-        z-index: 1000;
-        
-        /* --- MODIFICHE QUI --- */
-        display: flex;
-        flex-direction: row;  /* Dispone gli elementi in riga */
-        gap: 15px;            /* Spazio tra i menu */
-        align-items: flex-end;/* Allinea i box in basso se le label hanno altezze diverse */
-        /* -------------------- */
-        
-        text-align: left;
-        border: 1px solid #ddd;
-    }
-
-    .filter-item label {
-        display: block;
-        font-size: 0.75rem; /* Leggermente più piccolo per stare meglio in riga */
-        font-weight: bold;
-        margin-bottom: 2px;
-        color: #333;
-    }
-
-    .filter-item select {
-        width: 140px; /* Larghezza fissa per uniformità */
-        padding: 4px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 0.9rem;
-    }
-
-    /* Stile migliorato per il Tooltip */
-    .tooltip-map {
-        font-family: sans-serif;
-        font-size: 13px;
-        line-height: 1.4;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-    
-    .tooltip-header {
-        font-size: 14px;
-        margin-bottom: 5px;
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 3px;
-    }
-
-    .tooltip-list {
-        margin: 0;
-        padding: 0;
-        list-style: none;
-        font-size: 12px;
-        color: #555;
-    }
-    
-    .tooltip-list li {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
-    }
-
-    .zoom-bar {
-        transition: top 0.3s ease;
-    }
-
-/* -------------------------------------------------------------- */
-
-.filter-btn {
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
-    padding: 8px 15px;
-    margin: 0 5px;
-    cursor: pointer;
-    border-radius: 4px;
-}
-.filter-btn.active {
-    background: #343a40;
-    color: white;
-    border-color: #343a40;
-}
-
-
-
-/* ################### linechart */
-
-/* axis oblaging */
-#chart-section .axis path,
-#chart-section .axis line {
-    display: none;
-}
-
-/* number of axis */
-#chart-section .axis text {
-    font-size: 15px; 
-    font-family: 'Segoe UI', sans-serif;
-    color: #555;
-    font-weight: 500;
-}
-
-/* orizzontal grids  */
-#chart-section .grid line {
-    stroke: #b0b0b0;
-    stroke-opacity: 0.5;
-    stroke-width: 1px;
-    stroke-dasharray: 6, 10;
-    display: block;
-}
-
-/* cut off the upper line */
-#chart-section .grid .tick:last-of-type line {
-    display: none;
-}
-
-/* mantain the fist orizontal line */
-#chart-section .axis-x path {
-    stroke: #333;
-    stroke-width: 1px;
-    display: block !important;
-}
-
-/* line of the graph */
-#chart-section path.line {
-    fill: none;
-    stroke-width: 3.5px;
-    stroke-linecap: round;
-    transition: opacity 0.5s ease;
-    filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.1));
-}
-
-/* Tooltip */
-#chart-tooltip {
-    position: absolute;
-    background: rgba(255, 255, 255, 0.98);
-    border: none;
-    padding: 15px;
-    border-radius: 8px;
-    pointer-events: none;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-    font-size: 14px;
-    display: none;
-    z-index: 100;
-    font-family: 'Segoe UI', sans-serif;
-    line-height: 1.6;
-}
-
-/* linechart chackbox feature */
-.checkbox-wrapper {
-    margin-right: 25px; 
-    cursor: pointer;   
-}
-.checkbox-wrapper span {
-    margin-left: 8px;
-}
-
-
-/* ############spiek */
-/* --- 1. PULIZIA E LAYOUT GENERALE --- */
-
-/* Nasconde eventuali vecchi controlli generati da JS per errore */
-#spike-controls {
-    display: none !important;
-}
-
-/* Container dei controlli statici */
-#static-spike-controls {
-    user-select: none; /* Evita che il testo venga selezionato cliccando ripetutamente */
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
-
-/* Etichette LEVEL / FILTER */
-.control-label {
-    font-size: 12px;
-    letter-spacing: 1px;
-    color: #6c757d;
-    font-weight: 700;
-}
-
-/* --- 2. STILE BOTTONI (RADIO & CHECKBOX) --- */
-
-/* L'elemento <label> che funge da contenitore clikkabile */
-.spike-btn {
-    cursor: pointer;
-    margin: 0;
-}
-
-/* Nascondiamo il vero input (il pallino o la spunta di default) */
-.spike-btn input {
-    display: none;
-}
-
-/* L'aspetto visivo del bottone (lo SPAN) */
-.spike-btn span {
-    display: inline-block;
-    padding: 8px 18px;          /* Spaziatura interna */
-    background-color: #fff;     /* Sfondo bianco di base */
-    border: 1px solid #dee2e6;  /* Bordo grigio chiaro */
-    border-radius: 4px;         /* Angoli leggermente smussati */
-    color: #333;                /* Testo scuro */
-    font-size: 14px;
-    font-weight: 600;
-    transition: all 0.2s ease-in-out; /* Animazione fluida */
-}
-
-/* Stato ATTIVO: Quando l'input è selezionato (Checked) */
-.spike-btn input:checked + span {
-    background-color: #343a40;  /* Grigio Scuro (Bootstrap Dark) */
-    color: #fff;                /* Testo bianco */
-    border-color: #343a40;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.15); /* Leggera ombra */
-}
-
-/* Stato HOVER: Quando passi il mouse sopra (su bottone inattivo) */
-.spike-btn:hover span {
-    background-color: #f8f9fa;
-    border-color: #c6c7c8;
-}
-
-/* Stato HOVER su ATTIVO: Quando passi sopra un bottone già selezionato */
-.spike-btn input:checked:hover + span {
-    background-color: #23272b; /* Diventa ancora più scuro */
-    border-color: #1d2124;
-}
-
-/* --- 3. STILE BARRA ZOOM --- */
-
+/* --- 5. ZOOM BAR CUSTOMIZATION --- */
+/* Deve essere assoluta RISPETTO al .chart-wrapper-map */
 .zoom-bar {
-    position: absolute; /* FONDAMENTALE: Posiziona la barra sopra la mappa */
+    position: absolute; 
     top: 20px;
     right: 20px;
+    z-index: 100;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    padding: 4px;
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    background: white;
-    padding: 5px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    z-index: 100; /* Assicura che stia sopra al grafico SVG */
+    gap: 4px;
 }
 
 .zoom-btn {
-    width: 30px; 
-    height: 30px;
-    border: 1px solid #eee;
+    width: 32px; 
+    height: 32px;
+    border: 1px solid #dee2e6;
     background: #fff;
     border-radius: 4px;
     cursor: pointer;
@@ -500,106 +144,105 @@ h4, h5, h6 {
     align-items: center; 
     justify-content: center;
     transition: all 0.2s;
-    font-size: 18px; /* Dimensione del + e - */
 }
 
-.zoom-btn:hover { 
-    background: #f0f0f0; 
+.zoom-btn:hover {
+    background: #f1f1f1;
     color: #000;
 }
 
-
-/* ############## */
-
-/* --- LAYOUT GENERALE --- */
-/* Container principale */
-#stacked-bar-chart-container {
-    position: relative;
-}
-
-/* BOX GRIGIO */
-.chart-grey-box {
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 20px;
-    position: relative; 
-    margin-bottom: 20px;
-}
-
-/* LEGENDA (Fuori) */
-.legend-container-outer {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 12px;
-}
-
-.legend-card-btn {
-    display: inline-flex;
-    align-items: center;
-    background-color: #fff;
-    padding: 8px 16px;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
+/* --- 6. TOOLTIPS (Global) --- */
+.tooltip-map, #tooltip, #tooltip-bar, #chart-tooltip {
     font-family: 'Fira Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    color: #333;
-    cursor: pointer;
-    border-left-width: 6px;
-    border-left-style: solid;
-    transition: all 0.2s;
+    font-size: 13px;
+    line-height: 1.4;
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 4px;
+    pointer-events: none;
+    z-index: 3000; /* Molto alto per stare sopra a tutto */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-.legend-card-btn.inactive {
-    opacity: 0.5;
-    background-color: #f9f9f9;
+.tooltip-header {
+    font-weight: 700;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 3px;
 }
 
-/* --- OVERLAY HELP (Copre tutto) --- */
-.chart-help-overlay {
+.tooltip-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.tooltip-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+/* --- 7. LINE CHART SPECIFICS (FAO Chart) --- */
+#chart-section .axis path,
+#chart-section .axis line {
+    display: none; /* Nasconde assi default brutti */
+}
+
+#chart-section .grid line {
+    stroke: #e0e0e0;
+    stroke-opacity: 0.7;
+    stroke-dasharray: 4, 4;
+}
+
+#chart-section .axis-x path {
+    stroke: #333;
+    display: block !important;
+}
+
+#chart-section path.line {
+    fill: none;
+    stroke-width: 3px;
+    stroke-linecap: round;
+    filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.1));
+}
+
+/* --- Reusable Chart Loader --- */
+.chart-loader-overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.92); /* Bianco semitrasparente */
-    backdrop-filter: blur(2px);
-    z-index: 2000; 
-    display: flex;
+    background-color: rgba(255, 255, 255, 0.9); /* Sfondo bianco coprente */
+    display: flex; /* Flex per centrare lo spinner e visibile di default */
     justify-content: center;
     align-items: center;
-    opacity: 0;
-    pointer-events: none; /* Passante quando invisibile */
-    transition: opacity 0.3s ease;
+    z-index: 9999;
+    border-radius: 8px; /* Match con il bordo del grafico */
+}
+
+.loader-spinner {
+    border: 5px solid #f3f3f3; /* Grigio chiaro */
+    border-top: 5px solid #444; /* Colore scuro che gira */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Opzionale: Stile base contenitore mappa per assicurare posizionamento */
+#geo-container {
+    position: relative; 
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
     border-radius: 8px;
-}
-
-.chart-help-overlay.active {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.chart-help-box {
-    background: white;
-    border: 2px solid #000;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    max-width: 450px;
-    text-align: left;
-}
-
-.chart-help-box h4 {
-    margin-top: 0;
-    font-family: 'Roboto Slab', serif;
-    text-align: center;
-    color: #000;
-}
-.chart-help-box ul {
-    font-family: 'Fira Sans', sans-serif;
-    font-size: 14px;
-    line-height: 1.6;
-    color: #333;
+    width: 100%;
+    height: auto;
 }
