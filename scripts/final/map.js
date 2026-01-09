@@ -4,31 +4,19 @@ const GENERAL_GEOJSON_PATH = "../../data/final/geojson/europe_final.geojson";
 const COUNTRIES_EVENTS_PATH = "../../data/final/df_country_summary_v4.json";
 const ADMIN_EVENTS_PATH = "../../data/final/df_admin_summary_v4.json";
 
-// --- CONFIGURAZIONE LAYOUT SPECIALI (AGGIORNATA: Box a Destra + Zoom Portogallo) ---
+// Management of islands 
 const SPECIAL_COUNTRY_LAYOUTS = {
-    // PORTOGALLO
     "PRT": { 
         check: (props) => ["Azores", "Madeira"].includes(props.NAME_1), 
-        inset: { 
-            x: 750,     // Spostato a destra (1000 - 350 - margine)
-            y: 415,     // Alzato un po' per centrarlo nello spazio vuoto
-            w: 200,     // MOLTO più grande (prima era 220) per "zoomare" le isole
-            h: 200,     // Altezza proporzionale
-            title: "Azores & Madeira" 
-        } 
+        inset: { x: 750, y: 415, w: 200, h: 200, title: "Azores & Madeira" }
     },
 
-    // SPAGNA
     "ESP": { 
         check: (props) => ["IslasCanarias"].includes(props.NAME_1), 
-        inset: { 
-            x: 750,     // Spostato a destra (1000 - 220 - margine)
-            y: 415,     // In basso a destra
-            w: 200, 
-            h: 200, 
-            title: "Canary Islands" 
-        } 
+        inset: { x: 750, y: 415, w: 200, h: 200, title: "Canary Islands" } 
     }
+
+    // Possibility of adding FRA (Corsica)
 };
 
 Promise.all([
@@ -50,14 +38,15 @@ Promise.all([
         .style("border", "1px solid #dee2e6")  
         .style("border-radius", "8px");        
     
-    // SETUP CONTENITORE PER I BOTTONI
+    // Box parent for HTML bottons
     const svgParent = d3.select(svg.node().parentNode);
     svgParent.style("position", "relative"); 
 
-    // --- 1. DEFINIZIONE PROIEZIONE ---
+    // Projection 
     const projection = d3.geoIdentity().reflectY(true);
     const pathGenerator = d3.geoPath().projection(projection);
 
+    // Initial focus
     const europeFocus = {
         type: "FeatureCollection",
         features: [{
@@ -69,25 +58,24 @@ Promise.all([
         }]
     };
 
+    // Projection of the Europe (starting point)
     projection.fitExtent([[0, 80], [width - 20, height - 20]], europeFocus);
 
-    // --- GRUPPI SVG ---
-    
-    // 1. Gruppo Mappa Europa (Zoomabile nella vista principale)
+    // Europe Map Group
     const mapGroup = svg.append("g");
     
-    // 2. Overlay Sfondo (Statico)
+    // Overlay background
     const overlay = svg.append("rect")
         .attr("width", width)
         .attr("height", height)
         .attr("fill", "rgba(45, 45, 45, 0.9)")
         .style("display", "none")
         .style("pointer-events", "all");
-    
-    // 3. Gruppo Mappa Dettaglio (Zoomabile nella vista dettaglio)
+
+    // Detail Map Group
     const detailMapGroup = svg.append("g").style("display", "none");
 
-    // 4. Gruppo UI Dettaglio (Titoli e Bottoni - STATICO, NON ZOOMABILE)
+    // 4. Detail UI Group (Titles and Buttons - STATIC, NOT ZOOMABLE)
     const detailUiGroup = svg.append("g").style("display", "none");
 
     // Variabile di stato per lo zoom
@@ -297,6 +285,7 @@ Promise.all([
             .text("Number of Events");
     }
 
+    // --- UPDATE VISUALIZATION (MAPPA EUROPA) ---
     function updateVisualization() {
         if(isDetailMode) return;
 
@@ -321,6 +310,7 @@ Promise.all([
             .attr("d", pathGenerator)
             .attr("stroke", "#fff")
             .attr("stroke-width", 0.5)
+            .attr("stroke-linejoin", "round") // Angoli morbidi
             .style("cursor", "pointer");
 
         countries.transition().duration(400)
@@ -333,9 +323,17 @@ Promise.all([
 
         countries
             .on("mouseover", function(event, d) {
+                // 1. FONDAMENTALE: Alza il path sopra gli altri vicini
+                d3.select(this).raise();
+
                 const name = getGeoName(d);
                 const records = dataGrouped.get(name) || [];
-                d3.select(this).attr("fill", "orange").attr("stroke", "#000").attr("stroke-width", 1);
+                
+                d3.select(this)
+                    .attr("fill", "orange")
+                    .attr("stroke", "#000")
+                    .attr("stroke-width", 1.5); // Spessore uniforme e ben visibile
+
                 const htmlContent = generateTooltipContent(name, records);
                 tooltip.style("opacity", 1)
                     .html(htmlContent)
@@ -349,8 +347,13 @@ Promise.all([
                 const name = getGeoName(d);
                 const records = dataGrouped.get(name) || [];
                 const c = d3.sum(records, r => getEvents(r));
-                d3.select(this).attr("stroke", "#fff").attr("stroke-width", 0.5)
+                
+                // Ripristina lo stile originale
+                d3.select(this)
+                    .attr("stroke", "#fff")
+                    .attr("stroke-width", 0.5)
                     .attr("fill", c > 0 ? colorScale(c) : "#eee");
+                    
                 tooltip.style("opacity", 0);
             })
             .on("click", (event, d) => {
@@ -384,7 +387,7 @@ Promise.all([
         }
     }
 
-    // --- RENDER COUNTRY DETAIL (LOGICA BASATA SUI NOMI) ---
+    // --- RENDER COUNTRY DETAIL (AGGIORNATA CON RAISE SUI BORDI) ---
     function renderCountryDetail(geo, name, isoCode) {
         // 1. Reset e UI
         isDetailMode = true;
@@ -398,7 +401,7 @@ Promise.all([
         detailUiGroup.style("display", "block").style("opacity", 1);
         legendGroup.style("opacity", 1); 
 
-        // 2. Preparazione Dati (Eventi e Colori)
+        // 2. Preparazione Dati
         const selYear = yearSelect.property("value");
         const selEvent = eventSelect.property("value");
 
@@ -413,7 +416,6 @@ Promise.all([
         let nationalBaseRecords = [];
 
         filteredAdmin.forEach(d => {
-            // Normalizziamo controllo ISO
             if (d.GID_1 === "ISO" || d.GID_1 === isoCode) {
                 nationalBaseRecords.push(d);
             } else {
@@ -429,7 +431,7 @@ Promise.all([
         colorScale.domain([0, totalMax || 1]);
         updateLegend(totalMax || 1);
 
-        // Helper Disegno
+        // --- HELPER DISEGNO (MODIFICATO PER BORDI PERFETTI) ---
         function drawFeatures(selection, features, projection) {
             const localPath = d3.geoPath().projection(projection);
             
@@ -439,7 +441,8 @@ Promise.all([
                 .attr("d", localPath)
                 .attr("stroke", "#444")
                 .attr("stroke-width", 1)
-                .attr("vector-effect", "non-scaling-stroke")
+                .attr("stroke-linejoin", "round") // Angoli più morbidi
+                .attr("vector-effect", "non-scaling-stroke") 
                 .attr("fill", d => {
                     const regionGID = d.properties.GID_1; 
                     const regionRecords = regionDataMap.get(regionGID) || [];
@@ -447,12 +450,19 @@ Promise.all([
                     return totalVal > 0 ? adminColor(totalVal) : "#ffffff";
                 })
                 .on("mouseover", function(event, d) {
+                    // 1. "INNALZA" l'elemento corrente sopra tutti i vicini
+                    d3.select(this).raise(); 
+
                     const regionGID = d.properties.GID_1;
                     const regionName = d.properties.NAME_1 || regionGID; 
                     const regionRecords = regionDataMap.get(regionGID) || [];
                     const combinedRecords = regionRecords.concat(nationalBaseRecords);
 
-                    d3.select(this).attr("fill", "orange").attr("stroke", "#000").attr("stroke-width", 2);
+                    d3.select(this)
+                        .attr("fill", "orange")
+                        .attr("stroke", "#000")
+                        .attr("stroke-width", 2); // Bordo più spesso che ora sarà completamente visibile
+
                     tooltip.style("opacity", 1)
                         .html(generateTooltipContent(regionName, combinedRecords))
                         .style("left", (event.pageX + 15) + "px")
@@ -465,13 +475,19 @@ Promise.all([
                     const regionGID = d.properties.GID_1;
                     const regionRecords = regionDataMap.get(regionGID) || [];
                     const totalVal = d3.sum(regionRecords, r => getEvents(r)) + nationalSum;
-                    d3.select(this).attr("stroke", "#444").attr("stroke-width", 1)
+                    
+                    // Ripristina stile
+                    d3.select(this)
+                        .attr("stroke", "#444")
+                        .attr("stroke-width", 1)
                         .attr("fill", totalVal > 0 ? adminColor(totalVal) : "#ffffff");
+                    
                     tooltip.style("opacity", 0);
+                    // Nota: Non serve abbassare l'elemento (.lower()), lasciarlo "in alto" non crea problemi visivi
                 });
         }
 
-        // 3. LOGICA SPLIT (MAINLAND vs INSET) - PROPRIETÀ NAME_1
+        // 3. LOGICA SPLIT (MAINLAND vs INSET)
         const layout = SPECIAL_COUNTRY_LAYOUTS[isoCode] || SPECIAL_COUNTRY_LAYOUTS[isoCode.substring(0,2)];
         
         let mainlandFeats = [];
@@ -480,62 +496,52 @@ Promise.all([
 
         if (layout) {
             geo.features.forEach(f => {
-                // Controllo diretto sul nome della proprietà
                 if (f.properties && layout.check(f.properties)) {
                     insetFeats.push(f);
                 } else {
                     mainlandFeats.push(f);
                 }
             });
-
-            // Usiamo il layout splittato SOLO se abbiamo trovato le isole specificate
             if (insetFeats.length > 0 && mainlandFeats.length > 0) {
                 useSplitLayout = true;
             }
         }
 
         if (useSplitLayout) {
-            // A. MAINLAND (Grande al centro)
+            // A. MAINLAND
             const mainProj = d3.geoIdentity().reflectY(true);
             mainProj.fitExtent([[50, 50], [width - 50, height - 50]], { type: "FeatureCollection", features: mainlandFeats });
-            
             const mainGroup = detailMapGroup.append("g").attr("class", "mainland");
             drawFeatures(mainGroup, mainlandFeats, mainProj);
 
-            // B. INSET (Isole nel box)
+            // B. INSET
             const cfg = layout.inset;
             const insetGroup = detailMapGroup.append("g").attr("class", "inset-box");
             
-            // Sfondo Box
             insetGroup.append("rect")
                 .attr("x", cfg.x).attr("y", cfg.y)
                 .attr("width", cfg.w).attr("height", cfg.h)
                 .attr("fill", "white").attr("stroke", "#ccc").attr("rx", 4);
 
-            // Titolo Box
             insetGroup.append("text")
                 .attr("x", cfg.x + 10).attr("y", cfg.y + 20)
                 .text(cfg.title)
                 .style("font-size", "11px").style("font-weight", "bold").style("fill", "#333");
 
-            // Mappa Inset
             const insetProj = d3.geoIdentity().reflectY(true);
             insetProj.fitExtent([[cfg.x + 10, cfg.y + 30], [cfg.x + cfg.w - 10, cfg.y + cfg.h - 10]], { type: "FeatureCollection", features: insetFeats });
-            
             const insetMapGroup = insetGroup.append("g");
             drawFeatures(insetMapGroup, insetFeats, insetProj);
 
         } else {
-            // C. STANDARD (Fallback o paesi normali)
-            // Se non trova "Azores" o "Canarias", mostra tutto insieme come prima
+            // C. STANDARD
             const stdProj = d3.geoIdentity().reflectY(true);
             stdProj.fitExtent([[50, 80], [width - 50, height - 50]], { type: "FeatureCollection", features: geo.features });
-            
             const stdGroup = detailMapGroup.append("g").attr("class", "standard-view");
             drawFeatures(stdGroup, geo.features, stdProj);
         }
 
-        // UI Titolo e Chiusura
+        // UI
         detailUiGroup.append("text")
             .attr("x", width/2).attr("y", 40)
             .attr("text-anchor", "middle").attr("fill", "white") 
