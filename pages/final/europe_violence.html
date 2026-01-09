@@ -30,64 +30,49 @@
 
                     <div class="row justify-content-center mb-4">
                         <div class="col-lg-10">
-                            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                                <div class="card-body p-3 bg-white">
-                                    <div class="row g-3 align-items-center">
 
-                                        <div class="col-md-auto d-none d-md-block text-secondary ps-3">
-                                            <span class="fw-bold text-uppercase small"
-                                                style="letter-spacing: 1px;">FILTERS</span>
-                                        </div>
+                            <div class="compact-menu-bar">
 
-                                        <div class="col-md-auto d-none d-md-block">
-                                            <div class="vr h-100"></div>
-                                        </div>
-
-                                        <div class="col-md">
-                                            <div class="form-floating">
-                                                <select id="select-event" class="form-select border-0 bg-light"
-                                                    style="font-weight: 500;">
-                                                    <option value="All">All Events</option>
-                                                </select>
-                                                <label for="select-event">Event Type</label>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md">
-                                            <div class="form-floating">
-                                                <select id="select-year" class="form-select border-0 bg-light"
-                                                    style="font-weight: 500;">
-                                                    <option value="All">All Years</option>
-                                                </select>
-                                                <label for="select-year">Year</label>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md">
-                                            <div class="form-floating">
-                                                <select id="select-country" class="form-select border-0 bg-light"
-                                                    style="font-weight: 500;">
-                                                    <option value="All">All Countries</option>
-                                                </select>
-                                                <label for="select-country">Country</label>
-                                            </div>
-                                        </div>
-
-                                    </div>
+                                <div class="compact-group">
+                                    <label class="compact-label">Event Type</label>
+                                    <select id="select-event" class="compact-select">
+                                        <option value="All">All Events</option>
+                                    </select>
                                 </div>
+
+                                <div class="compact-divider"></div>
+
+                                <div class="compact-group">
+                                    <label class="compact-label">Year</label>
+                                    <select id="select-year" class="compact-select">
+                                        <option value="All">All Years</option>
+                                    </select>
+                                </div>
+
+                                <div class="compact-divider"></div>
+
+                                <div class="compact-group">
+                                    <label class="compact-label">Country</label>
+                                    <select id="select-country" class="compact-select">
+                                        <option value="All">All Countries</option>
+                                    </select>
+                                </div>
+
                             </div>
+
                         </div>
                     </div>
 
                     <div class="row justify-content-center">
                         <div class="col-lg-10">
+
                             <div id="map-wrapper"
                                 class="chart-wrapper-map position-relative border shadow-sm rounded-3">
                                 <svg id="geo-container"></svg>
                             </div>
+
                         </div>
                     </div>
-
                 </div>
             </section>
 

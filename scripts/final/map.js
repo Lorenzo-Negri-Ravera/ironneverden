@@ -411,6 +411,25 @@ Promise.all([
         });
     }
 
+    
+    // -- How to read the chart --
+    const mapHelpContent = {
+        title: "How to read the Map",
+        steps: [
+            "<strong>Colors:</strong> Darker red indicates a higher number of conflict events.",
+            "<strong>Interaction:</strong> Hover over any country to see detailed statistics.",
+            "<strong>Zoom:</strong> Click on a country to zoom in and explore regional data."
+        ]
+    };
+
+    // Chiamiamo la funzione globale di utils.js
+    // Questa funzione creerà i div e gestirà il mouseover
+    if (typeof createChartHelp === "function") {
+        createChartHelp("#map-wrapper", mapHelpContent);
+    } else {
+        console.warn("createChartHelp non trovata. Assicurati di caricare utils.js prima di map.js");
+    }
+
 }).catch(err => {
     console.error("Errore Caricamento:", err);
     d3.select(".loader-spinner").style("border-top", "5px solid red"); 
