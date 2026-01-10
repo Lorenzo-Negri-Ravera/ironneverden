@@ -14,7 +14,6 @@ const height = 700;
 const svg = d3.select("#geo-container")
     .attr("viewBox", [0, 0, width, height]);
 
-
 // Parent per bottoni e loader
 const svgParent = d3.select(svg.node().parentNode);
 
@@ -69,11 +68,15 @@ const geoCache = new Map();
 const SPECIAL_COUNTRY_LAYOUTS = {
     "PRT": {
         check: (props) => ["Azores", "Madeira"].includes(props.NAME_1),
-        inset: { x: 750, y: 415, w: 200, h: 200, title: "Azores & Madeira" }
+        inset: { x: 750, y: 350, w: 180, h: 200, title: "Azores & Madeira" }
     },
     "ESP": {
         check: (props) => ["IslasCanarias"].includes(props.NAME_1),
-        inset: { x: 750, y: 415, w: 200, h: 200, title: "Canary Islands" }
+        inset: { x: 750, y: 450, w: 150, h: 150, title: "Canary Islands" }
+    },
+    "FRA": {
+        check: (props) => ["Corse"].includes(props.NAME_1),
+        inset: { x: 20, y: 415, w: 150, h: 150, title: "Corsica" }
     }
 };
 
@@ -344,6 +347,7 @@ Promise.all([
         }
 
         const layout = SPECIAL_COUNTRY_LAYOUTS[isoCode] || SPECIAL_COUNTRY_LAYOUTS[isoCode.substring(0, 2)];
+        
         let mainlandFeats = [], insetFeats = [], useSplitLayout = false;
         if (layout) {
             geo.features.forEach(f => { if (f.properties && layout.check(f.properties)) insetFeats.push(f); else mainlandFeats.push(f); });
@@ -354,10 +358,9 @@ Promise.all([
             const mainProj = d3.geoIdentity().reflectY(true);
             mainProj.fitExtent([[50, 50], [width - 50, height - 50]], { type: "FeatureCollection", features: mainlandFeats });
             const mainGroup = detailMapGroup.append("g"); drawFeatures(mainGroup, mainlandFeats, mainProj);
-
             const cfg = layout.inset;
             const insetGroup = detailMapGroup.append("g");
-            insetGroup.append("rect").attr("x", cfg.x).attr("y", cfg.y).attr("width", cfg.w).attr("height", cfg.h).attr("fill", "white").attr("stroke", "#ccc").attr("rx", 4);
+            insetGroup.append("rect").attr("x", cfg.x).attr("y", cfg.y).attr("width", cfg.w).attr("height", cfg.h).attr("fill", "white").attr("stroke", "#ccc").attr("rx", 4).attr("stroke-dasharray", "5,5").attr("stroke-width", 1);
             insetGroup.append("text").attr("x", cfg.x + 10).attr("y", cfg.y + 20).text(cfg.title).style("font-size", "11px").style("font-weight", "bold").style("fill", "black");
             const insetProj = d3.geoIdentity().reflectY(true);
             insetProj.fitExtent([[cfg.x + 10, cfg.y + 30], [cfg.x + cfg.w - 10, cfg.y + cfg.h - 10]], { type: "FeatureCollection", features: insetFeats });

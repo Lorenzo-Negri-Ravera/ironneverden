@@ -71,7 +71,6 @@
                             <div class="d-flex justify-content-start align-items-center mt-3 w-100">
                                 <div id="geo-help-container"></div>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -127,50 +126,69 @@
                 </div>    
             </section> 
             
+
             <section id="spike-map-section" class="mt-5">
                 <div class="row justify-content-center">
                     <div class="col-lg-10 text-center">
+                        
                         <div class="text-container mb-4">
                             <h3>Intensità del Conflitto per Regione</h3>
                             <p class="text-muted">
                                 Totale vittime raggruppate per regione. Clicca su una regione per i dettagli.
                             </p>
                         </div>
-                        <div class="chart-wrapper-map position-relative border rounded bg-light mb-4">
-                            <svg id="spike-container"></svg>
-                            <div id="spike-zoom-controls" class="position-absolute d-flex flex-column gap-2 p-2" style="top: 10px; right: 10px; z-index: 100;">
-                                <button class="btn btn-sm btn-primary zoom-btn" id="spike-zoom-in">+</button>
-                                <button class="btn btn-sm btn-primary zoom-btn" id="spike-zoom-out">−</button>
-                                <button class="btn btn-sm btn-primary zoom-btn" id="spike-zoom-reset">R</button>
+
+                        <div id="static-spike-controls" class="d-flex justify-content-center flex-wrap gap-3 mb-4">
+                
+                            <div class="compact-menu-bar d-inline-flex align-items-center p-1" role="group">
+                                
+                                <input type="radio" class="btn-check" name="mapLevel" id="lvl-region" value="region" autocomplete="off">
+                                <label class="btn-compact py-1 px-3 d-flex align-items-center justify-content-center" for="lvl-region" style="min-width: 80px;">
+                                    Regions
+                                </label>
+                                
+                                <div class="compact-divider my-1"></div>
+                                
+                                <input type="radio" class="btn-check" name="mapLevel" id="lvl-district" value="district" autocomplete="off" checked>
+                                <label class="btn-compact active py-1 px-3 d-flex align-items-center justify-content-center" for="lvl-district" style="min-width: 80px;">
+                                    Districts
+                                </label>
+                                
+                                <div class="compact-divider my-1"></div>
+                                
+                                <input type="radio" class="btn-check" name="mapLevel" id="lvl-comuni" value="comuni" autocomplete="off">
+                                <label class="btn-compact py-1 px-3 d-flex align-items-center justify-content-center" for="lvl-comuni" style="min-width: 80px;">
+                                    Municipals
+                                </label>
+                            </div>
+
+                            <div class="compact-menu-bar d-inline-flex align-items-center p-1" role="group">
+                                
+                                <input type="checkbox" class="btn-check" id="check-battles" checked>
+                                <label class="btn-compact active py-1 px-3 d-flex align-items-center justify-content-center" for="check-battles" style="min-width: 80px;">
+                                    Battles
+                                </label>
+                                
+                                <div class="compact-divider my-1"></div>
+                                
+                                <input type="checkbox" class="btn-check" id="check-explosions" checked>
+                                <label class="btn-compact active py-1 px-3 d-flex align-items-center justify-content-center" for="check-explosions" style="min-width: 80px;">
+                                    Explosions
+                                </label>
                             </div>
                         </div>
-                        <div id="static-spike-controls"
-                            class="d-flex justify-content-center flex-wrap gap-4 p-3 border rounded bg-light">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="fw-bold small text-uppercase text-secondary">Level:</span>
-                                <div class="btn-group" role="group">
-                                    <input type="radio" class="btn-check" name="mapLevel" id="lvl-region" value="region"
-                                        autocomplete="off">
-                                    <label class="btn btn-outline-secondary btn-sm" for="lvl-region">Regions</label>
-                                    <input type="radio" class="btn-check" name="mapLevel" id="lvl-district"
-                                        value="district" autocomplete="off" checked>
-                                    <label class="btn btn-outline-secondary btn-sm" for="lvl-district">Districts</label>
-                                    <input type="radio" class="btn-check" name="mapLevel" id="lvl-comuni" value="comuni"
-                                        autocomplete="off">
-                                    <label class="btn btn-outline-secondary btn-sm" for="lvl-comuni">Municipals</label>
+
+                            <div id="spike-map-wrapper" class="position-relative border rounded bg-light mb-2">
+                                <svg id="spike-container"></svg>
+                                <div id="spike-zoom-controls" class="position-absolute d-flex flex-column gap-2 p-2" style="top: 10px; right: 10px; z-index: 100;">
+                                    <button class="btn btn-sm btn-primary zoom-btn" id="spike-zoom-in">+</button>
+                                    <button class="btn btn-sm btn-primary zoom-btn" id="spike-zoom-out">−</button>
+                                    <button class="btn btn-sm btn-primary zoom-btn" id="spike-zoom-reset">R</button>
                                 </div>
                             </div>
-                            <div class="vr d-none d-md-block text-muted"></div>
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="fw-bold small text-uppercase text-secondary">Filter:</span>
-                                <div class="btn-group" role="group">
-                                    <input type="checkbox" class="btn-check" id="check-battles" checked>
-                                    <label class="btn btn-outline-dark btn-sm" for="check-battles">Battles</label>
-                                    <input type="checkbox" class="btn-check" id="check-explosions" checked>
-                                    <label class="btn btn-outline-dark btn-sm" for="check-explosions">Explosions</label>
-                                </div>
+                            <div class="d-flex justify-content-start align-items-center mt-3 w-100">
+                                <div id="spike-help-container"></div>
                             </div>
-                        </div>
                     </div>
                 </div>
             </section>
@@ -235,7 +253,6 @@
                 
                 <p class="source text-muted mt-2 small">Fonte dati: Eurocontrol / Internal Data</p>
             </section>
-        
 
         </main>
     </div>

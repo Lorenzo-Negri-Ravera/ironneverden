@@ -210,8 +210,19 @@
             });
         });
 
+        // --- Funzione Helper per aggiornare lo stile dei bottoni ---
+        function updateControlStyles() {
+            // Seleziona tutti gli input (radio e checkbox) dentro il menu
+            d3.selectAll('#static-spike-controls input').each(function() {
+                const isChecked = d3.select(this).property("checked");
+                // Trova la label collegata a questo input tramite l'attributo "for"
+                d3.select(`label[for="${this.id}"]`).classed("active", isChecked);
+            });
+        }
+
         // --- UPDATE FUNCTION ---
         function updateSpikes() {
+            updateControlStyles(); // Aggiorna lo stile dei bottoni
             const radioNode = d3.select('input[name="mapLevel"]:checked').node();
             const level = radioNode ? radioNode.value : "district";
             const showBat = d3.select("#check-battles").property("checked");
@@ -325,6 +336,7 @@
         // Prima chiamata per disegnare la mappa
         updateSpikes();
 
+
         // -- How to read the chart --
         const mapHelpContent = {
             title: "How to read the Map",
@@ -337,7 +349,7 @@
 
         // Chiamo utils.js con i NUOVI parametri
         if (typeof createChartHelp === "function") {
-            createChartHelp("#front-help-container", "#front-map-wrapper", mapHelpContent);
+            createChartHelp("#spike-help-container", "#spike-map-wrapper", mapHelpContent);
         } else {
             console.warn("createChartHelp non trovata.");
         }

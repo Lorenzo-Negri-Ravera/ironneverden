@@ -432,12 +432,12 @@ h3, h4, h5, h6 {
     transition: all 0.2s ease; /* Transizione fluida */
     
     /* Colore di sfondo leggermente più scuro del primary standard */
-    background-color: #0d6efd; 
+    background-color: #bf0e0eb6; 
     border: none;
 }
 
 .btn-player:hover {
-    background-color: #0b5ed7; /* Colore hover */
+    background-color: #8a080895; /* Colore hover */
     box-shadow: 0 2px 5px rgba(0,123,255,0.3);
     transform: translateY(-1px); /* Leggero effetto sollevamento */
 }
@@ -532,6 +532,9 @@ h3, h4, h5, h6 {
     color: #25282A;       /* Nero/Scuro quando attivo */
     font-weight: 700;     /* Più grassetto per evidenziare */
 }
+
+
+
 
 /* ========================================= */
 /* --- RACE BAR CHART (ADAPTIVE BOX) ---     */
