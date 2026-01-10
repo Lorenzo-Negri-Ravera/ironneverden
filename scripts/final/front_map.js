@@ -242,24 +242,26 @@ Promise.all([
         render();
     }
 
+
+    // --- Zoom Logic ---
+    // --- ZOOM LOGIC (DEBUG VERSION) ---
+    
+    // 1. Definisci il comportamento dello zoom
     const zoom = d3.zoom()
-        .scaleExtent([1, 25])
+        .scaleExtent([1, 12])
         .on("zoom", (event) => {
+            mapGroup.attr("transform", event.transform);
             currentTransform = event.transform;
-            mapGroup.attr("transform", currentTransform);
-            render();
+            render(); // Ridisegna i punti
+            tooltip.style("opacity", 0);
         });
-    svg.call(zoom);
 
-    // Zoom Controls
-    const zoomBar = container.append("div")
-        .style("position", "absolute").style("top", "20px").style("right", "20px")
-        .style("display", "flex").style("flex-direction", "column").style("gap", "5px").style("z-index", 10);
+    svg.call(zoom).on("dblclick.zoom", null);
 
-    const btnStyle = "width:30px;height:30px;background:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:bold;box-shadow:0 2px 4px rgba(0,0,0,0.2);";
-    zoomBar.append("button").attr("style", btnStyle).text("+").on("click", () => svg.transition().call(zoom.scaleBy, 1.3));
-    zoomBar.append("button").attr("style", btnStyle).text("−").on("click", () => svg.transition().call(zoom.scaleBy, 0.7));
-    zoomBar.append("button").attr("style", btnStyle).text("R").on("click", () => svg.transition().call(zoom.transform, d3.zoomIdentity));
+    d3.select("#front-zoom-in").on("click", () => svg.transition().call(zoom.scaleBy, 1.3));
+    d3.select("#front-zoom-out").on("click", () => svg.transition().call(zoom.scaleBy, 0.7));
+    d3.select("#front-zoom-reset").on("click", () => svg.transition().call(zoom.transform, d3.zoomIdentity));
+
 
     // Slider
     const slider = d3.select("#time-slider").attr("max", days.length - 1);
@@ -288,11 +290,26 @@ Promise.all([
 
     updateVisibleData();
 
-    if (typeof setupHelpButton === "function") {
-        setupHelpButton(svg, width, height, {
-            x: 30, y: height - 30, title: "Mappa del Fronte",
-            instructions: ["Linea ROSSA = Confine con la Russia", "Punti Rossi = Battaglie", "Punti Gialli = Esplosioni"]
-        });
+
+
+    // -- How to read the chart --
+    const mapHelpContent = {
+        title: "How to read the Map",
+        steps: [
+            "<strong>Colors:</strong> Darker red indicates a higher number of conflict events.",
+            "<strong>Interaction:</strong> Hover over any country to see detailed statistics.",
+            "<strong>Zoom:</strong> Click on a country to zoom in and explore regional data."
+        ]
+    };
+
+    // Chiamo utils.js: funzione creerà i div e gestirà il mouseover
+    if (typeof createChartHelp === "function") {
+        createChartHelp("#front-map-wrapper", mapHelpContent);
+    } else {
+        console.warn("createChartHelp non trovata. Assicurati di caricare utils.js prima di map.js");
     }
 
-}).catch(err => console.error("Errore Front Map:", err));
+}).catch(err => {
+    console.error("Errore Front Map:", err);
+    d3.select(".loader-spinner").style("border-top", "5px solid red");
+});

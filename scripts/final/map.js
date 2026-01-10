@@ -99,38 +99,23 @@ Promise.all([
     };
     projection.fitExtent([[0, 80], [width - 20, height - 20]], europeFocus);
 
+
+    // --- Zoom Logic ---
     const zoom = d3.zoom()
-        .scaleExtent([1, 12])
-        .on("zoom", (event) => {
-            if (isDetailMode) detailMapGroup.attr("transform", event.transform);
-            else mapGroup.attr("transform", event.transform);
-            tooltip.style("opacity", 0);
-        });
+    .scaleExtent([1, 12])
+    .on("zoom", (event) => {
+        mapGroup.attr("transform", event.transform);
+        tooltip.style("opacity", 0);
+    });
 
     svg.call(zoom).on("dblclick.zoom", null);
 
-    // Zoom Bar
-    const zoomBar = svgParent.selectAll(".zoom-bar").data([0]).join("div")
-        .attr("class", "zoom-bar")
-        .style("position", "absolute")
-        .style("top", "20px")
-        .style("right", "20px")
-        .style("z-index", "100")
-        .style("display", "flex")
-        .style("flex-direction", "column")
-        .style("gap", "5px");
-    
-    zoomBar.selectAll("*").remove();
-    zoomBar.append("button").attr("class", "zoom-btn").text("+").on("click", () => svg.transition().duration(500).call(zoom.scaleBy, 1.3));
-    zoomBar.append("button").attr("class", "zoom-btn").text("−").on("click", () => svg.transition().duration(500).call(zoom.scaleBy, 0.7));
-    zoomBar.append("button").attr("class", "zoom-btn").style("font-size", "14px").text("Rst")
-        .on("click", () => {
-            if (isDetailMode) svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
-            else {
-                d3.select("#select-country").property("value", "All");
-                svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
-            }
-        });
+    d3.select("#zoom-in").on("click", () => svg.transition().call(zoom.scaleBy, 1.3));
+    d3.select("#zoom-out").on("click", () => svg.transition().call(zoom.scaleBy, 0.7));
+    d3.select("#zoom-reset").on("click", () => svg.transition().call(zoom.transform, d3.zoomIdentity));
+
+
+
 
     const colorScale = d3.scaleSqrt().range(["#fee5d9", "#C8102E"]);
 
@@ -301,7 +286,7 @@ Promise.all([
     function renderCountryDetail(geo, name, isoCode) {
         isDetailMode = true;
         svg.call(zoom.transform, d3.zoomIdentity);
-        d3.select(".zoom-bar").style("top", "90px");
+        d3.select("#zoom-controls").style("top", "75px");
         mapGroup.style("display", "none");
         overlay.attr("fill", "#f8f9fa").style("display", "block").style("opacity", 1);
         detailMapGroup.selectAll("*").remove(); detailMapGroup.style("display", "block").style("opacity", 1);
@@ -391,7 +376,7 @@ Promise.all([
 
     function closeDetail() {
         isDetailMode = false; svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
-        d3.select("#select-country").property("value", "All"); d3.select(".zoom-bar").style("top", "20px");
+        d3.select("#select-country").property("value", "All"); d3.select("#zoom-controls").style("top", "20px");
         overlay.style("display", "none"); detailMapGroup.style("display", "none"); detailUiGroup.style("display", "none");
         mapGroup.style("display", "block").style("opacity", 1); d3.select(".map-filters").style("visibility", "visible"); tooltip.style("opacity", 0);
         legendGroup.selectAll("text").style("fill", "#6c757d"); legendGroup.select(".legend-axis line").style("stroke", "#adb5bd"); legendGroup.select(".legend-axis path").style("stroke", "none");
@@ -422,8 +407,7 @@ Promise.all([
         ]
     };
 
-    // Chiamiamo la funzione globale di utils.js
-    // Questa funzione creerà i div e gestirà il mouseover
+    // Chiamo utils.js: funzione creerà i div e gestirà il mouseover
     if (typeof createChartHelp === "function") {
         createChartHelp("#map-wrapper", mapHelpContent);
     } else {

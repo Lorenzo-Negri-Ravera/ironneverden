@@ -24,7 +24,6 @@
         </header>
 
         <main class="p-4">
-
             <section id="geo-section" class="mb-5 position-relative">
                 <div class="container-fluid p-0">
 
@@ -69,6 +68,12 @@
                             <div id="map-wrapper"
                                 class="chart-wrapper-map position-relative border shadow-sm rounded-3">
                                 <svg id="geo-container"></svg>
+
+                                <div id="zoom-controls" class="position-absolute d-flex flex-column gap-2 p-2">
+                                    <button class="btn btn-sm btn-primary zoom-btn" id="zoom-in">+</button>
+                                    <button class="btn btn-sm btn-primary zoom-btn" id="zoom-out">−</button>
+                                    <button class="btn btn-sm btn-primary zoom-btn" id="zoom-reset">R</button>
+                                </div>
                             </div>
 
                         </div>
@@ -91,20 +96,32 @@
                             <button class="btn btn-outline-dark filter-btn"
                                 data-type="Explosions/Remote violence">Explosions</button>
                         </div>
-
-                        <div class="chart-wrapper-map position-relative border mb-3">
+                        
+                        <div id="front-map-wrapper" class="chart-wrapper-map position-relative border mb-3">
                             <div id="front-map-container"></div>
-                        </div>
 
-                        <div id="controls"
-                            class="d-flex align-items-center justify-content-center p-3 bg-light rounded border">
-                            <button id="play-button" class="btn btn-primary me-3">Play</button>
-                            <div class="flex-grow-1 mx-3">
-                                <input type="range" id="time-slider" class="form-range" style="width: 100%;">
+                            <div id="front-zoom-controls" class="position-absolute d-flex flex-column gap-2 p-2">
+                                    <button class="btn btn-sm btn-primary zoom-btn" id="front-zoom-in">+</button>
+                                    <button class="btn btn-sm btn-primary zoom-btn" id="front-zoom-out">−</button>
+                                    <button class="btn btn-sm btn-primary zoom-btn" id="front-zoom-reset">R</button>
                             </div>
-                            <span id="current-date-display" class="fw-bold ms-2" style="min-width: 100px;">Date</span>
                         </div>
 
+                        <div class="d-flex justify-content-end mt-3">
+                            <div id="controls" class="d-flex align-items-center bg-white shadow-sm border rounded-pill py-2 px-3 gap-3">
+                                <button id="play-button" class="btn btn-primary btn-sm btn-player d-flex align-items-center gap-2 px-3">
+                                    <span id="play-text" class="fw-bold">Play</span>
+                                </button>
+
+                                <div class="d-flex align-items-center">
+                                    <input type="range" id="time-slider" class="form-range custom-range-slider" style="width: 180px;">
+                                </div>
+
+                                <span id="current-date-display" class="fw-bold small text-nowrap" style="min-width: 80px; font-family: 'Fira Sans', sans-serif;">
+                                    Date
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
