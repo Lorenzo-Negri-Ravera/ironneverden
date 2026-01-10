@@ -532,3 +532,143 @@ h3, h4, h5, h6 {
     color: #25282A;       /* Nero/Scuro quando attivo */
     font-weight: 700;     /* Più grassetto per evidenziare */
 }
+
+/* ========================================= */
+/* --- RACE BAR CHART (ADAPTIVE BOX) ---     */
+/* ========================================= */
+
+/* IL CONTENITORE PRINCIPALE (Il Box Grigio) */
+#chart-container {
+    position: relative; 
+    width: 100%;
+    max-width: 1100px;  /* Larghezza stile "Card" */
+    
+    /* MODIFICA FONDAMENTALE: */
+    /* Togliamo min-height: 500px che creava lo spazio vuoto sotto. */
+    /* Mettiamo 'auto' o un minimo basso giusto per sicurezza. */
+    min-height: 300px; 
+    height: auto;       /* Si adatta all'altezza del grafico */
+    
+    /* Stile Estetico */
+    background-color: #f8f9fa; 
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin: 40px auto; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    
+    /* PADDING: */
+    /* 30px sopra e ai lati */
+    /* 70px SOTTO: serve spazio extra per i bottoni Help e Replay */
+    /* così non finiscono sopra le barre del grafico */
+    padding: 30px 30px 70px 30px; 
+    
+    box-sizing: border-box; 
+    font-family: 'Fira Sans', sans-serif;
+    overflow: hidden; /* Assicura che nulla esca dai bordi arrotondati */
+}
+
+/* L'SVG SI ADATTA AL CONTENITORE */
+#chart-container svg {
+    width: 100%;      /* Prende tutta la larghezza disponibile (meno il padding) */
+    height: auto;     /* Mantiene le proporzioni corrette senza deformarsi */
+    display: block;   /* Rimuove spazi bianchi fantasma sotto l'SVG */
+}
+
+/* --- ELEMENTI FLOTTANTI --- */
+
+/* Anno di sfondo */
+.year-ticker {
+    font-family: 'Roboto Slab', serif; 
+    font-size: 140px; 
+    font-weight: 700;
+    fill: #e0e0e0; 
+    text-anchor: end;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Trigger Help (Basso Sinistra) */
+.help-trigger-container {
+    position: absolute;
+    bottom: 20px;      
+    left: 30px; /* Allineato col padding laterale */
+    z-index: 100; 
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+/* Bottone Replay (Basso Destra) */
+#replay-btn {
+    position: absolute;
+    bottom: 20px; 
+    right: 30px; /* Allineato col padding laterale */
+    z-index: 100;
+    padding: 8px 20px;
+    background-color: #343a40; 
+    color: white;
+    border: none; 
+    border-radius: 20px;
+    font-weight: 600; 
+    font-size: 13px;
+    text-transform: uppercase;
+    cursor: pointer; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: background 0.2s;
+}
+#replay-btn:hover { background-color: #23272b; }
+
+/* Legenda (Posizionata sopra il bottone Replay) */
+.legend-box {
+    position: absolute; 
+    bottom: 70px; /* Appena sopra l'area dei bottoni */
+    right: 30px; 
+    background: rgba(255, 255, 255, 0.95); 
+    border: 1px solid #dee2e6;
+    padding: 15px; 
+    border-radius: 8px; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    min-width: 180px; 
+    z-index: 50;
+    transition: opacity 0.3s ease;
+}
+.legend-box.hidden { opacity: 0; pointer-events: none; }
+.legend-box h3 { margin: 0 0 8px 0; font-size: 16px; border-bottom: 2px solid #002677; padding-bottom: 4px; }
+.legend-box p { margin: 6px 0; font-size: 13px; font-weight: 600; }
+
+/* --- HELP OVERLAY --- */
+.chart-help-overlay {
+    position: absolute; 
+    top: 0; left: 0; 
+    width: 100%; height: 100%;
+    background-color: rgba(255, 255, 255, 0.96);
+    z-index: 200;
+    display: flex; justify-content: center; align-items: center;
+    opacity: 0; pointer-events: none; 
+    transition: opacity 0.3s ease;
+    border-radius: 8px; 
+}
+.help-trigger-container:hover + .chart-help-overlay,
+.chart-help-overlay:hover {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Stili interni help e icona */
+.info-icon {
+    width: 22px; height: 22px; background: #000; color: #fff;
+    border-radius: 50%; font-family: serif; font-weight: bold; font-style: italic;
+    display: flex; align-items: center; justify-content: center;
+}
+.help-text { font-weight: 700; font-size: 14px; color: #000; font-family: 'Roboto Slab', serif;}
+.chart-help-box { background: white; border: 2px solid #000; padding: 30px; border-radius: 8px; max-width: 450px; }
+.chart-help-box h4 { margin-top: 0; font-family: 'Roboto Slab', serif; text-align: center; font-size: 18px; margin-bottom: 15px;}
+.chart-help-box ul { padding-left: 20px; font-size: 14px; line-height: 1.5; }
+.chart-help-box li { margin-bottom: 8px; }
+
+/* Stili SVG Testo */
+.label-name { font-family: 'Fira Sans', sans-serif; font-weight: 700; font-size: 14px; fill: #333; }
+.label-value { font-family: 'Fira Sans', sans-serif; font-weight: 700; font-size: 14px; fill: #555; font-variant-numeric: tabular-nums; }
+.axis--top path, .axis--top line { stroke: #d0d0d0; } 
+.axis--top text { fill: #666; font-size: 12px; }
