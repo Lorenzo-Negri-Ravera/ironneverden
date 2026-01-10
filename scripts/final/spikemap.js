@@ -48,9 +48,9 @@
     svg.selectAll("*").remove();
     const g = svg.append("g");
 
+    /* --- OLD LOGIC ZOOM ---
     // Inizializziamo lo zoom, ma definiremo il comportamento .on("zoom") dopo aver caricato i dati
     const zoom = d3.zoom().scaleExtent([1, 8]);
-
     svg.call(zoom);
 
     // --- BARRA ZOOM ---
@@ -71,6 +71,27 @@
     zoomBar.append("button").attr("class", "zoom-btn").text("+").on("click", () => svg.transition().duration(500).call(zoom.scaleBy, 1.3));
     zoomBar.append("button").attr("class", "zoom-btn").text("−").on("click", () => svg.transition().duration(500).call(zoom.scaleBy, 0.7));
     zoomBar.append("button").attr("class", "zoom-btn").style("font-size","14px").text("Rst").on("click", () => svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity));
+    */
+
+
+    // --- ZOOM LOGIC (STANDARDIZZATA) ---
+    // 1. Definisci lo zoom
+    const zoom = d3.zoom()
+        .scaleExtent([1, 8]) // Mantieni il limite che avevi per la spike map
+        .on("zoom", (event) => {
+            // Applica la trasformazione al gruppo che contiene la mappa/spike
+            // Nota: Assicurati che 'mapGroup' o 'g' sia la variabile dove hai disegnato tutto
+            // Se nel tuo codice usi 'g' o un altro nome, aggiorna qui sotto:
+            svg.selectAll("g").attr("transform", event.transform); 
+        });
+
+    // 2. Collega lo zoom all'SVG e disabilita il doppio click
+    svg.call(zoom).on("dblclick.zoom", null);
+
+    // 3. Collega i bottoni HTML
+    d3.select("#spike-zoom-in").on("click", () => svg.transition().duration(500).call(zoom.scaleBy, 1.3));
+    d3.select("#spike-zoom-out").on("click", () => svg.transition().duration(500).call(zoom.scaleBy, 0.7));
+    d3.select("#spike-zoom-reset").on("click", () => svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity));
 
     // --- TOOLTIP ---
     let tooltip = d3.select("body").select(".shared-tooltip");
@@ -304,18 +325,21 @@
         // Prima chiamata per disegnare la mappa
         updateSpikes();
 
-        // --- BOTTONE AIUTO ---
-        if (typeof setupHelpButton === "function") {
-             setupHelpButton(svg, width, height, {
-                x: 30, y: height - 30,
-                title: "How to read this map",
-                instructions: [
-                    "1. Spikes represent the number of victims.",
-                    "2. Taller spikes mean more casualties.",
-                    "3. Use the buttons below to switch levels (Regions, Districts).",
-                    "4. Use filters to toggle Battles or Explosions."
-                ]
-            });
+        // -- How to read the chart --
+        const mapHelpContent = {
+            title: "How to read the Map",
+            steps: [
+                "<strong>Colors:</strong> Darker red indicates a higher number of conflict events.",
+                "<strong>Interaction:</strong> Hover over any country to see detailed statistics.",
+                "<strong>Zoom:</strong> Click on a country to zoom in and explore regional data."
+            ]
+        };
+
+        // Chiamo utils.js con i NUOVI parametri
+        if (typeof createChartHelp === "function") {
+            createChartHelp("#front-help-container", "#front-map-wrapper", mapHelpContent);
+        } else {
+            console.warn("createChartHelp non trovata.");
         }
 
     }).catch(e => console.error("CRITICAL ERROR:", e));

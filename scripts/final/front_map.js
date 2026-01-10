@@ -1,4 +1,4 @@
-// File: front_map.js (Fixed Responsive Version)
+// File: front_map.js (Fixed Responsive Version + Filters Working)
 
 // --- PERCORSI PAESI ---
 const UKR_PATH = "../../data/final/geojson/countries/UKR.json";
@@ -35,6 +35,10 @@ Promise.all([
     ukrBattlesData, ruBattlesData
 ]) { 
 
+    // --- 0. SETUP LOADER ---
+    const container = d3.select("#front-map-container");
+    container.html(""); // Pulisci eventuale loader precedente
+    
     // --- 1. SETUP DIMENSIONI ---
     const width = 1000;
     const height = 700;
@@ -97,8 +101,6 @@ Promise.all([
     const days = d3.timeDays(d3.min(allBattlesData, d => d.date), d3.max(allBattlesData, d => d.date));
 
     // --- 4. SETUP CONTENITORI (MODIFICATO PER RESPONSIVE) ---
-    const container = d3.select("#front-map-container");
-    container.html(""); 
     
     container
         .style("position", "relative") 
@@ -244,9 +246,6 @@ Promise.all([
 
 
     // --- Zoom Logic ---
-    // --- ZOOM LOGIC (DEBUG VERSION) ---
-    
-    // 1. Definisci il comportamento dello zoom
     const zoom = d3.zoom()
         .scaleExtent([1, 12])
         .on("zoom", (event) => {
@@ -263,8 +262,25 @@ Promise.all([
     d3.select("#front-zoom-reset").on("click", () => svg.transition().call(zoom.transform, d3.zoomIdentity));
 
 
-    // Slider
+    // --- LOGICA FILTRI (QUESTA PARTE MANCAVA!) ---
+    // Seleziona i bottoni "compact" dentro il container filtri
+    d3.selectAll("#filter-container .btn-compact").on("click", function() {
+        // 1. Gestione classi CSS (Visuale)
+        d3.selectAll("#filter-container .btn-compact").classed("active", false); // Togli active da tutti
+        d3.select(this).classed("active", true); // Metti active su quello cliccato
+
+        // 2. Aggiornamento Logica
+        activeFilter = d3.select(this).attr("data-type"); // Leggi il tipo dal HTML
+        
+        // 3. Render
+        updateVisibleData(); // Aggiorna la mappa
+    });
+
+
+    // --- TIMELINE PLAYER LOGIC ---
     const slider = d3.select("#time-slider").attr("max", days.length - 1);
+    
+    // Gestione trascinamento manuale slider
     slider.on("input", function() {
         currentIndex = +this.value;
         updateVisibleData();
@@ -272,25 +288,53 @@ Promise.all([
 
     let timer;
     let isPlaying = false;
-    d3.select("#play-button").on("click", function() {
+    
+    // Selezioniamo gli elementi una volta sola per pulizia
+    const playButton = d3.select("#play-button");
+    const playText = d3.select("#play-text"); 
+
+    playButton.on("click", function() {
         if (isPlaying) {
+            // --- LOGICA PAUSA ---
             clearInterval(timer);
-            d3.select(this).text("Play");
+            playText.text("Play");
+            isPlaying = false;
         } else {
-            timer = setInterval(() => {
-                currentIndex++;
-                if (currentIndex >= days.length) currentIndex = 0;
+            // --- LOGICA PLAY ---
+
+            // Se siamo arrivati in fondo e premiamo Play, ripartiamo dall'inizio.
+            if (currentIndex >= days.length - 1) {
+                currentIndex = 0;
                 slider.property("value", currentIndex);
                 updateVisibleData();
-            }, 70);
-            d3.select(this).text("Pause");
+            }
+
+            // Cambia testo in Pause
+            playText.text("Pause");
+            isPlaying = true;
+
+            timer = setInterval(() => {
+                // 1. Incrementa indice
+                currentIndex++;
+
+                // 2. Aggiorna Grafica
+                slider.property("value", currentIndex);
+                updateVisibleData();
+
+                // 3. Controllo Fine Corsa
+                if (currentIndex >= days.length - 1) {
+                    // STOP! Siamo arrivati alla fine
+                    clearInterval(timer);
+                    isPlaying = false;
+                    playText.text("Play"); // Rimette il tasto su Play per eventuale riavvio
+                }
+                
+            }, 70); // Velocità animazione
         }
-        isPlaying = !isPlaying;
     });
 
+    // Render iniziale
     updateVisibleData();
-
-
 
     // -- How to read the chart --
     const mapHelpContent = {
@@ -302,14 +346,13 @@ Promise.all([
         ]
     };
 
-    // Chiamo utils.js: funzione creerà i div e gestirà il mouseover
+    // Chiamo utils.js con i NUOVI parametri
     if (typeof createChartHelp === "function") {
-        createChartHelp("#front-map-wrapper", mapHelpContent);
+        createChartHelp("#front-help-container", "#front-map-wrapper", mapHelpContent);
     } else {
-        console.warn("createChartHelp non trovata. Assicurati di caricare utils.js prima di map.js");
+        console.warn("createChartHelp non trovata.");
     }
 
 }).catch(err => {
     console.error("Errore Front Map:", err);
-    d3.select(".loader-spinner").style("border-top", "5px solid red");
 });
