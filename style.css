@@ -535,6 +535,80 @@ h3, h4, h5, h6 {
 
 
 
+/* ######################### */
+/* --- RESPONSIVE STACKED BAR CHART CONTROLS (Specchio della Front Map) --- */
+/* --- COMPACT MENU BAR (Stile "Pillola" su una riga) --- */
+
+/* 1. Il Contenitore (Guscio esterno) */
+#stacked-legend-container.compact-menu-bar {
+    display: inline-flex;
+    align-items: center;
+    background-color: white;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 4px 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    
+    /* MODIFICA FONDAMENTALE PER UNA RIGA */
+    flex-wrap: nowrap !important;  /* Forza tutto su una linea */
+    white-space: nowrap;           /* Impedisce al testo di andare a capo */
+    
+    /* Sicurezza per schermi piccoli: permette lo scroll orizzontale se non ci sta */
+    max-width: 100%;
+    overflow-x: auto; 
+    
+    /* Nascondi la barra di scorrimento (estetica) */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+}
+
+/* Nascondi scrollbar Webkit (Chrome/Safari) */
+#stacked-legend-container.compact-menu-bar::-webkit-scrollbar {
+    display: none;
+}
+
+/* 2. I Bottoni */
+.btn-compact {
+    background: transparent;
+    border: none;
+    font-family: 'Fira Sans', sans-serif;
+    font-size: 15px;           /* Ridotto leggermente (era 13) per farci stare tutto */
+    font-weight: 700;          /* Grassetto per leggibilità */
+    color: #6c757d;
+    cursor: pointer;
+    
+    /* Ridotto il padding laterale per risparmiare spazio */
+    padding: 10px 6px;         /* Era 6px 14px */
+    
+    border-radius: 20px;
+    transition: all 0.2s ease;
+    text-transform: uppercase; /* Maiuscolo rende tutto più ordinato */
+    white-space: nowrap;       /* Testo sempre su una riga */
+    flex-shrink: 0;            /* Impedisce ai bottoni di schiacciarsi troppo */
+}
+
+.btn-compact:hover {
+    color: #333;
+    background-color: #f8f9fa;
+}
+
+/* Stato Attivo */
+.btn-compact.active {
+    color: #000;
+    font-weight: 800;          /* Extra bold quando attivo */
+    background-color: #e9ecef;
+}
+
+/* 3. Il Divisore Verticale */
+.compact-divider {
+    width: 1px;
+    height: 16px;
+    background-color: #dee2e6;
+    margin: 0 1px;             /* Spazio minimo */
+    flex-shrink: 0;            /* Non far sparire le linee */
+}
+
+
 
 /* ========================================= */
 /* --- RACE BAR CHART (ADAPTIVE BOX) ---     */

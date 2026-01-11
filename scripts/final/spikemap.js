@@ -211,11 +211,11 @@
         });
 
         // --- Funzione Helper per aggiornare lo stile dei bottoni ---
+        // Funzione per aggiornare lo stile "active" delle label quando cambia l'input
         function updateControlStyles() {
-            // Seleziona tutti gli input (radio e checkbox) dentro il menu
             d3.selectAll('#static-spike-controls input').each(function() {
                 const isChecked = d3.select(this).property("checked");
-                // Trova la label collegata a questo input tramite l'attributo "for"
+                // Aggiunge/Rimuove la classe .active alla label collegata
                 d3.select(`label[for="${this.id}"]`).classed("active", isChecked);
             });
         }
@@ -296,23 +296,55 @@
             all.select(".spike-hitbox")
                 .attr("d", d => spikePath(d.x, d.y, getHeight(d.value) < 25 ? 25 : getHeight(d.value), currentSpikeWidth));
 
-            all.on("mouseover", (e, d) => {
-                d3.select(e.currentTarget).select(".spike-visual").attr("fill", "#a71d2a").attr("fill-opacity", 1);
-                const b = d.details["Battles"] || 0; const ex = d.details["Explosions/Remote violence"] || 0;
-                tooltip.style("visibility", "visible").html(`
-                    <div style="border-bottom:2px solid #ddd; font-weight:800; margin-bottom:10px; padding-bottom:5px; font-size:18px; color:#222;">${d.name}</div>
-                    <div style="display:flex; justify-content:space-between; font-size:15px; color:#333; margin-bottom:12px;"><span>Victims:</span> <strong>${d.value.toLocaleString()}</strong></div>
-                    <svg width="260" height="50" style="background:#f0f0f0; border-radius:6px; margin-top:5px;">
-                        <rect x="0" y="0" width="${(b/Math.max(b,ex,1))*100}%" height="25" fill="#007bff"></rect><text x="8" y="18" class="tooltip-bar-label">Bat: ${b}</text>
-                        <rect x="0" y="25" width="${(ex/Math.max(b,ex,1))*100}%" height="25" fill="#dc3545"></rect><text x="8" y="43" class="tooltip-bar-label">Exp: ${ex}</text>
-                    </svg>`);
-            }).on("mousemove", e => tooltip.style("top", (e.pageY-20)+"px").style("left", (e.pageX+20)+"px"))
-              .on("mouseout", (e) => { d3.select(e.currentTarget).select(".spike-visual").attr("fill", "#dc3545").attr("fill-opacity", 0.85); tooltip.style("visibility", "hidden"); });
+                all.on("mouseover", (e, d) => {
+                    // Evidenzia la spike corrente
+                    d3.select(e.currentTarget).select(".spike-visual").attr("fill", "#a71d2a").attr("fill-opacity", 1);
+                    
+                    const b = d.details["Battles"] || 0; 
+                    const ex = d.details["Explosions/Remote violence"] || 0;
+                    const total = d.value || 1; // Evita divisione per zero
+                    
+                    // Calcolo Percentuali
+                    const bPerc = ((b / total) * 100).toFixed(1);
+                    const exPerc = ((ex / total) * 100).toFixed(1);
+    
+                    // Calcolo larghezza relativa (normalizzata sul massimo tra i due)
+                    const maxVal = Math.max(b, ex, 1);
+                    
+                    tooltip.style("visibility", "visible").html(`
+                        <div style="border-bottom: 2px solid #ddd; font-weight: 800; margin-bottom: 12px; padding-bottom: 8px; font-size: 22px; color: #222;">
+                            ${d.name}
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <span style="font-size: 18px; color: #444; font-weight: 700;">Total Victims:</span> 
+                            
+                            <strong style="font-size: 20px; color: #000; font-weight: 800;">${d.value.toLocaleString()}</strong>
+                        </div>
+    
+                        <div style="font-size: 15px; color: #666; margin-bottom: 8px; font-weight: 600;">Event Breakdown:</div>
+                        
+                        <svg width="300" height="70" style="background: #fafafa; border: 1px solid #eee; border-radius: 8px;">
+                            
+                            <rect x="0" y="0" width="${(b/maxVal)*100}%" height="35" fill="#ff6361" fill-opacity="0.3"></rect>
+                            <rect x="0" y="0" width="5" height="35" fill="#ff6361"></rect> 
+                            <text x="12" y="23" style="font-size: 16px; font-weight: 700; fill: #222; font-family: sans-serif; pointer-events: none;">
+                                Battles: ${b.toLocaleString()} (${bPerc}%)
+                            </text>
+    
+                            <rect x="0" y="35" width="${(ex/maxVal)*100}%" height="35" fill="#ffa600" fill-opacity="0.3"></rect>
+                            <rect x="0" y="35" width="5" height="35" fill="#ffa600"></rect>
+                            <text x="12" y="58" style="font-size: 16px; font-weight: 700; fill: #222; font-family: sans-serif; pointer-events: none;">
+                                Explosions: ${ex.toLocaleString()} (${exPerc}%)
+                            </text>
+                        </svg>
+                    `);
+                })
         }
 
         function drawLegend(mx) {
             legendLayer.selectAll("*").remove();
-            const lx = 30, ly = height - 110; 
+            const lx = 30, ly = height - 50; 
             const g = legendLayer.append("g").attr("transform", `translate(${lx},${ly})`);
             const steps = [{l:"0-100",v:100}, {l:"1k-5k",v:5000}];
             if (mx > 7500) steps.push({l: d3.format(".1s")(mx), v: mx});
@@ -322,7 +354,7 @@
                 if (s.v <= mx || (s.v===5000 && mx>=1000)) {
                     const h = lenScale(s.v) * 0.6; 
                     g.append("path").attr("d", spikePath(cx+10, 0, h, SPIKE_WIDTH)).attr("fill", "#dc3545").attr("stroke", "#8e0000").attr("stroke-width", 0.5);
-                    g.append("text").attr("x", cx+20).attr("y", 0).text(s.l).attr("font-size", "12px").attr("fill", "#555").attr("font-family", "sans-serif").attr("font-weight", "600");
+                    g.append("text").attr("x", cx+20).attr("y", 0).text(s.l).attr("font-size", "18px").attr("fill", "#555").attr("font-family", "sans-serif").attr("font-weight", "600");
                     cx += 90;
                 }
             });

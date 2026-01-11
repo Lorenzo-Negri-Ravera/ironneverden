@@ -184,7 +184,7 @@ Promise.all([
     // 5. Confine Rosso
     mapGroup.append("g").attr("clip-path", "url(#clip-russia-full-mask)").style("pointer-events", "none") 
         .selectAll("path").data(ukrGeo.features).join("path")
-        .attr("d", pathGenerator).attr("fill", "none").attr("stroke", "#ff3333").attr("stroke-width", 4)
+        .attr("d", pathGenerator).attr("fill", "none").attr("stroke", "#6a9c71").attr("stroke-width", 4)
         .attr("stroke-linejoin", "round").attr("stroke-linecap", "round");
 
     // --- CANVAS PUNTI (MODIFICATO PER RESPONSIVE) ---
@@ -221,7 +221,7 @@ Promise.all([
             const d = visiblePoints[i];
             const age = d3.timeDay.count(d.date, currentDate);
             ctx.globalAlpha = opacityScale(age);
-            ctx.fillStyle = d.event_type === "Battles" ? "#c1272d" : "#f5a623";
+            ctx.fillStyle = d.event_type === "Battles" ? "#ff6361" : "#ffa600";
             ctx.beginPath();
             ctx.arc(d.x, d.y, r, 0, 2 * Math.PI);
             ctx.fill();
