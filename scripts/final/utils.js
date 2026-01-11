@@ -2,92 +2,98 @@
 
 /**
  * Gestisce la creazione del bottone Help e dell'Overlay.
- * Supporta due modalità:
- * 1. AUTOMATICA (2 argomenti): createChartHelp("#mapId", contentObj)
- * - Mette l'overlay dentro #mapId
- * - Mette il bottone nel genitore di #mapId (comportamento classico)
- * * 2. MANUALE (3 argomenti): createChartHelp("#btnContainerId", "#overlayContainerId", contentObj)
- * - Mette il bottone dove dici tu (#btnContainerId)
- * - Mette l'overlay dove dici tu (#overlayContainerId)
+ * Logica: JavaScript gestisce solo struttura e visibilità.
+ * Stile: Tutto delegato al CSS (classi .chart-help-*).
  */
 function createChartHelp(arg1, arg2, arg3) {
     let triggerContainer, overlayContainer, content;
 
-    // Rilevamento modalità in base al tipo del secondo argomento
+    // 1. Rilevamento modalità (Automatica o Manuale)
     if (typeof arg2 === 'object' && arg3 === undefined) {
-        // --- MODALITÀ AUTOMATICA (Compatibilità con Geo Map e altri) ---
+        // AUTOMATICA
         const wrapperId = arg1;
         content = arg2;
-        
         overlayContainer = d3.select(wrapperId);
-        // Nella modalità automatica, il bottone va nel genitore del wrapper
         triggerContainer = d3.select(overlayContainer.node().parentNode);
-        
     } else {
-        // --- MODALITÀ MANUALE (Per Front Map) ---
-        // arg1 = ID dove mettere il bottone
-        // arg2 = ID dove mettere l'overlay (sopra la mappa)
-        // arg3 = content
+        // MANUALE
         triggerContainer = d3.select(arg1);
         overlayContainer = d3.select(arg2);
         content = arg3;
     }
 
-    // Controllo sicurezza
     if (triggerContainer.empty() || overlayContainer.empty()) {
-        console.error("createChartHelp: Container non trovati.", arg1);
+        console.error("createChartHelp: Container mancanti!", arg1, arg2);
         return;
     }
 
-    // 1. PULIZIA: Rimuovi vecchi elementi per evitare duplicati
-    // Rimuoviamo l'overlay dal container mappa
+    // 2. PULIZIA ELEMENTI ESISTENTI
     overlayContainer.selectAll(".chart-help-overlay").remove();
-    // Rimuoviamo il bottone dal container controlli
     triggerContainer.selectAll(".chart-help-trigger").remove();
 
-    // 2. CREAZIONE OVERLAY (Il velo bianco con le istruzioni)
-    // Deve essere absolute per coprire la mappa
+    // 3. FIX POSIZIONAMENTO PADRE
+    // Necessario affinché l'overlay absolute si posizioni rispetto al grafico e non alla pagina
+    if (overlayContainer.style("position") === "static") {
+        overlayContainer.style("position", "relative");
+    }
+
+    // 4. CREAZIONE OVERLAY
+    // Nota: Usiamo JS per sovrascrivere il "display: none" del CSS quando serve,
+    // ma lasciamo che il CSS gestisca background, blur, ecc.
     const overlay = overlayContainer.append("div")
         .attr("class", "chart-help-overlay")
-        .style("display", "none")
-        .style("position", "absolute")
-        .style("top", "0")
-        .style("left", "0")
-        .style("width", "100%")
-        .style("height", "100%")
-        .style("z-index", "2000") // Z-index alto
-        .style("background", "rgba(255, 255, 255, 0.9)")
-        .style("justify-content", "center")
-        .style("align-items", "center");
+        // --- STILI FUNZIONALI (JS) ---
+        .style("visibility", "hidden") // Partiamo nascosti
+        .style("opacity", "0")       // Opacità 0 per transizione
+        .style("display", "flex")    // Flex per centrare il contenuto (sovrascrive display:none del CSS)
+        .style("transition", "opacity 0.2s, visibility 0.2s") // Animazione fluida
+        .style("pointer-events", "none"); // Trasparente al mouse
 
-    const contentBox = overlay.append("div").attr("class", "chart-help-content");
+    // 5. CREAZIONE CONTENUTO
+    const contentBox = overlay.append("div")
+        .attr("class", "chart-help-content");
+        // Nessun stile inline qui! Prenderà padding, shadow e radius dal CSS.
     
+    // Titolo
     contentBox.append("h4")
-        .style("margin", "0")
-        .style("color", "#333")
+        .style("margin-top", "0") // Unico reset utile
+        .style("color", "#333")   // Colore base titolo
         .text(content.title || "How to read the chart");
 
-    contentBox.append("div").attr("class", "chart-help-divider");
+    // DIVIDER (Barretta Rossa)
+    // Qui non metto stili. Il CSS .chart-help-divider gestirà:
+    // width: 50px, background: #C8102E, margin: 10px auto (centrato)
+    contentBox.append("div")
+        .attr("class", "chart-help-divider");
 
+    // Lista Istruzioni
     const ul = contentBox.append("ul");
+
     if (content.steps) {
         content.steps.forEach(step => ul.append("li").html(step));
     }
 
-    // 3. CREAZIONE TRIGGER (Il bottone "i")
+    // 6. CREAZIONE TRIGGER (BOTTONE)
+    // Nessun style inline per flex o gap, ci pensa il CSS .chart-help-trigger
     const trigger = triggerContainer.append("div")
         .attr("class", "chart-help-trigger")
-        // Reset margini per garantire allineamento
-        .style("margin", "0") 
-        .style("padding", "0"); 
+        .style("pointer-events", "auto"); // Assicura che sia cliccabile
 
     trigger.html(`
         <span class="chart-help-icon">i</span>
         <span class="chart-help-text">How to read the chart?</span>
     `);
 
-    // 4. EVENTI MOUSE
-    trigger
-        .on("mouseenter", () => overlay.style("display", "flex"))
-        .on("mouseleave", () => overlay.style("display", "none"));
+    // 7. EVENTI (Logica On/Off)
+    trigger.on("mouseenter", function() {
+        overlay
+            .style("visibility", "visible")
+            .style("opacity", "1");
+    });
+
+    trigger.on("mouseleave", function() {
+        overlay
+            .style("visibility", "hidden")
+            .style("opacity", "0");
+    });
 }
