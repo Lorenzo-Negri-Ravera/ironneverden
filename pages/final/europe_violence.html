@@ -108,13 +108,19 @@
                             
                             <div id="front-help-container" class="align-self-start align-self-md-auto"></div>
 
-                            <div id="controls" class="d-flex align-items-center bg-white shadow-sm border rounded-pill py-2 px-3 gap-3 w-100 w-md-auto justify-content-between justify-content-md-start">
+                            <div id="controls" class="d-flex flex-grow-1 align-items-center bg-white shadow-sm border rounded-pill py-2 px-3 gap-3">
                                 <button id="play-button" class="btn btn-primary btn-sm btn-player d-flex align-items-center gap-2 px-3">
                                     <span id="play-text" class="fw-bold">Play</span>
                                 </button>
 
-                                <div class="d-flex align-items-center flex-grow-1">
-                                    <input type="range" id="time-slider" class="form-range custom-range-slider w-100">
+                                <div class="d-flex align-items-center flex-grow-1 position-relative">
+        
+                                    <div id="timeline-markers" class="position-absolute w-100 h-100 start-0 top-0" style="pointer-events: none; z-index: 5;">
+                                    </div>
+
+                                    <div id="slider-ghost-thumb" style="position: absolute; top: 0; width: 1px; height: 100%; pointer-events: none; z-index: -1;"></div>
+
+                                    <input type="range" id="time-slider" class="form-range custom-range-slider flex-grow-1" style="position: relative; z-index: 1;">
                                 </div>
 
                                 <span id="current-date-display" class="fw-bold small text-nowrap text-end" style="min-width: 80px; font-family: 'Fira Sans', sans-serif;">

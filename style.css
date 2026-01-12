@@ -412,11 +412,8 @@ h3, h4, h5, h6 {
 
 /* 1. Contenitore della barra di controllo */
 #controls {
-    /* Togliamo la forma a pillola, mettiamo angoli leggermente arrotondati */
     border-radius: 8px !important; 
-    /* Aggiungiamo un'ombra più definita */
     box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
-    /* Un po' più di spazio interno */
     padding: 10px 16px !important; 
 }
 
@@ -430,14 +427,12 @@ h3, h4, h5, h6 {
     letter-spacing: 0.5px;
     height: 36px; /* Altezza fissa per consistenza */
     transition: all 0.2s ease; /* Transizione fluida */
-    
-    /* Colore di sfondo leggermente più scuro del primary standard */
-    background-color: #bf0e0eb6; 
+    background-color: #c5655e; 
     border: none;
 }
 
 .btn-player:hover {
-    background-color: #8a080895; /* Colore hover */
+    background-color: #ad534d !important; /* Colore hover */
     box-shadow: 0 2px 5px rgba(0,123,255,0.3);
     transform: translateY(-1px); /* Leggero effetto sollevamento */
 }
@@ -446,10 +441,6 @@ h3, h4, h5, h6 {
     background-color: #0a58ca;
     transform: translateY(0); /* Torna giù al click */
 }
-
-/* Se vuoi che il testo sia nascosto quando c'è Play e visibile con Pause, 
-   puoi gestire la visibilità dello span #play-text via JS, 
-   oppure tenerli sempre entrambi. La soluzione attuale li tiene entrambi. */
 
 
 /* 3. Slider e Data (Modifiche minori per coerenza) */
@@ -470,6 +461,46 @@ h3, h4, h5, h6 {
     font-size: 14px;
     color: #25282A;
 }
+
+
+/* Timeline ticker */
+/* Assicura che lo slider stia sopra i marker per quanto riguarda il pallino */
+#time-slider {
+    position: relative;
+    z-index: 20; /* Il livello più alto per il pallino */
+    background: transparent; /* Importante per vedere i tick sotto */
+}
+
+/* Stile del singolo segnalino */
+.timeline-tick {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;               /* Leggermente più largo per vederlo meglio */
+    height: 16px;             /* Più alto della linea timeline */
+    background-color: #ffc107; 
+    border: 1px solid white;  /* Un bordino bianco aiuta a staccarlo dalla linea grigia */
+    border-radius: 2px;
+    cursor: pointer;          /* Manina */
+    
+    z-index: 10;              /* Sta SOPRA la linea grigia (che è background) ma SOTTO input */
+    pointer-events: auto;     /* Cliccabile */
+    
+    transition: opacity 0.1s; /* Sparizione dolce quando il pallino arriva */
+}
+
+.timeline-tick:hover {
+    transform: translateY(-50%) scale(1.3);
+    background-color: #ff9800;
+    z-index: 30; /* Se ci passi sopra, sale in primo piano */
+}
+
+#slider-ghost-thumb {
+    /* Sposta il punto di ancoraggio leggermente a destra per centrarlo sul pallino */
+    transform: translateX(10px); 
+}
+
+
 
 
 
@@ -532,6 +563,16 @@ h3, h4, h5, h6 {
     color: #25282A;       /* Nero/Scuro quando attivo */
     font-weight: 700;     /* Più grassetto per evidenziare */
 }
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -607,6 +648,8 @@ h3, h4, h5, h6 {
     margin: 0 1px;             /* Spazio minimo */
     flex-shrink: 0;            /* Non far sparire le linee */
 }
+
+
 
 
 

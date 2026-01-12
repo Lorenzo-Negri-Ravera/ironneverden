@@ -276,7 +276,7 @@ Promise.all([
         updateVisibleData(); // Aggiorna la mappa
     });
 
-
+    /*
     // --- TIMELINE PLAYER LOGIC ---
     const slider = d3.select("#time-slider").attr("max", days.length - 1);
     
@@ -353,6 +353,217 @@ Promise.all([
         console.warn("createChartHelp non trovata.");
     }
 
+
+    // Handle of the ticker
+    // Da mettere nel tuo file JS o in un tag <script> alla fine del body
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
 }).catch(err => {
     console.error("Errore Front Map:", err);
 });
+*/
+
+
+// ... (Codice precedente invariato) ...
+
+    // ==========================================
+    // --- TIMELINE PLAYER LOGIC ---
+    // ==========================================
+
+    const slider = d3.select("#time-slider").attr("max", days.length - 1);
+    const playButton = d3.select("#play-button");
+    const playText = d3.select("#play-text"); 
+
+    // Variabile per gestire il Tooltip dinamico sul pallino
+    let sliderTooltip = null;
+
+    // Funzione helper per gestire il tooltip del pallino
+    function setSliderTooltip(text) {
+        const element = document.getElementById('time-slider');
+        
+        // 1. Se esiste già un tooltip, aggiornalo o distruggilo
+        if (sliderTooltip) {
+            sliderTooltip.dispose(); // Pulizia totale vecchia istanza
+            sliderTooltip = null;
+        }
+
+        // 2. Se c'è testo, crea un nuovo tooltip e mostralo
+        if (text) {
+            element.setAttribute('title', text); // Imposta titolo nativo per Bootstrap
+            element.setAttribute('data-bs-original-title', text);
+            
+            sliderTooltip = new bootstrap.Tooltip(element, {
+                trigger: 'manual', // Lo controlliamo noi manualmente
+                placement: 'top',
+                animation: false // Disabilita animazione per risposta istantanea
+            });
+            sliderTooltip.show();
+        } else {
+            // Se non c'è testo, assicurati che l'attributo sia vuoto
+            element.setAttribute('title', '');
+            element.setAttribute('data-bs-original-title', '');
+        }
+    }
+
+    // Mappa per salvare gli eventi
+    let eventsIndexMap = {}; 
+
+    // --- FUNZIONE CENTRALE DI AGGIORNAMENTO ---
+    function updateStateAndRender() {
+        // 1. Aggiorna Mappa D3
+        updateVisibleData();
+
+        // 2. Gestione Ticker e Note
+        
+        // A. Reset: Mostra tutti i tick (opacità 1)
+        d3.selectAll('.timeline-tick').style('opacity', 1);
+
+        // B. Controlla se siamo su un evento
+        if (eventsIndexMap[currentIndex]) {
+            const eventInfo = eventsIndexMap[currentIndex];
+
+            // C. Nascondi IL TICKER specifico (così il pallino sembra averlo mangiato)
+            // Selezioniamo per ID univoco
+            d3.select(`#tick-${currentIndex}`).style('opacity', 0);
+
+            // D. Mostra la nota SUL PALLINO
+            setSliderTooltip(eventInfo.fullLabel);
+
+        } else {
+            // E. Se non siamo su un evento, nascondi il tooltip del pallino
+            setSliderTooltip(null);
+        }
+    }
+
+    // Event Listener Slider (Trascinamento)
+    slider.on("input", function() {
+        currentIndex = +this.value;
+        updateStateAndRender();
+    });
+
+    let timer;
+    let isPlaying = false;
+
+    playButton.on("click", function() {
+        if (isPlaying) {
+            clearInterval(timer);
+            playText.text("Play");
+            isPlaying = false;
+        } else {
+            if (currentIndex >= days.length - 1) {
+                currentIndex = 0;
+                slider.property("value", currentIndex);
+                updateStateAndRender();
+            }
+            playText.text("Pause");
+            isPlaying = true;
+            timer = setInterval(() => {
+                currentIndex++;
+                slider.property("value", currentIndex);
+                updateStateAndRender();
+                if (currentIndex >= days.length - 1) {
+                    clearInterval(timer);
+                    isPlaying = false;
+                    playText.text("Play");
+                }
+            }, 70); 
+        }
+    });
+
+
+    // ==========================================
+    // --- LOGICA TICKER (EVENT MARKERS) ---
+    // ==========================================
+
+    const significantEvents = [
+        { date: "2022-02-24", title: "Invasione su larga scala" },
+        { date: "2022-04-01", title: "Ritiro dal nord (Kyiv)" },
+        { date: "2022-09-06", title: "Controffensiva Kharkiv" },
+        { date: "2022-11-11", title: "Liberazione Kherson" },
+        { date: "2023-05-20", title: "Presa di Bakhmut" }
+    ];
+
+    const markersContainer = document.getElementById('timeline-markers');
+    if(markersContainer) markersContainer.innerHTML = "";
+
+    const mapStartDate = days[0]; 
+    const mapEndDate = days[days.length - 1];
+    const totalTime = mapEndDate - mapStartDate;
+
+    significantEvents.forEach(event => {
+        const eventDate = parseDate(event.date);
+        if (eventDate < mapStartDate || eventDate > mapEndDate) return;
+
+        // Indice esatto
+        const exactIndex = d3.timeDay.count(mapStartDate, eventDate);
+        // Percentuale posizione
+        const percent = ((eventDate - mapStartDate) / totalTime) * 100;
+
+        // Stringhe testo
+        const readableDate = d3.timeFormat("%d %b %Y")(eventDate);
+        const fullLabel = `${readableDate}: ${event.title}`;
+
+        // Salva nella mappa globale per usarlo nel player
+        eventsIndexMap[exactIndex] = { title: event.title, fullLabel: fullLabel };
+
+        // Crea Elemento DOM
+        const tick = document.createElement('div');
+        tick.className = 'timeline-tick';
+        tick.id = `tick-${exactIndex}`; // ID univoco per nasconderlo dopo
+        tick.style.left = percent + '%';
+        
+        // Attributi Tooltip (Statici per il tick)
+        tick.setAttribute('data-bs-toggle', 'tooltip');
+        tick.setAttribute('data-bs-placement', 'top'); 
+        tick.setAttribute('title', fullLabel);
+
+        // Click Listener
+        tick.addEventListener('click', function(e) {
+            e.stopPropagation(); // Evita conflitti
+            currentIndex = exactIndex;
+            slider.property("value", currentIndex);
+            updateStateAndRender(); // Questo nasconderà il tick e mostrerà il tooltip sul pallino
+        });
+
+        if(markersContainer) markersContainer.appendChild(tick);
+
+        // *** INIZIALIZZAZIONE IMMEDIATA TOOLTIP ***
+        // Lo facciamo subito per ogni singolo elemento, così non scappa
+        new bootstrap.Tooltip(tick);
+    });
+
+    // Render iniziale
+    updateStateAndRender();
+
+
+    // ... (Codice Help e chiusura Promise rimangono uguali) ...
+
+    // ... (Resto del codice Help e catch rimane uguale) ...
+
+    // ==========================================
+    // --- FINE LOGICA TICKER ---
+    // ==========================================
+
+
+    // -- How to read the chart --
+    const mapHelpContent = {
+        title: "How to read the Map",
+        steps: [
+            "<strong>Colors:</strong> Darker red indicates a higher number of conflict events.",
+            "<strong>Interaction:</strong> Hover over any country to see detailed statistics.",
+            "<strong>Zoom:</strong> Click on a country to zoom in and explore regional data."
+        ]
+    };
+
+    if (typeof createChartHelp === "function") {
+        createChartHelp("#front-help-container", "#front-map-wrapper", mapHelpContent);
+    } else {
+        console.warn("createChartHelp non trovata.");
+    }
+
+}).catch(err => {
+    console.error("Errore Front Map:", err);
+});
+
+
