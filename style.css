@@ -439,7 +439,6 @@ h6 {
 
 #front-map-section #controls {
     width: 100%;
-    max-width: 500px;
 }
 
 /* Button Play */
@@ -547,6 +546,8 @@ h6 {
 
 
 
+
+
 /* --- COMPACT BUTTONS (Per Front Map) --- */
 
 .btn-compact {
@@ -580,10 +581,6 @@ h6 {
     font-weight: 700;
     /* Più grassetto per evidenziare */
 }
-
-
-
-
 
 
 
