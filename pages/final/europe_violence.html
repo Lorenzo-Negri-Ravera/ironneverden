@@ -284,30 +284,34 @@
                                 <div id="food-help-container"></div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </section>
             
-            <section id="race-chart-section" class="text-center border-top pt-5 mt-5 pb-5">
-                <div class="text-container mb-4">
-                    <h3>Traffico Aereo in Europa (Race Annuale)</h3>
-                    <p class="text-muted">Evoluzione del numero di voli negli stati confinanti e nel network europeo.</p>
-                </div>
-            
-                <div id="race-chart-wrapper" class="chart-wrapper-relative" style="position: relative; max-width: 1000px; margin: 0 auto;">
+
+            <section id="race-chart-section" class="text-center mt-5 mb-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-10">
+                        
+                        <div class="text-container mb-4">
+                            <h3>Traffico Aereo in Europa (Race Annuale)</h3>
+                            <p class="text-muted">Evoluzione del numero di voli negli stati confinanti e nel network europeo.</p>
+                        </div>
                     
-                    <div id="chart-container"></div> 
-            
-                    <div class="help-trigger-container">
-                        <div class="info-icon">i</div>
-                        <span class="help-text">How to read the chart?</span>
+                        <div id="race-chart-wrapper" class="chart-wrapper-relative position-relative mb-0">
+                            <div id="chart-container"></div> 
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-0">
+                            
+                            <div id="race-help-container" class="text-start"></div>
+
+                            <button id="replay-btn" class="btn btn-sm btn-dark d-flex align-items-center gap-2" onclick="replay()">
+                                <span style="font-size: 14px; font-weight: bold;">⟳</span> REPLAY
+                            </button>
+                        </div>
+
                     </div>
-            
-                    <button id="replay-btn" onclick="replay()">
-                        ⟳ REPLAY
-                    </button>
-            
                 </div>
             </section>
             

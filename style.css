@@ -87,6 +87,7 @@ h6 {
 #spike-container,
 #stacked-bar-chart-container,
 #sub-event-line-chart-container,
+#chart-container,
 #chart svg {
     width: 100% !important;
     height: auto !important;
@@ -664,48 +665,31 @@ h6 {
 /* --- RACE BAR CHART (ADAPTIVE BOX) ---     */
 /* ========================================= */
 
-/* IL CONTENITORE PRINCIPALE (Il Box Grigio) */
+/* 
 #chart-container {
     position: relative;
     width: 100%;
     max-width: 1100px;
-    /* Larghezza stile "Card" */
-
-    /* MODIFICA FONDAMENTALE: */
-    /* Togliamo min-height: 500px che creava lo spazio vuoto sotto. */
-    /* Mettiamo 'auto' o un minimo basso giusto per sicurezza. */
     min-height: 300px;
     height: auto;
-    /* Si adatta all'altezza del grafico */
-
-    /* Stile Estetico */
     background-color: #f8f9fa;
     border: 1px solid #dee2e6;
     border-radius: 8px;
     margin: 40px auto;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-
-    /* PADDING: */
-    /* 30px sopra e ai lati */
-    /* 70px SOTTO: serve spazio extra per i bottoni Help e Replay */
-    /* così non finiscono sopra le barre del grafico */
     padding: 30px 30px 70px 30px;
-
     box-sizing: border-box;
     font-family: 'Fira Sans', sans-serif;
     overflow: hidden;
-    /* Assicura che nulla esca dai bordi arrotondati */
 }
 
-/* L'SVG SI ADATTA AL CONTENITORE */
 #chart-container svg {
     width: 100%;
-    /* Prende tutta la larghezza disponibile (meno il padding) */
     height: auto;
-    /* Mantiene le proporzioni corrette senza deformarsi */
     display: block;
-    /* Rimuove spazi bianchi fantasma sotto l'SVG */
 }
+*/
+
 
 /* --- ELEMENTI FLOTTANTI --- */
 
@@ -722,11 +706,11 @@ h6 {
 
 
 /* Bottone Replay (Basso Destra) */
+/*
 #replay-btn {
     position: absolute;
     bottom: 20px;
     right: 30px;
-    /* Allineato col padding laterale */
     z-index: 100;
     padding: 8px 20px;
     background-color: #343a40;
@@ -744,6 +728,46 @@ h6 {
 #replay-btn:hover {
     background-color: #23272b;
 }
+*/
+
+/* ============================================== */
+/* FIX REPLAY BUTTON RACE CHART                   */
+/* ============================================== */
+
+/* Resetta la posizione assoluta per farlo tornare nel flusso normale (flex) */
+#race-chart-section #replay-btn {
+    position: static !important; /* Fondamentale: toglie il position absolute */
+    bottom: auto !important;
+    right: auto !important;
+
+    margin-right: 50px !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    
+    z-index: 10;
+    
+    /* Stile estetico (opzionale, per uniformarlo) */
+    background-color: #343a40;
+    border-radius: 20px;
+    padding: 6px 16px;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+#race-chart-section #replay-btn:hover {
+    background-color: #23272b;
+    transform: translateY(-1px);
+}
+
+#race-chart-section #replay-btn:active {
+    transform: translateY(0);
+}
+
 
 /* Legenda (Posizionata sopra il bottone Replay) */
 .legend-box {

@@ -414,7 +414,7 @@ function initFoodChart() {
         keys.forEach(key => {
             const safeId = "line-food-" + key.replace(/[^a-zA-Z0-9]/g, '-');
             
-            const path = svg.append("path")
+            svg.append("path")
                 .datum(data)
                 .attr("id", safeId)
                 .attr("class", "line-trace")
