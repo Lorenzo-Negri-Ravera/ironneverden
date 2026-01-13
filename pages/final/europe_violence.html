@@ -129,7 +129,7 @@
 
                         <div class="row">
                             <div class="col-12 p-0">
-                                <div id="front-help-container" class="ps-3 mt-1">
+                                <div id="front-help-container" class="mt-1">
                                     </div>
                             </div>
                         </div>
@@ -199,28 +199,30 @@
                 </div>
             </section>
 
-
+            <!-- Modified the stacked bar chart section: removal of the background (grey box) -->
             <section id="stacked-bar-section" class="mt-5">
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
-            
+                        
                         <div id="tooltip-bar"
                             style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 4px; pointer-events: none; font-family: 'Fira Sans', sans-serif; font-size: 12px; z-index: 3000;">
                         </div>
-            
-                        <div id="stacked-bar-wrapper" class="chart-wrapper-map position-relative border rounded mb-2" style="overflow: hidden; background-color: #f9f9f9;">
+
+                        <div id="stacked-bar-wrapper" class="chart-wrapper-map position-relative mb-0" style="overflow: hidden;">
                             <div id="stacked-bar-chart-container" class="w-100"></div>
                         </div>
-            
-                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center align-items-md-start mt-3 w-100 gap-3">
-                            
-                            <div id="stacked-help-container" class="align-self-start align-self-md-auto">
+
+                        <div class="row mt-1">
+                            <div class="col-12">
+                                <div id="stacked-legend-container" class="w-100"></div>
                             </div>
-            
-                            <div id="stacked-legend-container"></div>
-                        
                         </div>
-            
+
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div id="stacked-help-container"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -229,7 +231,26 @@
             <section id="sub-event-line-section" class="mt-5">
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
-                        <div id="sub-event-line-chart-container" class="w-100"></div>
+                        
+                        <div id="sub-event-tooltip"
+                            style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 4px; pointer-events: none; font-family: 'Fira Sans', sans-serif; font-size: 12px; z-index: 3000;">
+                        </div>
+
+                        <div id="sub-event-wrapper" class="chart-wrapper-map position-relative mb-0" style="overflow: hidden;">
+                            <div id="sub-event-line-chart-container" class="w-100"></div>
+                        </div>
+
+                        <div class="row mt-1">
+                            <div class="col-12">
+                                <div id="sub-event-legend-container" class="w-100"></div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div id="sub-event-help-container"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -237,14 +258,33 @@
 
             <section id="chart-section" class="mt-5">
                 <div class="row justify-content-center">
-                    <div class="col-lg-10 text-center">
-                        <h2 class="mb-4">Andamento Indice Prezzi Cibo (FAO)</h2>
+                    <div class="col-lg-10">
+                        
+                        <!--
+                        <div class="text-center mb-4">
+                            <h2 class="mb-0">Andamento Indice Prezzi Cibo (FAO)</h2>
+                        </div> -->
 
-                        <div class="chart-container position-relative w-100">
-                            <div id="chart"></div>
-                            <div id="chart-controls-inner" class="controls-container mt-3"></div>
-                            <div id="chart-tooltip"></div>
+                        <div id="food-chart-tooltip"
+                            style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 4px; pointer-events: none; font-family: 'Fira Sans', sans-serif; font-size: 12px; z-index: 3000;">
                         </div>
+
+                        <div id="food-chart-wrapper" class="chart-wrapper-map position-relative mb-0" style="overflow: hidden;">
+                            <div id="food-chart-container" class="w-100"></div>
+                        </div>
+
+                        <div class="row mt-1">
+                            <div class="col-12">
+                                <div id="food-legend-container" class="w-100"></div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div id="food-help-container"></div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </section>
@@ -269,8 +309,6 @@
                     </button>
             
                 </div>
-                
-                <p class="source text-muted mt-2 small">Fonte dati: Eurocontrol / Internal Data</p>
             </section>
             
         </main>

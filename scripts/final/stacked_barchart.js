@@ -5,12 +5,17 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function initStackedBarChart() {
-    // 1. SELEZIONE
     const mainContainer = d3.select("#stacked-bar-chart-container");
     const legendContainer = d3.select("#stacked-legend-container");
     const helpContainer = d3.select("#stacked-help-container");
 
     if (mainContainer.empty() || legendContainer.empty()) return;
+
+    // ADDED: removal of the background (grey box)
+    mainContainer
+        .style("background-color", "transparent")
+        .style("border", "none")
+        .style("box-shadow", "none");
 
     // Pulizia
     mainContainer.html("");
@@ -23,57 +28,54 @@ function initStackedBarChart() {
     const color = d3.scaleOrdinal().domain(keys).range(PALETTE);
     let activeFilter = null;
 
-    // --- 2. DISEGNO LEGENDA (STRUTTURA HTML REPLICATA) ---
-    
-    // Aggiungiamo la classe contenitore al div esistente
-    legendContainer.attr("class", "compact-menu-bar d-inline-flex justify-content-center");
 
+    // Interactive Legend
+    legendContainer.attr("class", "d-flex flex-wrap justify-content-start align-items-center column-gap-1 row-gap-1 mt-1");
+    //legendContainer.attr("class", "d-flex flex-wrap justify-content-center align-items-center gap-4 mt-3");
     keys.forEach((key, index) => {
         const itemColor = color(key);
-
-        // A. Creiamo il BOTTONE
         const btn = legendContainer.append("button")
-            .attr("class", "btn-compact d-flex align-items-center gap-2"); // Classi CSS definite sopra
+            .attr("class", "btn-compact d-flex align-items-center gap-2 p-0"); 
 
         // Pallino colorato
         btn.append("span")
-            .style("width", "8px").style("height", "8px")
+            .style("width", "10px").style("height", "10px") 
             .style("background-color", itemColor)
             .style("border-radius", "50%")
-            .style("display", "inline-block");
+            .style("display", "inline-block")
+            .style("flex-shrink", "0");
 
         // Testo
-        btn.append("span").text(key);
+        btn.append("span")
+            .text(key)
+            .style("text-transform", "uppercase") 
+            .style("font-size", "12px")
+            .style("font-weight", "600")
+            .style("color", "#25282A"); 
 
-        // Evento Click
+        // Evento Click 
         btn.on("click", function() {
             activeFilter = (activeFilter === key) ? null : key;
             updateChartState();
         });
 
-        // Salviamo la chiave nel bottone
+        // Store the key on the button for later reference
         btn.node().__key__ = key;
-
-        // B. Creiamo il DIVISORE (Se non è l'ultimo elemento)
-        if (index < keys.length - 1) {
-            legendContainer.append("div").attr("class", "compact-divider");
-        }
     });
 
-    // --- FUNZIONE AGGIORNAMENTO ---
+    // Update Chart State Function
     function updateChartState() {
-        // Aggiorna Grafico
         d3.selectAll(".bar-rect").transition().duration(200)
             .style("opacity", d => (!activeFilter || d.key === activeFilter) ? 1 : 0.1);
         
-        // Aggiorna Legenda (Usa la classe .active del CSS)
-        legendContainer.selectAll(".btn-compact")
-            .classed("active", function() {
-                return this.__key__ === activeFilter;
+        // Update Legend Opacity
+        legendContainer.selectAll("button")
+            .style("opacity", function() {
+                return (!activeFilter || this.__key__ === activeFilter) ? 1 : 0.4;
             });
     }
 
-    // --- 3. HELP (Standard) ---
+    // -- How to read the chart --
     const barHelpContent = {
         title: "How to read the Chart",
         steps: ["X-axis: Years", "Y-axis: Percentage", "Click legend to filter."]
@@ -82,22 +84,26 @@ function initStackedBarChart() {
         createChartHelp("#stacked-help-container", "#stacked-bar-wrapper", barHelpContent);
     }
 
-    // --- 4. GRAFICO (SVG) ---
+
+    // Definitions of margins and dimensions
     const margin = {top: 50, right: 30, bottom: 40, left: 50};
     const width = 1000 - margin.left - margin.right;
     const height = 550 - margin.top - margin.bottom;
 
+    // Build of SVG
     const svg = mainContainer.append("svg")
         .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
         .style("width", "100%").style("height", "auto").style("display", "block")
         .append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
+    /* Title: it will be handled in HTML
     svg.append("text")
         .attr("x", width / 2).attr("y", -25).attr("text-anchor", "middle")
         .style("font-family", "'Roboto Slab', serif").style("font-size", "22px").style("font-weight", "700").style("fill", "#25282A")
         .text("Normalized visualization of Top 5 Event Types");
+    */
 
-    // --- 5. CARICAMENTO DATI ---
+    // Data
     d3.json("../../data/final/stackedbarchart/Year_Events_UKR.json").then(function(data) {
         data.forEach(d => { d.YEAR = +d.YEAR; d.count = +d.count; if(d.EVENT_TYPE) d.EVENT_TYPE = d.EVENT_TYPE.trim(); });
         
@@ -129,32 +135,29 @@ function initStackedBarChart() {
             .attr("x", d => x(d.data.YEAR)).attr("y", d => y(d[1])).attr("height", d => y(d[0]) - y(d[1])).attr("width", x.bandwidth())
             .style("cursor", "pointer").style("transition", "opacity 0.3s ease");
 
-            // --- GESTIONE TOOLTIP (Modificata) ---
-        
-            // 1. Selezioniamo il div del tooltip (già presente nell'HTML)
-            const tooltip = d3.select("#tooltip-bar");
-    
-            // 2. Gestione Eventi Mouse
+            // --- Tooltip ---
+            const tooltip = d3.select("#tooltip-bar"); // in HTML code
+            
+            // Mouseover event
             rects.on("mouseover", function(event, d) {
-                
-                // A. Logica Opacità (Evidenzia la barra corrente)
+                // Highlighting Logic
                 if (!activeFilter) {
                     d3.selectAll(".bar-rect").style("opacity", 0.4);
                     d3.select(this).style("opacity", 1);
                 }
     
-                // B. Calcoli Matematici
-                const eventName = d.key;                 // Nome evento
-                const year = d.data.YEAR;                // Anno
-                const value = d.data[d.key];             // Valore assoluto
+                // Extraction of data for tooltip
+                const eventName = d.key;                   
+                const year = d.data.YEAR;                
+                const value = d.data[d.key];             
                 
-                // Calcolo del totale per questo specifico anno (somma di tutte le chiavi)
+                // Computation of total for the year
                 const total = d3.sum(keys, k => d.data[k]);
                 
-                // Calcolo percentuale
+                // Percentage calculation
                 const percent = ((value / total) * 100).toFixed(1);
     
-                // C. Costruzione Contenuto HTML
+                // Display tooltip: HTML construction
                 tooltip.style("visibility", "visible")
                        .html(`
                            <div style="font-family: 'Fira Sans', sans-serif; font-size: 13px; line-height: 1.5;">
@@ -167,15 +170,11 @@ function initStackedBarChart() {
                        `);
             })
             .on("mousemove", function(event) {
-                // D. Il tooltip segue il mouse
                 tooltip.style("top", (event.pageY - 10) + "px")
                        .style("left", (event.pageX + 15) + "px");
             })
             .on("mouseout", function() {
-                // E. Nascondi tutto quando esci
                 tooltip.style("visibility", "hidden");
-    
-                // Ripristina opacità barre
                 if (!activeFilter) d3.selectAll(".bar-rect").style("opacity", 1);
                 else updateChartState();
             });

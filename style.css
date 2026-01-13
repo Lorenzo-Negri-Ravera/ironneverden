@@ -293,6 +293,39 @@ h6 {
 }
 
 
+/* --- Buttons --- */
+.btn-compact {
+    background: none;
+    border: none;
+    font-family: 'Fira Sans', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: #999;
+    cursor: pointer;
+    padding: 0 15px;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    /* Centering of the text within the buttons */
+    display: flex;            
+    justify-content: center;  
+    align-items: center;      
+    flex: 1;                  
+    width: 100%;              
+    text-align: center;       
+    margin: 0;                
+}
+
+.btn-compact:hover {
+    color: #555;
+}
+
+.btn-compact.active {
+    color: #25282A;
+    font-weight: 700;
+}
+
 
 
 
@@ -548,39 +581,9 @@ h6 {
 
 
 
-/* --- COMPACT BUTTONS (Per Front Map) --- */
 
-.btn-compact {
-    background: none;
-    border: none;
-    font-family: 'Fira Sans', sans-serif;
-    font-weight: 600;
-    /* Stesso peso del testo select */
-    font-size: 14px;
-    /* Dimensione leggibile */
-    color: #999;
-    /* Grigio inattivo (come le label sopra) */
-    cursor: pointer;
-    padding: 0 15px;
-    /* Spaziatura laterale per cliccare meglio */
-    transition: all 0.2s ease;
-    text-transform: uppercase;
-    /* Opzionale: per uniformità con le label */
-    letter-spacing: 0.5px;
-}
 
-/* Stato Hover */
-.btn-compact:hover {
-    color: #555;
-}
 
-/* Stato Attivo (Selezionato) */
-.btn-compact.active {
-    color: #25282A;
-    /* Nero/Scuro quando attivo */
-    font-weight: 700;
-    /* Più grassetto per evidenziare */
-}
 
 
 
@@ -650,55 +653,8 @@ h6 {
     display: none;
 }
 
-/* 2. I Bottoni */
-.btn-compact {
-    background: transparent;
-    border: none;
-    font-family: 'Fira Sans', sans-serif;
-    font-size: 15px;
-    /* Ridotto leggermente (era 13) per farci stare tutto */
-    font-weight: 700;
-    /* Grassetto per leggibilità */
-    color: #6c757d;
-    cursor: pointer;
 
-    /* Ridotto il padding laterale per risparmiare spazio */
-    padding: 10px 6px;
-    /* Era 6px 14px */
 
-    border-radius: 20px;
-    transition: all 0.2s ease;
-    text-transform: uppercase;
-    /* Maiuscolo rende tutto più ordinato */
-    white-space: nowrap;
-    /* Testo sempre su una riga */
-    flex-shrink: 0;
-    /* Impedisce ai bottoni di schiacciarsi troppo */
-}
-
-.btn-compact:hover {
-    color: #333;
-    background-color: #f8f9fa;
-}
-
-/* Stato Attivo */
-.btn-compact.active {
-    color: #000;
-    font-weight: 800;
-    /* Extra bold quando attivo */
-    background-color: #e9ecef;
-}
-
-/* 3. Il Divisore Verticale */
-.compact-divider {
-    width: 1px;
-    height: 16px;
-    background-color: #dee2e6;
-    margin: 0 1px;
-    /* Spazio minimo */
-    flex-shrink: 0;
-    /* Non far sparire le linee */
-}
 
 
 
@@ -764,18 +720,6 @@ h6 {
     pointer-events: none;
 }
 
-/* Trigger Help (Basso Sinistra) */
-.help-trigger-container {
-    position: absolute;
-    bottom: 20px;
-    left: 30px;
-    /* Allineato col padding laterale */
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-}
 
 /* Bottone Replay (Basso Destra) */
 #replay-btn {
@@ -835,77 +779,7 @@ h6 {
     font-weight: 600;
 }
 
-/* --- HELP OVERLAY --- */
-.chart-help-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.96);
-    z-index: 200;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-    border-radius: 8px;
-}
 
-.help-trigger-container:hover+.chart-help-overlay,
-.chart-help-overlay:hover {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-/* Stili interni help e icona */
-.info-icon {
-    width: 22px;
-    height: 22px;
-    background: #000;
-    color: #fff;
-    border-radius: 50%;
-    font-family: serif;
-    font-weight: bold;
-    font-style: italic;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.help-text {
-    font-weight: 700;
-    font-size: 14px;
-    color: #000;
-    font-family: 'Roboto Slab', serif;
-}
-
-.chart-help-box {
-    background: white;
-    border: 2px solid #000;
-    padding: 30px;
-    border-radius: 8px;
-    max-width: 450px;
-}
-
-.chart-help-box h4 {
-    margin-top: 0;
-    font-family: 'Roboto Slab', serif;
-    text-align: center;
-    font-size: 18px;
-    margin-bottom: 15px;
-}
-
-.chart-help-box ul {
-    padding-left: 20px;
-    font-size: 14px;
-    line-height: 1.5;
-}
-
-.chart-help-box li {
-    margin-bottom: 8px;
-}
 
 /* Stili SVG Testo */
 .label-name {

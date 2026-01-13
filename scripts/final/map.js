@@ -412,9 +412,6 @@ Promise.all([
 
     // Chiamo utils.js: funzione creerà i div e gestirà il mouseover
     if (typeof createChartHelp === "function") {
-        // MODIFICA QUI: Passiamo 3 argomenti per usare la modalità manuale precisa
-        // 1. Dove mettere il bottone: #geo-help-container
-        // 2. Dove mettere l'overlay: #map-wrapper
         createChartHelp("#geo-help-container", "#map-wrapper", mapHelpContent);
     }
 
