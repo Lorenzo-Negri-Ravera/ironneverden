@@ -4,13 +4,15 @@
     // ==========================================
     const path = "../../data/final/FlightsUKR/fly/race_bar.csv"; 
     
+    // Nomi completi dei paesi
     const codeToName = {
         "UA": "Ukraine", "RU": "Russia", "PL": "Poland", "RO": "Romania", 
         "HU": "Hungary", "SK": "Slovakia", "LT": "Lithuania",
         "MD": "Moldova", "BY": "Belarus", "DE": "Germany", "TR": "Turkey"
     };
 
-    // VELOCITÀ: 40000 = 40 secondi
+    // --- MODIFICA QUI PER LA VELOCITÀ ---
+    // 20000 = 20 secondi. 40000 = 40 secondi (Più è alto, più è lento)
     const duration = 40000; 
     
     const k = 10;           
@@ -24,13 +26,14 @@
     // Variabili di Stato
     let n, height, svg, keyframes;
     let globalMax; 
-    let isAnimationRunning = false; 
+    let isAnimationRunning = false; // Controllo per il replay
 
     // ==========================================
     // --- 2. CARICAMENTO DATI ---
     // ==========================================
     d3.csv(path).then(function(rawData) {
 
+        // Pulizia e Filtro dati
         let data = processHybridData(rawData);
         data = data.filter(d => neigh.includes(d.name));
 
@@ -39,11 +42,13 @@
             return;
         }
 
+        // Calcoli preliminari (Nomi, Dimensioni, Massimi)
         const names = new Set(data.map(d => d.name));
         n = names.size;
         height = margin.top + barSize * n + margin.bottom;
         globalMax = d3.max(data, d => d.value);
 
+        // Preparazione Keyframes (Interpolazione temporale)
         const dateValues = Array.from(d3.rollup(data, ([d]) => d.value, d => d.date, d => d.name))
             .map(([date, data]) => [new Date(date), data])
             .sort(([a], [b]) => d3.ascending(a, b));
@@ -61,27 +66,11 @@
         }
         if(kb) keyframes.push([new Date(kb), rank(name => b.get(name) || 0, names)]);
 
-        // --- SETUP UI ---
-        
-        // 1. REPLAY
-        setupReplayButton(); 
+        // 3. INIZIALIZZAZIONE INTERFACCIA
+        setupHelp();          // Inserisce il bottone Help nel tuo HTML
+        setupReplayButton();  // Collega il tasto Replay
 
-        // 2. HELP (Usa utils.js)
-        if (typeof createChartHelp === "function") {
-            createChartHelp("#race-help-container", "#race-chart-wrapper", {
-                title: "How to read the Race Chart",
-                steps: [
-                    "<strong>Bars:</strong> Represent flight volume per destination.",
-                    "<strong>Rank:</strong> Watch countries rise and fall in rank over time.",
-                    "<strong>Numbers:</strong> The monthly total flights.",
-                    "<strong>Replay:</strong> Use the button to restart the animation."
-                ]
-            });
-        } else {
-            console.warn("createChartHelp non è definita. Hai importato utils.js?");
-        }
-
-        // --- AVVIO GRAFICO ---
+        // 4. AVVIO GRAFICO
         initChart();
         runAnimation();
 
@@ -95,23 +84,25 @@
     // --- 3. DISEGNO GRAFICO (INIT) ---
     // ==========================================
     function initChart() {
+        // Rimuove eventuali vecchi SVG
         d3.select("#race-chart-container svg").remove();
         
         svg = d3.select("#race-chart-container").append("svg")
             .attr("viewBox", [0, 0, width, height]);
 
-        // Assi e Gruppi
         svg.append("g").attr("class", "axis axis--top").attr("transform", `translate(0,${margin.top})`);
         svg.append("g").attr("class", "bars");
         svg.append("g").attr("class", "labels-name");
         svg.append("g").attr("class", "labels-value");
         
-        // Ticker Anno
+        // --- TICKER (NUMERO ANNO) ---
         svg.append("text")
             .attr("class", "year-ticker")
             .attr("x", width - 60)
             .attr("y", height - 30)
-            .style("font-size", "24px") 
+            // --- MODIFICA RICHIESTA: FONT PIÙ PICCOLO ---
+            .style("font-size", "24px")  // Era molto più grande
+            // ---------------------------------------------
             .style("opacity", 0.6)
             .style("font-weight", "bold")
             .attr("text-anchor", "end")
@@ -123,7 +114,7 @@
     // ==========================================
     async function runAnimation() {
         if (!svg) return;
-        isAnimationRunning = true;
+        isAnimationRunning = true; // Segnala che stiamo girando
 
         const x = d3.scaleLinear([0, globalMax], [margin.left, width - margin.right]);
         const y = d3.scaleBand()
@@ -136,17 +127,20 @@
         const formatNumber = d3.format(",d");
         const formatDate = d3.utcFormat("%B %Y"); 
 
+        // Disegna Assi
         svg.select(".axis--top")
             .call(d3.axisTop(x).ticks(width / 160).tickSizeOuter(0).tickSizeInner(-barSize * (n + y.padding())));
         svg.select(".axis--top .domain").remove();
 
+        // Ciclo sui frame
         for (const keyframe of keyframes) {
+            // Se clicco replay, isAnimationRunning diventa false e il loop si ferma
             if (!isAnimationRunning) break; 
 
             const transition = svg.transition().duration(duration / keyframes.length).ease(d3.easeLinear);
             const [date, data] = keyframe;
 
-            // Rettangoli
+            // Barre
             svg.select(".bars").selectAll("rect")
                 .data(data.slice(0, n), d => d.name)
                 .join(
@@ -167,7 +161,7 @@
                     .attr("fill", d => getColor(d.name))
                 );
 
-            // Nomi
+            // Nomi Paesi
             svg.select(".labels-name").selectAll("text")
                 .data(data.slice(0, n), d => d.name)
                 .join(
@@ -186,7 +180,7 @@
                     .style("font-weight", "bold")
                 );
 
-            // Valori
+            // Valori Numerici
             svg.select(".labels-value").selectAll("text")
                 .data(data.slice(0, n), d => d.name)
                 .join(
@@ -210,8 +204,13 @@
                     })
                 );
 
+            // Ticker Data
             svg.select(".year-ticker").text(formatDate(date));
-            try { await transition.end(); } catch(e) { }
+
+            // Attesa fine frame (gestione errori per interrupt)
+            try {
+                await transition.end();
+            } catch(e) { }
         }
     }
 
@@ -251,29 +250,72 @@
     }
 
     // ==========================================
-    // --- 6. GESTIONE REPLAY ---
+    // --- 6. FUNZIONI UI & REPLAY ---
     // ==========================================
-    function setupReplayButton() {
-        const triggerReplay = () => {
-            if(svg && keyframes) {
-                isAnimationRunning = false; 
-                svg.selectAll("*").interrupt(); 
-                setTimeout(() => {
-                    initChart();
-                    runAnimation();
-                }, 50);
-            }
-        };
+    
+    // Funzione Replay Interna
+    function triggerReplay() {
+        if(svg && keyframes) {
+            isAnimationRunning = false; // Ferma il loop corrente
+            svg.selectAll("*").interrupt(); // Interrompe transizioni D3
+            
+            // Riavvia dopo breve pausa
+            setTimeout(() => {
+                initChart();
+                runAnimation();
+            }, 50);
+        }
+    }
 
+    // Setup Bottone Replay (ignora onclick HTML per sicurezza)
+    function setupReplayButton() {
+        // Esponi globale per compatibilità
         window.replay = triggerReplay;
 
+        // Attacca listener diretto
         const btn = document.getElementById("replay-btn");
         if(btn) {
-            btn.onclick = null;
+            btn.onclick = null; // Rimuove vecchio handler se presente
             btn.addEventListener("click", function(e) {
                 e.preventDefault();
                 triggerReplay();
             });
+        }
+    }
+
+    // Setup Help (Genera HTML nel contenitore vuoto)
+    function setupHelp() {
+        const container = document.getElementById("race-help-container");
+        if (!container) return;
+
+        // Inserisce HTML che sfrutta le classi CSS esistenti
+        container.innerHTML = `
+            <div class="chart-help-trigger" style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                <span class="chart-help-icon" style="background: #343a40; color: white; border-radius: 50%; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-family: serif; font-weight: bold; font-style: italic;">i</span>
+                <span class="chart-help-text" style="font-weight: bold; font-size: 13px; color: #495057;">HOW TO READ THIS CHART</span>
+            </div>
+            
+            <div class="chart-help-overlay" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 5000; align-items: center; justify-content: center; backdrop-filter: blur(2px); border-radius: 8px;">
+                <div class="chart-help-content" style="background: white; padding: 25px; border: 1px solid #ccc; border-radius: 8px; text-align: center; max-width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+                    <h3 style="margin-top:0;">Bar Chart Race</h3>
+                    <div style="height: 3px; width: 40px; background: #C8102E; margin: 10px auto;"></div>
+                    <ul style="text-align: left; font-size: 13px; line-height: 1.5; padding-left: 20px; color: #555;">
+                        <li><strong>Barre:</strong> Mostrano l'evoluzione dei voli nel tempo.</li>
+                        <li><strong>Classifica:</strong> I paesi si scambiano posizione in base al volume.</li>
+                        <li><strong>Numeri:</strong> Totale voli mensili per destinazione.</li>
+                    </ul>
+                    <p style="font-size: 11px; color: #999; margin-top: 15px; cursor: pointer;">(Clicca ovunque per chiudere)</p>
+                </div>
+            </div>
+        `;
+
+        // Logica Apertura/Chiusura
+        const trigger = container.querySelector(".chart-help-trigger");
+        const overlay = container.querySelector(".chart-help-overlay");
+
+        if (trigger && overlay) {
+            trigger.addEventListener("click", () => overlay.style.display = "flex");
+            overlay.addEventListener("click", () => overlay.style.display = "none");
         }
     }
 

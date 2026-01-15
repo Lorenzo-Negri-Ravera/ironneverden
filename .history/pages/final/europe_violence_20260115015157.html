@@ -324,97 +324,47 @@
             <section id="sankey-section" class="py-5" style="background-color: #fff;">
                 <div class="container">
                     
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="controls-wrapper text-center mb-4">
                         
-                       
+                        <div class="d-flex justify-content-between align-items-center mb-3" style="max-width: 800px; margin: 0 auto;">
+                            
+                            <div id="sankey-help-container" style="width: 150px; text-align: left;"></div>
             
-                        <div id="sankey-filter-container" class="compact-menu-bar d-inline-flex justify-content-center" role="group">
-                            <button class="btn-compact active" data-type="2019">2019</button>
-                            <div class="compact-divider"></div>
-                            <button class="btn-compact" data-type="2020">2020</button>
-                            <div class="compact-divider"></div>
-                            <button class="btn-compact" data-type="2021">2021</button>
-                            <div class="compact-divider"></div>
-                            <button class="btn-compact" data-type="2022">2022</button>
+                            <div id="sankey-filter-container" class="compact-menu-bar d-inline-flex justify-content-center" role="group">
+                                <button class="btn-compact active" data-type="2019">2019</button>
+                                <div class="compact-divider"></div>
+                                <button class="btn-compact" data-type="2020">2020</button>
+                                <div class="compact-divider"></div>
+                                <button class="btn-compact" data-type="2021">2021</button>
+                                <div class="compact-divider"></div>
+                                <button class="btn-compact" data-type="2022">2022</button>
+                            </div>
+            
+                            <div style="width: 150px;"></div>
                         </div>
             
-                        <div style="min-width: 150px;"></div>
+                        <div class="d-flex justify-content-center">
+                            <div style="width: 100%; max-width: 500px;">
+                                <label for="monthSlider" style="font-size: 16px; font-weight: 600; color: #333; margin-bottom: 8px; display: block;">
+                                    Mese selezionato: <span id="monthDisplay" style="color: #003f5c; font-weight: 800;">Gennaio</span>
+                                </label>
+                                <input type="range" id="monthSlider" class="form-range" min="1" max="12" value="1" step="1" style="width: 100%;">
+                                <div class="d-flex justify-content-between text-muted" style="font-size: 10px; margin-top: 5px;">
+                                    <span>Gen</span><span>Dic</span>
+                                </div>
+                            </div>
+                        </div>
+            
                     </div>
             
                     <div class="row justify-content-center">
                         <div class="col-12">
+                            <!-- <div id="sankey-chart-wrapper" class="chart-wrapper-map" style="position: relative; border: 1px solid #dee2e6; border-radius: 8px; padding: 10px; background: white;">
+                                
+                            </div> -->
                             <div id="sankey_chart"></div>
                         </div>
                     </div>
-            
-                    <!-- <div class="row justify-content-center mt-4">
-                        <div class="col-md-8 col-lg-6">
-                            <div class="text-center p-3" style="background: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;">
-                                <label for="monthSlider" style="font-size: 16px; font-weight: 600; color: #333; margin-bottom: 10px; display: block;">
-                                    Month: <span id="monthDisplay" style="color: #003f5c; font-weight: 800;">Gennaio</span>
-                                </label>
-                                <input type="range" id="monthSlider" class="form-range" min="1" max="12" value="1" step="1" style="width: 100%;">
-                                <div class="d-flex justify-content-between text-muted" style="font-size: 11px; margin-top: 5px; font-weight: 500;">
-                                    <span>Jan</span><span>Dec</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
-                    <!-- <div class="row justify-content-center mt-4">
-                        <div class="col-md-8 col-lg-6">
-                            
-                            <div class="text-center mb-2" style="font-family: 'Fira Sans', sans-serif;">
-                                <span style="font-size: 14px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.5px;">Month:</span>
-                                <span id="monthDisplay" style="font-size: 16px; font-weight: 700; color: #25282A; margin-left: 5px;">January</span>
-                            </div>
-                    
-                            <div class="d-flex align-items-center position-relative w-100" style="height: 30px;">
-                                
-                                <div id="timeline-markers" class="position-absolute w-100 h-100 start-0 top-0" style="pointer-events: none; z-index: 5;"></div>
-                                
-                                <div id="slider-ghost-thumb" style="position: absolute; top: 0; width: 1px; height: 100%; pointer-events: none; z-index: -1;"></div>
-                                
-                                <input type="range" id="monthSlider" class="custom-range-slider flex-grow-1" min="1" max="12" value="1" step="1" style="position: relative; z-index: 10; width: 100%;">
-                            
-                            </div>
-                    
-                            <div class="d-flex justify-content-between mt-1" style="font-family: 'Fira Sans', sans-serif; font-size: 11px; font-weight: 600; color: #999; text-transform: uppercase;">
-                                <span>Jan</span>
-                                <span>Dec</span>
-                            </div>
-                    
-                        </div>
-                    </div> -->
-                    <div class="row justify-content-center mt-4">
-                        <div class="col-md-8 col-lg-6">
-                            
-                            <div class="slider-wrapper-compact">
-                                
-                                <div class="mb-2 w-100 text-center">
-                                    <span>Month:</span>
-                                    <span id="monthDisplay" class="slider-value-active">GENNAIO</span>
-                                </div>
-                    
-                                <div class="d-flex align-items-center position-relative w-100" style="height: 20px;">
-                                    <div id="timeline-markers" class="position-absolute w-100 h-100 start-0 top-0" style="pointer-events: none; z-index: 5;"></div>
-                                    <div id="slider-ghost-thumb" style="position: absolute; top: 0; width: 1px; height: 100%; pointer-events: none; z-index: -1;"></div>
-                                    
-                                    <input type="range" id="monthSlider" class="custom-range-slider flex-grow-1" min="1" max="12" value="1" step="1" style="position: relative; z-index: 10;">
-                                </div>
-                    
-                                <div class="d-flex justify-content-between w-100" style="font-size: 10px; margin-top: 5px; opacity: 0.8;">
-                                    <span>JAN</span>
-                                    <span>DEC</span>
-                                </div>
-                    
-                            </div>
-                    
-                        </div>
-                    </div>
-
-                    
-                        <div id="sankey-help-container" style="min-width: 150px; text-align: left;">
-                        </div>
             
                 </div>
             </section>

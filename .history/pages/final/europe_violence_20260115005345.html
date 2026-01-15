@@ -289,137 +289,247 @@
             </section>
             
 
-           
-
-            <!-- ########################################## LOLLO  ######################################################### -->
-            <section id="race-chart-section" class="mt-5">
-                <div class="row justify-content-center">
-                    <div class="col-lg-10">
-                        
-                        <div id="race-chart-tooltip"
-                            style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 4px; pointer-events: none; font-family: 'Fira Sans', sans-serif; font-size: 12px; z-index: 3000;">
-                        </div>
-                        <div id="race-chart-wrapper" class="chart-wrapper-map position-relative mb-0" style="overflow: hidden;">
-                            <div id="race-chart-container"class="w-100"></div>
-                        </div>
-
-                        <div class="d-flex justify-content-between align-items-center mt-0">
-                            
-                            <div id="race-help-container" class="text-start"></div>
-
-                            <button id="replay-btn" class="btn btn-sm btn-dark d-flex align-items-center gap-2" onclick="replay()">
-                                <span style="font-size: 14px; font-weight: bold;">⟳</span> REPLAY
-                            </button>
-                        </div>
-
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <div id="sub-event-help-container"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="sankey-section" class="py-5" style="background-color: #fff;">
-                <div class="container">
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        
-                       
             
-                        <div id="sankey-filter-container" class="compact-menu-bar d-inline-flex justify-content-center" role="group">
-                            <button class="btn-compact active" data-type="2019">2019</button>
-                            <div class="compact-divider"></div>
-                            <button class="btn-compact" data-type="2020">2020</button>
-                            <div class="compact-divider"></div>
-                            <button class="btn-compact" data-type="2021">2021</button>
-                            <div class="compact-divider"></div>
-                            <button class="btn-compact" data-type="2022">2022</button>
-                        </div>
-            
-                        <div style="min-width: 150px;"></div>
-                    </div>
-            
-                    <div class="row justify-content-center">
-                        <div class="col-12">
-                            <div id="sankey_chart"></div>
-                        </div>
-                    </div>
-            
-                    <!-- <div class="row justify-content-center mt-4">
-                        <div class="col-md-8 col-lg-6">
-                            <div class="text-center p-3" style="background: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;">
-                                <label for="monthSlider" style="font-size: 16px; font-weight: 600; color: #333; margin-bottom: 10px; display: block;">
-                                    Month: <span id="monthDisplay" style="color: #003f5c; font-weight: 800;">Gennaio</span>
-                                </label>
-                                <input type="range" id="monthSlider" class="form-range" min="1" max="12" value="1" step="1" style="width: 100%;">
-                                <div class="d-flex justify-content-between text-muted" style="font-size: 11px; margin-top: 5px; font-weight: 500;">
-                                    <span>Jan</span><span>Dec</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
-                    <!-- <div class="row justify-content-center mt-4">
-                        <div class="col-md-8 col-lg-6">
-                            
-                            <div class="text-center mb-2" style="font-family: 'Fira Sans', sans-serif;">
-                                <span style="font-size: 14px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.5px;">Month:</span>
-                                <span id="monthDisplay" style="font-size: 16px; font-weight: 700; color: #25282A; margin-left: 5px;">January</span>
-                            </div>
-                    
-                            <div class="d-flex align-items-center position-relative w-100" style="height: 30px;">
-                                
-                                <div id="timeline-markers" class="position-absolute w-100 h-100 start-0 top-0" style="pointer-events: none; z-index: 5;"></div>
-                                
-                                <div id="slider-ghost-thumb" style="position: absolute; top: 0; width: 1px; height: 100%; pointer-events: none; z-index: -1;"></div>
-                                
-                                <input type="range" id="monthSlider" class="custom-range-slider flex-grow-1" min="1" max="12" value="1" step="1" style="position: relative; z-index: 10; width: 100%;">
-                            
-                            </div>
-                    
-                            <div class="d-flex justify-content-between mt-1" style="font-family: 'Fira Sans', sans-serif; font-size: 11px; font-weight: 600; color: #999; text-transform: uppercase;">
-                                <span>Jan</span>
-                                <span>Dec</span>
-                            </div>
-                    
-                        </div>
-                    </div> -->
-                    <div class="row justify-content-center mt-4">
-                        <div class="col-md-8 col-lg-6">
-                            
-                            <div class="slider-wrapper-compact">
-                                
-                                <div class="mb-2 w-100 text-center">
-                                    <span>Month:</span>
-                                    <span id="monthDisplay" class="slider-value-active">GENNAIO</span>
-                                </div>
-                    
-                                <div class="d-flex align-items-center position-relative w-100" style="height: 20px;">
-                                    <div id="timeline-markers" class="position-absolute w-100 h-100 start-0 top-0" style="pointer-events: none; z-index: 5;"></div>
-                                    <div id="slider-ghost-thumb" style="position: absolute; top: 0; width: 1px; height: 100%; pointer-events: none; z-index: -1;"></div>
-                                    
-                                    <input type="range" id="monthSlider" class="custom-range-slider flex-grow-1" min="1" max="12" value="1" step="1" style="position: relative; z-index: 10;">
-                                </div>
-                    
-                                <div class="d-flex justify-content-between w-100" style="font-size: 10px; margin-top: 5px; opacity: 0.8;">
-                                    <span>JAN</span>
-                                    <span>DEC</span>
-                                </div>
-                    
-                            </div>
-                    
-                        </div>
-                    </div>
+(function() {
+    // ==========================================
+    // --- CONFIGURAZIONE ---
+    // ==========================================
+    const path = "../../data/final/FlightsUKR/fly/race_bar.csv"; 
+    
 
-                    
-                        <div id="sankey-help-container" style="min-width: 150px; text-align: left;">
-                        </div>
+    // Mappa per convertire i codici in nomi completi
+    const codeToName = {
+        "UA": "Ukraine", "RU": "Russia", "PL": "Poland", "RO": "Romania", 
+        "HU": "Hungary", "SK": "Slovakia", "LT": "Lithuania",
+        "MD": "Moldova", "BY": "Belarus", "DE": "Germany", "TR": "Turkey"
+        // Aggiungi altri se necessario...
+    };
+
+    const duration = 20000; 
+    const k = 10;           
+    const width = 1000;
+    const barSize = 48;
+    const margin = { top: 16, right: 6, bottom: 6, left: 160 }; 
+
+    const customPalette = ["#003f5c", "#374c80", "#7a5195", "#bc5090", "#ef5675", "#ff764a", "#ffa600"];
+    const neigh = ["Russia", "Ukraine", "Poland", "Hungary", "Romania", "Lithuania", "Slovakia"];
+
+    // Variabili Locali
+    let n, height, svg, keyframes;
+    let globalMax; 
+
+    // ==========================================
+    // --- CARICAMENTO DATI (IBRIDO) ---
+    // ==========================================
+    d3.csv(path).then(function(rawData) {
+
+        // 1. Trasformiamo i dati "sporchi" in dati puliti
+        let data = processHybridData(rawData);
+
+        // 2. Filtriamo solo se necessario (il file sembra già filtrato, ma per sicurezza)
+        data = data.filter(d => neigh.includes(d.name));
+
+        if (data.length === 0) {
+            console.error("Race Chart: Dati vuoti.");
+            return;
+        }
+
+        const names = new Set(data.map(d => d.name));
+        n = names.size;
+        height = margin.top + barSize * n + margin.bottom;
+        
+        // Calcolo massimo per asse fisso
+        globalMax = d3.max(data, d => d.value);
+
+        const dateValues = Array.from(d3.rollup(data, ([d]) => d.value, d => d.date, d => d.name))
+            .map(([date, data]) => [new Date(date), data])
+            .sort(([a], [b]) => d3.ascending(a, b));
+
+        keyframes = [];
+        let ka, a, kb, b;
+        for ([[ka, a], [kb, b]] of d3.pairs(dateValues)) {
+            for (let i = 0; i < k; ++i) {
+                const t = i / k;
+                keyframes.push([
+                    new Date(ka * (1 - t) + kb * t),
+                    rank(name => (a.get(name) || 0) * (1 - t) + (b.get(name) || 0) * t, names)
+                ]);
+            }
+        }
+        if(kb) keyframes.push([new Date(kb), rank(name => b.get(name) || 0, names)]);
+
+        initChart();
+        runAnimation();
+
+    }).catch(err => {
+        console.error("ERRORE CARICAMENTO:", err);
+        d3.select("#chart-container").html(`<p style="color:red; text-align:center;">Errore caricamento: ${path}</p>`);
+    });
+
+
+    // ==========================================
+    // --- LOGICA DI DISEGNO ---
+    // ==========================================
+    function initChart() {
+        d3.select("#chart-container svg").remove();
+        svg = d3.select("#chart-container").append("svg")
+            .attr("viewBox", [0, 0, width, height]);
+
+        svg.append("g").attr("class", "axis axis--top").attr("transform", `translate(0,${margin.top})`);
+        svg.append("g").attr("class", "bars");
+        svg.append("g").attr("class", "labels-name");
+        svg.append("g").attr("class", "labels-value");
+        
+        svg.append("text")
+            .attr("class", "year-ticker")
+            .attr("x", width - 60).attr("y", height - 30)
+            .style("font-size", "40px").style("opacity", 0.6)
+            .style("font-weight", "bold").attr("text-anchor", "end")
+            .text("");
+    }
+
+    async function runAnimation() {
+        const x = d3.scaleLinear([0, globalMax], [margin.left, width - margin.right]);
+        const y = d3.scaleBand()
+            .domain(d3.range(n + 2))
+            .rangeRound([margin.top, margin.top + barSize * (n + 2 + 0.1)])
+            .padding(0.1);
+        
+        const colorScale = d3.scaleOrdinal(customPalette).domain(neigh);
+        const getColor = (name) => colorScale(name) || "#ccc";
+        const formatNumber = d3.format(",d");
+        const formatDate = d3.utcFormat("%B %Y"); 
+
+        svg.select(".axis--top")
+            .call(d3.axisTop(x).ticks(width / 160).tickSizeOuter(0).tickSizeInner(-barSize * (n + y.padding())));
+        svg.select(".axis--top .domain").remove();
+
+        for (const keyframe of keyframes) {
+            const transition = svg.transition().duration(duration / keyframes.length).ease(d3.easeLinear);
+            const [date, data] = keyframe;
+
+            svg.select(".bars").selectAll("rect")
+                .data(data.slice(0, n), d => d.name)
+                .join(
+                    enter => enter.append("rect")
+                        .attr("fill", d => getColor(d.name))
+                        .attr("height", y.bandwidth())
+                        .attr("x", x(0))
+                        .attr("y", d => y(n + 1))
+                        .attr("width", d => x(d.value) - x(0)),
+                    update => update,
+                    exit => exit.transition(transition).remove()
+                        .attr("y", d => y(n + 1))
+                        .attr("width", d => x(d.value) - x(0))
+                )
+                .call(bar => bar.transition(transition)
+                    .attr("y", d => y(d.rank))
+                    .attr("width", d => x(d.value) - x(0))
+                    .attr("fill", d => getColor(d.name))
+                );
+
+            svg.select(".labels-name").selectAll("text")
+                .data(data.slice(0, n), d => d.name)
+                .join(
+                    enter => enter.append("text")
+                        .attr("text-anchor", "end")
+                        .attr("x", margin.left - 10)
+                        .attr("y", d => y(n + 1) + y.bandwidth() / 2)
+                        .attr("dy", "0.35em")
+                        .text(d => d.name),
+                    update => update,
+                    exit => exit.transition(transition).remove()
+                        .attr("y", d => y(n + 1) + y.bandwidth() / 2)
+                )
+                .call(text => text.transition(transition)
+                    .attr("y", d => y(d.rank) + y.bandwidth() / 2)
+                    .style("font-weight", "bold")
+                );
+
+            svg.select(".labels-value").selectAll("text")
+                .data(data.slice(0, n), d => d.name)
+                .join(
+                    enter => enter.append("text")
+                        .attr("text-anchor", "start")
+                        .attr("x", d => x(d.value) + 6)
+                        .attr("y", d => y(n + 1) + y.bandwidth() / 2)
+                        .attr("dy", "0.35em")
+                        .text(d => formatNumber(d.value)),
+                    update => update,
+                    exit => exit.transition(transition).remove()
+                        .attr("x", d => x(d.value) + 6)
+                        .attr("y", d => y(n + 1) + y.bandwidth() / 2)
+                )
+                .call(text => text.transition(transition)
+                    .attr("x", d => x(d.value) + 6)
+                    .attr("y", d => y(d.rank) + y.bandwidth() / 2)
+                    .tween("text", function(d) {
+                        const i = d3.interpolateNumber(this.textContent.replace(/,/g, "") || 0, d.value);
+                        return function(t) { this.textContent = formatNumber(i(t)); };
+                    })
+                );
+
+            svg.select(".year-ticker").text(formatDate(date));
+            await transition.end();
+        }
+    }
+
+    // ==========================================
+    // --- FUNZIONE DI SUPPORTO (CRUCIALE) ---
+    // ==========================================
+    // Questa funzione legge il tuo file CSV "ibrido" e lo trasforma
+    function processHybridData(data) {
+        const output = [];
+        const years = [2019, 2020, 2021, 2022]; 
+
+        data.forEach(row => {
+            const destCode = row.destination_name;
+            const destName = codeToName[destCode] || destCode; 
+            const monthIndex = parseInt(row.mese_id) - 1;
+
+            if (isNaN(monthIndex)) return; 
+
+            years.forEach(year => {
+                const colName = `flights_${year}`; 
+                const val = parseFloat(row[colName]);
+
+                if (!isNaN(val)) {
+                    output.push({
+                        name: destName,
+                        date: new Date(year, monthIndex, 1),
+                        value: val
+                    });
+                }
+            });
+        });
+        return output.sort((a, b) => a.date - b.date);
+    }
+
+    function rank(value, names) {
+        const data = Array.from(names, name => ({name, value: value(name)}));
+        data.sort((a, b) => d3.descending(a.value, b.value));
+        for (let i = 0; i < data.length; ++i) data[i].rank = Math.min(n, i);
+        return data;
+    }
+
+    window.replayRace = function() {
+        if(svg && keyframes) {
+            svg.selectAll("*").interrupt(); 
+            initChart();
+            runAnimation();
+        }
+    };
+
+})();
+
+
+
+
+
+
+
+
             
-                </div>
-            </section>
- <!-- ########################################## LOLLO  ######################################################### -->
-       
         </main>
     </div>
 
@@ -429,7 +539,6 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://unpkg.com/topojson@3"></script>
     <script src="../../scripts/final/utils.js"></script>

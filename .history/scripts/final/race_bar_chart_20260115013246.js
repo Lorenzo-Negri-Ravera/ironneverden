@@ -61,25 +61,9 @@
         }
         if(kb) keyframes.push([new Date(kb), rank(name => b.get(name) || 0, names)]);
 
-        // --- SETUP UI ---
-        
-        // 1. REPLAY
-        setupReplayButton(); 
-
-        // 2. HELP (Usa utils.js)
-        if (typeof createChartHelp === "function") {
-            createChartHelp("#race-help-container", "#race-chart-wrapper", {
-                title: "How to read the Race Chart",
-                steps: [
-                    "<strong>Bars:</strong> Represent flight volume per destination.",
-                    "<strong>Rank:</strong> Watch countries rise and fall in rank over time.",
-                    "<strong>Numbers:</strong> The monthly total flights.",
-                    "<strong>Replay:</strong> Use the button to restart the animation."
-                ]
-            });
-        } else {
-            console.warn("createChartHelp non è definita. Hai importato utils.js?");
-        }
+        // --- INIZIALIZZAZIONE UI ---
+        setupReplayButton(); // Collega il tasto Replay esistente
+        setupHelp();         // RIEMPIE IL DIV #race-help-container
 
         // --- AVVIO GRAFICO ---
         initChart();
@@ -251,9 +235,12 @@
     }
 
     // ==========================================
-    // --- 6. GESTIONE REPLAY ---
+    // --- 6. GESTIONE UI (HELP & REPLAY) ---
     // ==========================================
+    
+    // --- A. REPLAY ---
     function setupReplayButton() {
+        // Funzione trigger interna
         const triggerReplay = () => {
             if(svg && keyframes) {
                 isAnimationRunning = false; 
@@ -265,14 +252,60 @@
             }
         };
 
+        // Assegna globale (per l'HTML onclick="replay()")
         window.replay = triggerReplay;
 
+        // Assegna listener JS (per sicurezza, se onclick fallisce)
         const btn = document.getElementById("replay-btn");
         if(btn) {
             btn.onclick = null;
             btn.addEventListener("click", function(e) {
                 e.preventDefault();
                 triggerReplay();
+            });
+        }
+    }
+
+    // --- B. HELP (Inserisce il bottone nel div #race-help-container) ---
+    function setupHelp() {
+        const container = document.getElementById("race-help-container");
+        if (!container) {
+            console.warn("Container #race-help-container non trovato nell'HTML.");
+            return;
+        }
+
+        // Inseriamo l'HTML del bottone e dell'overlay direttamente nel contenitore
+        // Usiamo le classi che hai già nel CSS (.chart-help-trigger, .chart-help-overlay)
+        container.innerHTML = `
+            <div class="chart-help-trigger" style="cursor: pointer; display: inline-flex; align-items: center; gap: 8px; padding: 5px; border-radius: 4px; background: #fff; border: 1px solid #ddd;">
+                <span class="chart-help-icon" style="background: #343a40; color: white; border-radius: 50%; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-family: serif; font-weight: bold; font-style: italic;">i</span>
+                <span class="chart-help-text" style="font-weight: bold; font-size: 13px; color: #333;">How to read this chart</span>
+            </div>
+
+            <div class="chart-help-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 9999; align-items: center; justify-content: center;">
+                <div class="chart-help-content" style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); max-width: 400px; text-align: center; border: 1px solid #ccc;">
+                    <h3 style="margin-top: 0; color: #333;">Bar Chart Race</h3>
+                    <div style="height: 3px; width: 50px; background: #C8102E; margin: 15px auto;"></div>
+                    <ul style="text-align: left; font-size: 14px; line-height: 1.6; color: #555;">
+                        <li><strong>Barre:</strong> Rappresentano il volume di voli per destinazione.</li>
+                        <li><strong>Classifica:</strong> I paesi cambiano posizione in base al volume mensile.</li>
+                        <li><strong>Numeri:</strong> Totale voli per quel mese specifico.</li>
+                    </ul>
+                    <p style="font-size: 12px; color: #999; margin-top: 20px; cursor: pointer;">(Clicca ovunque per chiudere)</p>
+                </div>
+            </div>
+        `;
+
+        // Logica click
+        const trigger = container.querySelector(".chart-help-trigger");
+        const overlay = container.querySelector(".chart-help-overlay");
+
+        if (trigger && overlay) {
+            trigger.addEventListener("click", () => {
+                overlay.style.display = "flex"; // Mostra
+            });
+            overlay.addEventListener("click", () => {
+                overlay.style.display = "none"; // Nascondi
             });
         }
     }

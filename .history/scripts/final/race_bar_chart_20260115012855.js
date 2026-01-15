@@ -10,7 +10,7 @@
         "MD": "Moldova", "BY": "Belarus", "DE": "Germany", "TR": "Turkey"
     };
 
-    // VELOCITÀ: 40000 = 40 secondi
+    // VELOCITÀ: 40000 = 40 secondi (più alto = più lento)
     const duration = 40000; 
     
     const k = 10;           
@@ -61,27 +61,10 @@
         }
         if(kb) keyframes.push([new Date(kb), rank(name => b.get(name) || 0, names)]);
 
-        // --- SETUP UI ---
-        
-        // 1. REPLAY
+        // Setup Bottoni
         setupReplayButton(); 
 
-        // 2. HELP (Usa utils.js)
-        if (typeof createChartHelp === "function") {
-            createChartHelp("#race-help-container", "#race-chart-wrapper", {
-                title: "How to read the Race Chart",
-                steps: [
-                    "<strong>Bars:</strong> Represent flight volume per destination.",
-                    "<strong>Rank:</strong> Watch countries rise and fall in rank over time.",
-                    "<strong>Numbers:</strong> The monthly total flights.",
-                    "<strong>Replay:</strong> Use the button to restart the animation."
-                ]
-            });
-        } else {
-            console.warn("createChartHelp non è definita. Hai importato utils.js?");
-        }
-
-        // --- AVVIO GRAFICO ---
+        // Avvio Grafico
         initChart();
         runAnimation();
 
@@ -106,7 +89,7 @@
         svg.append("g").attr("class", "labels-name");
         svg.append("g").attr("class", "labels-value");
         
-        // Ticker Anno
+        // Ticker Anno (Font ridotto come richiesto)
         svg.append("text")
             .attr("class", "year-ticker")
             .attr("x", width - 60)
@@ -116,6 +99,25 @@
             .style("font-weight", "bold")
             .attr("text-anchor", "end")
             .text("");
+
+        // ----------------------------------------------------
+        // AGGIUNTA PULSANTE HELP (Usando la tua funzione globale)
+        // ----------------------------------------------------
+        if (typeof setupHelpButton === "function") {
+             setupHelpButton(svg, width, height, {
+                x: 20,              // Posizionato a sinistra
+                y: height - 20,     // Posizionato in basso
+                title: "How to read the Race Chart",
+                instructions: [
+                    "1. Bars represent flight volume per destination.",
+                    "2. Watch countries rise and fall in rank over time.",
+                    "3. The number on the right is the monthly total.",
+                    "4. Use the Replay button to restart the animation."
+                ]
+            });
+        } else {
+            console.warn("setupHelpButton function not found. Check utils.js inclusion.");
+        }
     }
 
     // ==========================================
@@ -146,7 +148,6 @@
             const transition = svg.transition().duration(duration / keyframes.length).ease(d3.easeLinear);
             const [date, data] = keyframe;
 
-            // Rettangoli
             svg.select(".bars").selectAll("rect")
                 .data(data.slice(0, n), d => d.name)
                 .join(
@@ -167,7 +168,6 @@
                     .attr("fill", d => getColor(d.name))
                 );
 
-            // Nomi
             svg.select(".labels-name").selectAll("text")
                 .data(data.slice(0, n), d => d.name)
                 .join(
@@ -186,7 +186,6 @@
                     .style("font-weight", "bold")
                 );
 
-            // Valori
             svg.select(".labels-value").selectAll("text")
                 .data(data.slice(0, n), d => d.name)
                 .join(
@@ -254,6 +253,7 @@
     // --- 6. GESTIONE REPLAY ---
     // ==========================================
     function setupReplayButton() {
+        // Funzione trigger interna
         const triggerReplay = () => {
             if(svg && keyframes) {
                 isAnimationRunning = false; 
@@ -265,8 +265,10 @@
             }
         };
 
+        // Assegna globale (per l'HTML onclick="replay()")
         window.replay = triggerReplay;
 
+        // Assegna listener JS (per sicurezza)
         const btn = document.getElementById("replay-btn");
         if(btn) {
             btn.onclick = null;

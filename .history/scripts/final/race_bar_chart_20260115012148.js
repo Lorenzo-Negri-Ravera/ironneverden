@@ -1,6 +1,6 @@
 (function() {
     // ==========================================
-    // --- 1. CONFIGURAZIONE ---
+    // --- CONFIGURAZIONE ---
     // ==========================================
     const path = "../../data/final/FlightsUKR/fly/race_bar.csv"; 
     
@@ -10,9 +10,7 @@
         "MD": "Moldova", "BY": "Belarus", "DE": "Germany", "TR": "Turkey"
     };
 
-    // VELOCITÀ: 40000 = 40 secondi
-    const duration = 40000; 
-    
+    const duration = 20000; 
     const k = 10;           
     const width = 1000;
     const barSize = 48;
@@ -21,13 +19,13 @@
     const customPalette = ["#003f5c", "#374c80", "#7a5195", "#bc5090", "#ef5675", "#ff764a", "#ffa600"];
     const neigh = ["Russia", "Ukraine", "Poland", "Hungary", "Romania", "Lithuania", "Slovakia"];
 
-    // Variabili di Stato
+    // Variabili di stato
     let n, height, svg, keyframes;
-    let globalMax; 
-    let isAnimationRunning = false; 
+    let globalMax;
+    let isAnimationRunning = false; // Flag per evitare click multipli o sovrapposizioni
 
     // ==========================================
-    // --- 2. CARICAMENTO DATI ---
+    // --- CARICAMENTO DATI ---
     // ==========================================
     d3.csv(path).then(function(rawData) {
 
@@ -61,27 +59,13 @@
         }
         if(kb) keyframes.push([new Date(kb), rank(name => b.get(name) || 0, names)]);
 
-        // --- SETUP UI ---
+        // 1. Inizializza Help
+        setupHelp(); 
         
-        // 1. REPLAY
-        setupReplayButton(); 
+        // 2. Inizializza Replay Button (LA CORREZIONE È QUI)
+        setupReplayButton();
 
-        // 2. HELP (Usa utils.js)
-        if (typeof createChartHelp === "function") {
-            createChartHelp("#race-help-container", "#race-chart-wrapper", {
-                title: "How to read the Race Chart",
-                steps: [
-                    "<strong>Bars:</strong> Represent flight volume per destination.",
-                    "<strong>Rank:</strong> Watch countries rise and fall in rank over time.",
-                    "<strong>Numbers:</strong> The monthly total flights.",
-                    "<strong>Replay:</strong> Use the button to restart the animation."
-                ]
-            });
-        } else {
-            console.warn("createChartHelp non è definita. Hai importato utils.js?");
-        }
-
-        // --- AVVIO GRAFICO ---
+        // 3. Avvia grafico
         initChart();
         runAnimation();
 
@@ -90,9 +74,8 @@
         d3.select("#race-chart-container").html(`<p style="color:red; text-align:center;">Errore caricamento: ${path}</p>`);
     });
 
-
     // ==========================================
-    // --- 3. DISEGNO GRAFICO (INIT) ---
+    // --- LOGICA DI DISEGNO ---
     // ==========================================
     function initChart() {
         d3.select("#race-chart-container svg").remove();
@@ -100,27 +83,17 @@
         svg = d3.select("#race-chart-container").append("svg")
             .attr("viewBox", [0, 0, width, height]);
 
-        // Assi e Gruppi
         svg.append("g").attr("class", "axis axis--top").attr("transform", `translate(0,${margin.top})`);
         svg.append("g").attr("class", "bars");
         svg.append("g").attr("class", "labels-name");
         svg.append("g").attr("class", "labels-value");
         
-        // Ticker Anno
         svg.append("text")
             .attr("class", "year-ticker")
-            .attr("x", width - 60)
-            .attr("y", height - 30)
-            .style("font-size", "24px") 
-            .style("opacity", 0.6)
-            .style("font-weight", "bold")
-            .attr("text-anchor", "end")
+            .attr("x", width - 60).attr("y", height - 30)
             .text("");
     }
 
-    // ==========================================
-    // --- 4. ANIMAZIONE (LOOP) ---
-    // ==========================================
     async function runAnimation() {
         if (!svg) return;
         isAnimationRunning = true;
@@ -141,12 +114,12 @@
         svg.select(".axis--top .domain").remove();
 
         for (const keyframe of keyframes) {
+            // Se l'animazione è stata fermata (perché abbiamo cliccato replay), usciamo dal loop
             if (!isAnimationRunning) break; 
 
             const transition = svg.transition().duration(duration / keyframes.length).ease(d3.easeLinear);
             const [date, data] = keyframe;
 
-            // Rettangoli
             svg.select(".bars").selectAll("rect")
                 .data(data.slice(0, n), d => d.name)
                 .join(
@@ -167,7 +140,6 @@
                     .attr("fill", d => getColor(d.name))
                 );
 
-            // Nomi
             svg.select(".labels-name").selectAll("text")
                 .data(data.slice(0, n), d => d.name)
                 .join(
@@ -186,7 +158,6 @@
                     .style("font-weight", "bold")
                 );
 
-            // Valori
             svg.select(".labels-value").selectAll("text")
                 .data(data.slice(0, n), d => d.name)
                 .join(
@@ -211,12 +182,16 @@
                 );
 
             svg.select(".year-ticker").text(formatDate(date));
-            try { await transition.end(); } catch(e) { }
+            try {
+                await transition.end();
+            } catch(e) {
+                // Gestisce l'interruzione della transizione senza errori in console
+            }
         }
     }
 
     // ==========================================
-    // --- 5. FUNZIONI DATI ---
+    // --- FUNZIONI DI SUPPORTO ---
     // ==========================================
     function processHybridData(data) {
         const output = [];
@@ -226,11 +201,13 @@
             const destCode = row.destination_name;
             const destName = codeToName[destCode] || destCode; 
             const monthIndex = parseInt(row.mese_id) - 1;
+
             if (isNaN(monthIndex)) return; 
 
             years.forEach(year => {
                 const colName = `flights_${year}`; 
                 const val = parseFloat(row[colName]);
+
                 if (!isNaN(val)) {
                     output.push({
                         name: destName,
@@ -251,13 +228,19 @@
     }
 
     // ==========================================
-    // --- 6. GESTIONE REPLAY ---
+    // --- GESTIONE REPLAY (ROBUSTA) ---
     // ==========================================
     function setupReplayButton() {
+        const btn = document.getElementById("replay-btn");
+        
+        // Funzione interna di replay
         const triggerReplay = () => {
             if(svg && keyframes) {
+                // Ferma l'animazione corrente
                 isAnimationRunning = false; 
                 svg.selectAll("*").interrupt(); 
+                
+                // Piccolo timeout per dare tempo al loop di fermarsi
                 setTimeout(() => {
                     initChart();
                     runAnimation();
@@ -265,14 +248,55 @@
             }
         };
 
+        // 1. Assegna Globale (per sicurezza HTML onclick)
         window.replay = triggerReplay;
 
-        const btn = document.getElementById("replay-btn");
+        // 2. Assegna Event Listener JS (per sicurezza CSS/DOM)
         if(btn) {
-            btn.onclick = null;
-            btn.addEventListener("click", function(e) {
-                e.preventDefault();
-                triggerReplay();
+            // Rimuovi eventuali listener precedenti per non duplicare
+            btn.removeEventListener("click", triggerReplay);
+            btn.addEventListener("click", triggerReplay);
+        } else {
+            console.warn("Bottone #replay-btn non trovato nel DOM");
+        }
+    }
+
+
+    // ==========================================
+    // --- GESTIONE HELP ---
+    // ==========================================
+    function setupHelp() {
+        const helpContainer = document.getElementById("race-help-container");
+        if (!helpContainer) return;
+
+        helpContainer.innerHTML = `
+            <div class="chart-help-trigger" style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                <span class="chart-help-icon" style="background: black; color: white; border-radius: 50%; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-family: serif; font-weight: bold; font-style: italic;">i</span>
+                <span class="chart-help-text" style="font-weight: bold;">How to read this chart</span>
+            </div>
+            <div class="chart-help-overlay" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 5000; align-items: center; justify-content: center;">
+                <div class="chart-help-content" style="background: white; padding: 20px; border: 1px solid #ccc; border-radius: 8px; text-align: center; max-width: 300px;">
+                    <h3>Bar Chart Race</h3>
+                    <div style="height: 2px; width: 40px; background: red; margin: 10px auto;"></div>
+                    <ul style="text-align: left; font-size: 13px;">
+                        <li><strong>Barre:</strong> Evoluzione dei voli nel tempo.</li>
+                        <li><strong>Ordine:</strong> I paesi cambiano posizione in classifica.</li>
+                        <li><strong>Numeri:</strong> Voli totali per quel mese.</li>
+                    </ul>
+                    <p style="font-size: 11px; color: #888; margin-top: 10px; cursor: pointer;">(Clicca per chiudere)</p>
+                </div>
+            </div>
+        `;
+
+        const trigger = helpContainer.querySelector(".chart-help-trigger");
+        const overlay = helpContainer.querySelector(".chart-help-overlay");
+
+        if (trigger && overlay) {
+            trigger.addEventListener("click", () => {
+                overlay.style.display = "flex";
+            });
+            overlay.addEventListener("click", () => {
+                overlay.style.display = "none";
             });
         }
     }
