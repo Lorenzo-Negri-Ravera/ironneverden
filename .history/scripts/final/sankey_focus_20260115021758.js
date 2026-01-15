@@ -8,7 +8,6 @@
     const height = 600;
     const margin = { top: 20, right: 150, bottom: 20, left: 150 };
 
-    // 1. MESI IN INGLESE
     const monthNames = {
         1: "January", 2: "February", 3: "March", 4: "April", 
         5: "May", 6: "June", 7: "July", 8: "August", 
@@ -78,12 +77,7 @@
         yearButtons.on("click", function() {
             yearButtons.classed("active", false);
             d3.select(this).classed("active", true);
-            
             currentYear = +d3.select(this).attr("data-type");
-            
-            // 2. LOGICA 2022: Controlla e limita lo slider
-            updateSliderConstraints();
-
             updateChart();
         });
 
@@ -97,7 +91,7 @@
             });
         }
 
-        // 3. HELP
+        // 3. HELP (Cruciale: deve puntare agli ID nuovi)
         if (typeof createChartHelp === "function") {
             createChartHelp("#sankey-help-container", "#sankey-chart-wrapper", {
                 title: "How to read the Sankey Diagram",
@@ -108,33 +102,13 @@
                     "<strong>Filters:</strong> Use the Year buttons and Month slider to explore data over time."
                 ]
             });
+        } else {
+            console.warn("createChartHelp non trovata! Assicurati di includere utils.js");
         }
 
-        // Check iniziale
-        updateSliderConstraints();
         updateChart();
 
     }).catch(err => console.error("Errore Caricamento Sankey:", err));
-
-
-    // ==========================================
-    // --- FUNZIONE LIMITAZIONE SLIDER ---
-    // ==========================================
-    function updateSliderConstraints() {
-        const slider = d3.select("#monthSlider");
-        
-        // Se 2022 -> Max 11, Altrimenti -> Max 12
-        const maxMonth = (currentYear === 2022) ? 11 : 12;
-        
-        slider.attr("max", maxMonth);
-
-        // Se siamo oltre il limite (es. eravamo a Dicembre e clicchiamo 2022), torna indietro
-        if (currentMonth > maxMonth) {
-            currentMonth = maxMonth;
-            slider.property("value", maxMonth);
-            d3.select("#monthDisplay").text(monthNames[currentMonth]);
-        }
-    }
 
 
     // ==========================================
@@ -145,38 +119,13 @@
 
         let flows = globalData.filter(d => d.year == currentYear && d.month == currentMonth);
 
-        // 3. SCHERMATA "NO DATA" MIGLIORATA
         if (flows.length === 0) {
             svg.selectAll("*").remove();
-            
-            const g = svg.append("g")
-                .attr("transform", `translate(${width/2}, ${height/2})`);
-
-            // Cerchio sfondo
-            g.append("circle")
-                .attr("r", 60)
-                .attr("fill", "#f8f9fa")
-                .attr("stroke", "#dee2e6");
-
-            // Testo Principale
-            g.append("text")
+            svg.append("text")
+                .attr("x", width / 2).attr("y", height / 2)
                 .attr("text-anchor", "middle")
-                .attr("dy", "-5")
-                .style("font-family", "sans-serif")
-                .style("font-weight", "bold")
-                .style("font-size", "16px")
-                .style("fill", "#6c757d")
-                .text("DATA NOT AVAILABLE");
-
-            // Sottotitolo
-            g.append("text")
-                .attr("text-anchor", "middle")
-                .attr("dy", "20")
-                .style("font-family", "sans-serif")
-                .style("font-size", "12px")
-                .style("fill", "#adb5bd")
-                .text(`for ${monthNames[currentMonth]} ${currentYear}`);
-
+                .style("font-size", "20px").style("fill", "#666")
+                .text(`Nessun dato per ${monthNames[currentMonth]} ${currentYear}`);
             return;
         }
 
@@ -231,7 +180,7 @@
             .on("mouseover", function() { d3.select(this).attr("stroke-opacity", 0.8); })
             .on("mouseout", function() { d3.select(this).attr("stroke-opacity", 0.5); });
 
-        link.append("title").text(d => `${d.source.name} → ${d.target.name}\n${d3.format(",.0f")(d.value)} Flights`);
+        link.append("title").text(d => `${d.source.name} → ${d.target.name}\n${d3.format(",.0f")(d.value)} Voli`);
 
         const node = svg.append("g")
             .selectAll("rect").data(nodes).join("rect")
@@ -240,7 +189,7 @@
             .attr("fill", d => d.name === "Russia" ? "#333" : colorScale(d.name))
             .attr("stroke", "#000");
 
-        node.append("title").text(d => `${d.name}\n${d3.format(",.0f")(d.value)} Total`);
+        node.append("title").text(d => `${d.name}\n${d3.format(",.0f")(d.value)} Totali`);
 
         svg.append("g")
             .attr("font-family", "sans-serif").attr("font-size", 12).style("font-weight", "bold")
