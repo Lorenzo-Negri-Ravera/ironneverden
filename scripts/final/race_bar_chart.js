@@ -16,7 +16,7 @@
     const k = 10;           
     const width = 1000;
     const barSize = 48;
-    const margin = { top: 16, right: 6, bottom: 6, left: 160 }; 
+    const margin = { top: 16, right: 6, bottom: 6, left: 90 };    //CHANGED: left (before 160)
 
     const customPalette = ["#003f5c", "#374c80", "#7a5195", "#bc5090", "#ef5675", "#ff764a", "#ffa600"];
     const neigh = ["Russia", "Ukraine", "Poland", "Hungary", "Romania", "Lithuania", "Slovakia"];
@@ -125,7 +125,8 @@
         if (!svg) return;
         isAnimationRunning = true;
 
-        const x = d3.scaleLinear([0, globalMax], [margin.left, width - margin.right]);
+        // Added factor to increase bar size for better visibility (1,2)
+        const x = d3.scaleLinear([0, globalMax * 1.2], [margin.left, width - margin.right]);
         const y = d3.scaleBand()
             .domain(d3.range(n + 2))
             .rangeRound([margin.top, margin.top + barSize * (n + 2 + 0.1)])

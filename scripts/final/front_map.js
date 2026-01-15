@@ -1,9 +1,9 @@
 // File: front_map.js (Fixed Responsive Version + Filters Working)
 
-// --- PERCORSI PAESI ---
+// --- RUS and UKR ---
 const UKR_PATH = "../../data/final/geojson/countries/UKR.json";
 const RUS_PATH = "../../data/final/geojson/countries/RUS.json";
-// Nuovi Paesi Confinanti
+// Borders countries
 const MDA_PATH = "../../data/final/geojson/countries/MDA.geojson"; 
 const ROU_PATH = "../../data/final/geojson/countries/ROU.geojson"; 
 const HUN_PATH = "../../data/final/geojson/countries/HUN.geojson"; 
@@ -11,7 +11,11 @@ const SVK_PATH = "../../data/final/geojson/countries/SVK.geojson";
 const POL_PATH = "../../data/final/geojson/countries/POL.geojson"; 
 const BLR_PATH = "../../data/final/geojson/countries/BLR.geojson"; 
 const BGR_PATH = "../../data/final/geojson/countries/BGR.geojson"; 
+const MKD_PATH = "../../data/final/geojson/countries/MKD.geojson";
+const SRB_PATH = "../../data/final/geojson/countries/SRB.geojson";
+const XKO_PATH = "../../data/final/geojson/countries/XKO.geojson";
 
+// Data
 const FRONT_UKR_PATH = "../../data/final/front_UKR.csv";
 const FRONT_RU_PATH = "../../data/final/front_RU.csv";
 
@@ -27,29 +31,33 @@ Promise.all([
     d3.json(POL_PATH),
     d3.json(BLR_PATH),
     d3.json(BGR_PATH),
+    d3.json(MKD_PATH),
+    d3.json(SRB_PATH),
+    d3.json(XKO_PATH),
     d3.csv(FRONT_UKR_PATH),
     d3.csv(FRONT_RU_PATH)
 ]).then(function([
     ukrGeo, rusGeo, 
-    mdaGeo, rouGeo, hunGeo, svkGeo, polGeo, blrGeo, bgrGeo,
+    mdaGeo, rouGeo, hunGeo, svkGeo, polGeo, blrGeo, bgrGeo, mkdGeo, srbGeo, xkoGeo,
     ukrBattlesData, ruBattlesData
 ]) { 
 
-    // --- 0. SETUP LOADER ---
+    // Setup container
     const container = d3.select("#front-map-container");
-    container.html(""); // Pulisci eventuale loader precedente
+    container.html(""); 
     
-    // --- 1. SETUP DIMENSIONI ---
+    // Dimensions
     const width = 1000;
     const height = 700;
     
-    // --- 2. PREPARAZIONE DATI GEOGRAFICI ---
-    
+    // Geo Features    
     const neighborsFeatures = [
         ...mdaGeo.features, ...rouGeo.features, ...hunGeo.features,
-        ...svkGeo.features, ...polGeo.features, ...blrGeo.features, ...bgrGeo.features
+        ...svkGeo.features, ...polGeo.features, ...blrGeo.features, 
+        ...bgrGeo.features, ...mkdGeo.features, ...srbGeo.features, ...xkoGeo.features
     ];
 
+    // Western Russia IDs to show
     const westernRussiaIds = [
         "RUORL", "RUBEL", "RUKRS", "RUBRY", "RUVOR", "RUROS", "RUVGG", "RUTAM", 
         "RULIP", "RUMOS", "RUMOW", "RUKLU", "RUTUL", "RURYA", "RUAST", "RUKL", 
@@ -59,31 +67,38 @@ Promise.all([
     const visibleRusFeatures = rusGeo.features.filter(d => westernRussiaIds.includes(d.properties.id));
     const restOfRusFeatures = rusGeo.features.filter(d => !westernRussiaIds.includes(d.properties.id));
     
+    // Projection and Path
     const projection = d3.geoConicConformal()
         .parallels([44, 52])
         .rotate([-31, 0]);
 
+    // Fit projection to combined extent of Ukraine + visible Russia
     const extentFeatures = { type: "FeatureCollection", features: [...ukrGeo.features, ...visibleRusFeatures] };
 
+    // Apply a zoom level to have some margin
     const ZOOM_LEVEL = 1.25; 
     const expandedWidth = (width * 0.9) * ZOOM_LEVEL;
     const expandedHeight = (height - 30) * ZOOM_LEVEL;
     const dx = (width - expandedWidth) / 2;
     const dy = (height - expandedHeight) / 2;
 
+    // Fit with margins
     projection.fitExtent(
         [[dx, dy], [dx + expandedWidth, dy + expandedHeight]], 
         extentFeatures
     );
     
+    // Adjust translate for better centering
     const currentTranslate = projection.translate();
     projection.translate([
         currentTranslate[0] + 55,  
         currentTranslate[1] - 80 
     ]);
 
+    // Path generator
     const pathGenerator = d3.geoPath().projection(projection);
 
+    // Data Processing
     const processData = (data, type) => {
         data.forEach(d => {
             d.date = parseDate(d.event_date);
@@ -93,37 +108,36 @@ Promise.all([
         });
         return data;
     };
-
     const allBattlesRaw = [...processData(ukrBattlesData, 'UKR'), ...processData(ruBattlesData, 'RUS')];
     const allBattlesData = allBattlesRaw.filter(d => !isNaN(d.x) && !isNaN(d.y));
     allBattlesData.sort((a, b) => a.date - b.date);
-    
     const days = d3.timeDays(d3.min(allBattlesData, d => d.date), d3.max(allBattlesData, d => d.date));
 
-    // --- 4. SETUP CONTENITORI (MODIFICATO PER RESPONSIVE) ---
-    
+
+    // --- SVG Setup (Responsive) ---        check with css style, could be redundant
     container
         .style("position", "relative") 
-        .style("width", "100%")       // Occupa tutta la larghezza disponibile
-        .style("height", "auto")      // Altezza automatica...
-        .style("aspect-ratio", "1000 / 700") // ...ma vincolata alla proporzione!
+        .style("width", "100%")       
+        .style("height", "auto")      
+        .style("aspect-ratio", "1000 / 700") 
         .style("background-color", "#f8f9fa") 
         .style("border", "1px solid #dee2e6")  
         .style("border-radius", "8px")         
         .style("margin", "0 auto")
         .style("overflow", "hidden"); 
 
+    // SVG Element                          check with css style, could be redundant
     const svg = container.append("svg")
         .attr("viewBox", [0, 0, width, height])
         .style("position", "absolute")
         .style("top", 0)
         .style("left", 0)
-        .style("width", "100%")   // Si adatta al container
-        .style("height", "100%")  // Si adatta al container
+        .style("width", "100%")  
+        .style("height", "100%")  
         .style("z-index", 1);
 
+    // Clip Path for Russia Mask
     const mapGroup = svg.append("g");
-
     const defs = mapGroup.append("defs");
     defs.append("clipPath")
         .attr("id", "clip-russia-full-mask")
@@ -132,6 +146,7 @@ Promise.all([
         .join("path")
         .attr("d", pathGenerator);
 
+    // Tooltip Setup
     const tooltip = d3.select("body").selectAll(".tooltip-geo").data([0]).join("div")
         .attr("class", "tooltip-geo")
         .style("position", "absolute")
@@ -145,68 +160,70 @@ Promise.all([
         .style("opacity", 0)
         .style("z-index", 9999);
 
+    // Tooltip Handlers
     const handleMouseOver = function(event, d) {
         d3.select(this).attr("fill-opacity", 0.8);
         const regionName = d.properties.COUNTRY || d.properties.name || d.properties.NAME || "Region";
         tooltip.style("opacity", 1).text(regionName);
     };
-
     const handleMouseMove = function(event) {
         tooltip.style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 15) + "px");
     };
-
     const handleMouseOut = function() {
         d3.select(this).attr("fill-opacity", 1); 
         tooltip.style("opacity", 0);
     };
 
-    // --- DISEGNO MAPPA ---
-    // 1. Vicini
+    // --- Draw map ---
+    // Neighbor Countries
     mapGroup.append("g").selectAll("path").data(neighborsFeatures).join("path")
         .attr("d", pathGenerator).attr("fill", "#e9ecef").attr("stroke", "#ffffff").attr("stroke-width", 1)
         .on("mouseover", handleMouseOver).on("mousemove", handleMouseMove).on("mouseout", handleMouseOut);
 
-    // 2. Russia Resto
+    // Rest of Russia
     mapGroup.append("g").selectAll("path").data(restOfRusFeatures).join("path")
         .attr("d", pathGenerator).attr("fill", "#cfd2d6").attr("fill-opacity", 1).attr("stroke", "#ffffff").attr("stroke-width", 0.5)
         .on("mouseover", handleMouseOver).on("mousemove", handleMouseMove).on("mouseout", handleMouseOut);
 
-    // 3. Ucraina
+    // Ukraine
     mapGroup.append("g").selectAll("path").data(ukrGeo.features).join("path")
         .attr("d", pathGenerator).attr("fill", "#cfd2d6").attr("stroke", "#ffffff").attr("stroke-width", 1)
         .on("mouseover", handleMouseOver).on("mousemove", handleMouseMove).on("mouseout", handleMouseOut);
 
-    // 4. Russia Attiva
+    // Western Russia
     mapGroup.append("g").selectAll("path").data(visibleRusFeatures).join("path")
         .attr("d", pathGenerator).attr("fill", "#cfd2d6").attr("stroke", "#ffffff").attr("stroke-width", 1)
         .on("mouseover", handleMouseOver).on("mousemove", handleMouseMove).on("mouseout", handleMouseOut);
 
-    // 5. Confine Rosso
+    // Russia-Ukraine Border Highlight
     mapGroup.append("g").attr("clip-path", "url(#clip-russia-full-mask)").style("pointer-events", "none") 
         .selectAll("path").data(ukrGeo.features).join("path")
         .attr("d", pathGenerator).attr("fill", "none").attr("stroke", "#6a9c71").attr("stroke-width", 4)
         .attr("stroke-linejoin", "round").attr("stroke-linecap", "round");
 
-    // --- CANVAS PUNTI (MODIFICATO PER RESPONSIVE) ---
+
+    // --- Canvas Setup for Points (Responsive)---
     const canvas = container.append("canvas")
-        .attr("width", width)  // Risoluzione interna (pixel reali)
-        .attr("height", height) // Risoluzione interna
+        .attr("width", width)  
+        .attr("height", height) 
         .style("position", "absolute")
         .style("top", 0)
         .style("left", 0)
-        .style("width", "100%")  // Scalato visivamente
-        .style("height", "100%") // Scalato visivamente
+        .style("width", "100%")  
+        .style("height", "100%") 
         .style("z-index", 2)
         .style("pointer-events", "none"); 
     
     const ctx = canvas.node().getContext("2d");
 
+    // --- Canvas Drawing Logic ---
     let currentTransform = d3.zoomIdentity;
     let activeFilter = "all";
     let currentIndex = 0;
     let visiblePoints = [];
     const opacityScale = d3.scaleLinear().domain([0, 5]).range([1, 0.15]);
 
+    // Render function
     function render() {
         ctx.clearRect(0, 0, width, height);
         ctx.save();
@@ -232,6 +249,7 @@ Promise.all([
         ctx.restore();
     }
 
+    // Update visible data based on current index and filter
     function updateVisibleData() {
         const currentDate = days[currentIndex];
         const startDate = d3.timeDay.offset(currentDate, -5);
@@ -245,7 +263,8 @@ Promise.all([
     }
 
 
-    // --- Zoom Logic ---
+    // --- Zoom Logic (before) ---
+    /*
     const zoom = d3.zoom()
         .scaleExtent([1, 12])
         .on("zoom", (event) => {
@@ -253,55 +272,49 @@ Promise.all([
             currentTransform = event.transform;
             render(); // Ridisegna i punti
             tooltip.style("opacity", 0);
+        });*/
+
+    // --- Zoom Logic with limit box ---    
+    const zoom = d3.zoom()
+        .scaleExtent([1, 12])
+        .translateExtent([[-80, -100], [width + 120, height + 20]])
+        .on("zoom", (event) => {
+            mapGroup.attr("transform", event.transform);
+            currentTransform = event.transform;
+            render(); 
+            tooltip.style("opacity", 0);
         });
 
     svg.call(zoom).on("dblclick.zoom", null);
 
+    // Zoom Buttons
     d3.select("#front-zoom-in").on("click", () => svg.transition().call(zoom.scaleBy, 1.3));
     d3.select("#front-zoom-out").on("click", () => svg.transition().call(zoom.scaleBy, 0.7));
     d3.select("#front-zoom-reset").on("click", () => svg.transition().call(zoom.transform, d3.zoomIdentity));
 
 
-    // --- LOGICA FILTRI (QUESTA PARTE MANCAVA!) ---
-    // Seleziona i bottoni "compact" dentro il container filtri
+    // --- Filter Buttons Logic ---
     d3.selectAll("#filter-container .btn-compact").on("click", function() {
-        // 1. Gestione classi CSS (Visuale)
-        d3.selectAll("#filter-container .btn-compact").classed("active", false); // Togli active da tutti
-        d3.select(this).classed("active", true); // Metti active su quello cliccato
-
-        // 2. Aggiornamento Logica
-        activeFilter = d3.select(this).attr("data-type"); // Leggi il tipo dal HTML
-        
-        // 3. Render
-        updateVisibleData(); // Aggiorna la mappa
+        d3.selectAll("#filter-container .btn-compact").classed("active", false); 
+        d3.select(this).classed("active", true); 
+        activeFilter = d3.select(this).attr("data-type"); 
+        updateVisibleData(); 
     });
 
-    // ... (Tutto il codice prima rimane invariato) ...
-
-    // ==========================================
-    // --- TIMELINE PLAYER LOGIC ---
-    // ==========================================
-
+    
+    // --- Timeline Slider and Play/Pause Logic ---
     const slider = d3.select("#time-slider").attr("max", days.length - 1);
     const playButton = d3.select("#play-button");
     const playText = d3.select("#play-text"); 
 
-    // --- FUNZIONE CENTRALE DI AGGIORNAMENTO ---
+    // Function to update state and render: overlap effect
     function updateStateAndRender() {
-        // 1. Aggiorna la mappa
         updateVisibleData();
-
-        // 2. TRUCCO VISIVO SOVRAPPOSIZIONE
-        // A. Prima resettiamo: rendiamo TUTTI i tick visibili (opacity 1)
         d3.selectAll('.timeline-tick').style('opacity', 1);
-
-        // B. Poi nascondiamo SOLO quello corrente (opacity 0)
-        // Se il pallino è sopra un tick, nascondiamo il tick. 
-        // L'effetto visivo è che il pallino (che è sopra) lo ha "coperto".
         d3.select(`#tick-${currentIndex}`).style('opacity', 0);
     }
 
-    // Event Listener Slider (Trascinamento manuale)
+    // Event Listener Slider 
     slider.on("input", function() {
         currentIndex = +this.value;
         updateStateAndRender();
@@ -310,7 +323,7 @@ Promise.all([
     let timer;
     let isPlaying = false;
 
-    // Logica Play/Pause
+    // Play/Pause Logic
     playButton.on("click", function() {
         if (isPlaying) {
             clearInterval(timer);
@@ -338,10 +351,7 @@ Promise.all([
     });
 
 
-    // ==========================================
-    // --- LOGICA TICKER (EVENT MARKERS) ---
-    // ==========================================
-
+    // --- Timeline Significant Events Markers ---
     const significantEvents = [
         { date: "2022-02-24", title: "Invasione su larga scala" },
         { date: "2022-04-01", title: "Ritiro dal nord (Kyiv)" },
@@ -361,45 +371,41 @@ Promise.all([
         const eventDate = parseDate(event.date);
         if (eventDate < mapStartDate || eventDate > mapEndDate) return;
 
-        // Calcolo posizione e indice
+        // Compute position on timeline
         const exactIndex = d3.timeDay.count(mapStartDate, eventDate);
         const percent = ((eventDate - mapStartDate) / totalTime) * 100;
 
-        // Testo Tooltip
+        // Tooltip content
         const readableDate = d3.timeFormat("%d %b %Y")(eventDate);
         const fullLabel = `${readableDate}: ${event.title}`;
 
-        // Crea Tick
+        // Create tick element
         const tick = document.createElement('div');
         tick.className = 'timeline-tick';
         
-        // *** IMPORTANTE: Assegniamo un ID univoco per nasconderlo dopo ***
+        // Set ID for reference (important to manage visibility on update)
         tick.id = `tick-${exactIndex}`; 
         
         tick.style.left = percent + '%';
         
-        // --- CONFIGURAZIONE TOOLTIP (Solo Hover) ---
+        // Bootstrap Tooltip attributes
         tick.setAttribute('data-bs-toggle', 'tooltip');
         tick.setAttribute('data-bs-placement', 'top'); 
         tick.setAttribute('title', fullLabel);
 
-        // --- GESTIONE CLICK (Navigazione) ---
+        // Click event to jump to date
         tick.addEventListener('click', function(e) {
             e.stopPropagation(); 
             currentIndex = exactIndex;
-            slider.property("value", currentIndex);
-            
-            // Questo aggiornerà la mappa E nasconderà il tick cliccato
+            slider.property("value", currentIndex);            
             updateStateAndRender(); 
         });
 
         if(markersContainer) markersContainer.appendChild(tick);
-
-        // Attiva tooltip Bootstrap
         new bootstrap.Tooltip(tick);
     });
 
-    // Render iniziale
+    // Render 
     updateStateAndRender();
 
 
@@ -412,7 +418,6 @@ Promise.all([
             "<strong>Zoom:</strong> Click on a country to zoom in and explore regional data."
         ]
     };
-
     if (typeof createChartHelp === "function") {
         createChartHelp("#front-help-container", "#front-map-wrapper", mapHelpContent);
     } else {
