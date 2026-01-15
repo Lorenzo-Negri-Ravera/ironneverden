@@ -6,7 +6,6 @@
 
     const width = 1000;
     const height = 600;
-    // Margini ampi a sinistra e destra per ospitare le etichette esterne
     const margin = { top: 20, right: 150, bottom: 20, left: 150 };
 
     // 1. MESI IN INGLESE
@@ -74,15 +73,21 @@
         // --- INTERAZIONE UI ---
         // ==========================================
         
+        // 1. Bottoni Anno
         const yearButtons = d3.selectAll("#sankey-filter-container .btn-compact");
         yearButtons.on("click", function() {
             yearButtons.classed("active", false);
             d3.select(this).classed("active", true);
+            
             currentYear = +d3.select(this).attr("data-type");
+            
+            // 2. LOGICA 2022: Controlla e limita lo slider
             updateSliderConstraints();
+
             updateChart();
         });
 
+        // 2. Slider Mese
         const slider = d3.select("#monthSlider");
         if (!slider.empty()) {
             slider.on("input", function(event) {
@@ -92,6 +97,7 @@
             });
         }
 
+        // 3. HELP
         if (typeof createChartHelp === "function") {
             createChartHelp("#sankey-help-container", "#sankey-chart-wrapper", {
                 title: "How to read the Sankey Diagram",
@@ -104,6 +110,7 @@
             });
         }
 
+        // Check iniziale
         updateSliderConstraints();
         updateChart();
 
@@ -111,12 +118,17 @@
 
 
     // ==========================================
-    // --- LIMITAZIONE SLIDER ---
+    // --- FUNZIONE LIMITAZIONE SLIDER ---
     // ==========================================
     function updateSliderConstraints() {
         const slider = d3.select("#monthSlider");
+        
+        // Se 2022 -> Max 11, Altrimenti -> Max 12
         const maxMonth = (currentYear === 2022) ? 11 : 12;
+        
         slider.attr("max", maxMonth);
+
+        // Se siamo oltre il limite (es. eravamo a Dicembre e clicchiamo 2022), torna indietro
         if (currentMonth > maxMonth) {
             currentMonth = maxMonth;
             slider.property("value", maxMonth);
@@ -133,16 +145,38 @@
 
         let flows = globalData.filter(d => d.year == currentYear && d.month == currentMonth);
 
+        // 3. SCHERMATA "NO DATA" MIGLIORATA
         if (flows.length === 0) {
             svg.selectAll("*").remove();
-            const g = svg.append("g").attr("transform", `translate(${width/2}, ${height/2})`);
-            g.append("circle").attr("r", 60).attr("fill", "#f8f9fa").attr("stroke", "#dee2e6");
-            g.append("text").attr("text-anchor", "middle").attr("dy", "-5")
-                .style("font-family", "sans-serif").style("font-weight", "bold").style("font-size", "16px").style("fill", "#6c757d")
+            
+            const g = svg.append("g")
+                .attr("transform", `translate(${width/2}, ${height/2})`);
+
+            // Cerchio sfondo
+            g.append("circle")
+                .attr("r", 60)
+                .attr("fill", "#f8f9fa")
+                .attr("stroke", "#dee2e6");
+
+            // Testo Principale
+            g.append("text")
+                .attr("text-anchor", "middle")
+                .attr("dy", "-5")
+                .style("font-family", "sans-serif")
+                .style("font-weight", "bold")
+                .style("font-size", "16px")
+                .style("fill", "#6c757d")
                 .text("DATA NOT AVAILABLE");
-            g.append("text").attr("text-anchor", "middle").attr("dy", "20")
-                .style("font-family", "sans-serif").style("font-size", "12px").style("fill", "#adb5bd")
+
+            // Sottotitolo
+            g.append("text")
+                .attr("text-anchor", "middle")
+                .attr("dy", "20")
+                .style("font-family", "sans-serif")
+                .style("font-size", "12px")
+                .style("fill", "#adb5bd")
                 .text(`for ${monthNames[currentMonth]} ${currentYear}`);
+
             return;
         }
 
@@ -155,8 +189,10 @@
         flows.forEach(flow => {
             const srcId = flow.source + "_src";
             const tgtId = flow.target + "_tgt";
+
             if (!nodesMap.has(srcId)) nodesMap.set(srcId, { id: srcId, name: flow.source, type: "source" });
             if (!nodesMap.has(tgtId)) nodesMap.set(tgtId, { id: tgtId, name: flow.target, type: "target" });
+
             links.push({ source: srcId, target: tgtId, value: flow.value });
         });
 
@@ -206,26 +242,13 @@
 
         node.append("title").text(d => `${d.name}\n${d3.format(",.0f")(d.value)} Total`);
 
-        // ============================================
-        // MODIFICA QUI: TESTI ESTERNI (OUTSIDE)
-        // ============================================
         svg.append("g")
             .attr("font-family", "sans-serif").attr("font-size", 12).style("font-weight", "bold")
             .selectAll("text").data(nodes).join("text")
-            
-            // POSIZIONE X:
-            // Se il nodo è a sinistra (Source), metti il testo a sinistra (d.x0 - 6)
-            // Se il nodo è a destra (Target), metti il testo a destra (d.x1 + 6)
-            .attr("x", d => d.x0 < width / 2 ? d.x0 - 6 : d.x1 + 6)
-            
+            .attr("x", d => d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6)
             .attr("y", d => (d.y1 + d.y0) / 2)
             .attr("dy", "0.35em")
-            
-            // ALLINEAMENTO TESTO:
-            // Se è a sinistra, allinea a destra (end) così finisce vicino alla barra
-            // Se è a destra, allinea a sinistra (start) così inizia vicino alla barra
-            .attr("text-anchor", d => d.x0 < width / 2 ? "end" : "start")
-            
+            .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
             .text(d => d.name);
     }
 })();

@@ -314,73 +314,71 @@
 
                         <div class="row mt-3">
                             <div class="col-12">
-                                <div id="race-help-container"></div>
+                                <div id="sub-event-help-container"></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
-        
-                   
-
-                    <section id="sankey-section" class="py-5" style="background-color: #fff; position: relative;">
-                        <div class="container">
-                            
-                            <div id="tooltip" style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 20px; border-radius: 4px; pointer-events: none; font-family: Arial; font-size: 12px; z-index: 3000;"></div>
+            
+            <section id="sankey-section" class="py-5" style="background-color: #fff; position: relative;">
+                <div class="container">
                     
-                            <div class="d-flex justify-content-center mb-3">
-                                <div id="sankey-filter-container" class="compact-menu-bar d-inline-flex justify-content-center" role="group">
-                                    <button class="btn-compact active" data-type="2019">2019</button>
-                                    <div class="compact-divider"></div>
-                                    <button class="btn-compact" data-type="2020">2020</button>
-                                    <div class="compact-divider"></div>
-                                    <button class="btn-compact" data-type="2021">2021</button>
-                                    <div class="compact-divider"></div>
-                                    <button class="btn-compact" data-type="2022">2022</button>
-                                </div>
-                            </div>
-                    
-                            <div class="row justify-content-center">
-                                <div class="col-12 col-md-10">
-                                    <div id="sankey-chart-wrapper" class="chart-wrapper-map" style="position: relative; border: none; border-radius: 8px; padding: 0; background: white;">
-                                        <div id="sankey_chart"></div>
-                                    </div>
-                                </div>
-                            </div>
-                    
-                            <div class="row justify-content-center mt-4">
-                                
-                                <div class="col-12 col-md-10 col-lg-8"> 
-                                    
-                                    <div id="controls" class="d-flex align-items-center bg-white shadow-sm border rounded-pill py-3 px-4 gap-3">
-                                        
-                                        <div class="d-flex align-items-center gap-2 px-2">
-                                            <span class="fw-bold text-uppercase" style="font-size: 18px; font-weight: 700; color: #999; font-family: 'Fira Sans', sans-serif;">Month</span>
-                                        </div>
-                    
-                                        <div class="d-flex align-items-center flex-grow-1 position-relative w-100" style="height: 20px;">
-                                            <div id="timeline-markers" class="position-absolute w-100 h-100 start-0 top-0" style="pointer-events: none; z-index: 5;"></div>
-                                            <div id="slider-ghost-thumb" style="position: absolute; top: 0; width: 1px; height: 100%; pointer-events: none; z-index: -1;"></div>
-                                            
-                                            <input type="range" id="monthSlider" class="form-range custom-range-slider flex-grow-1" min="1" max="12" value="1" step="1" style="position: relative; z-index: 10; width: 100%;">
-                                        </div>
-                    
-                                        <span id="monthDisplay" class="fw-bold text-nowrap text-end" style="min-width: 100px; font-weight: 700; font-size: 18px; font-family: 'Fira Sans', sans-serif; color: #25282A;">
-                                            January
-                                        </span>
-                                    </div>
-                    
-                                </div>
-                            </div>
-                            
-                            <div class="row justify-content-center mt-3">
-                                <div class="col-12 col-md-10">
-                                    <div id="sankey-help-container" class="text-start"></div>
-                                </div>
-                            </div>
-                    
+                    <div id="tooltip" style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 20px; border-radius: 4px; pointer-events: none; font-family: Arial; font-size: 12px; z-index: 3000;"></div>
+            
+                    <div class="d-flex justify-content-center mb-3">
+                        <div id="sankey-filter-container" class="compact-menu-bar d-inline-flex justify-content-center" role="group">
+                            <button class="btn-compact active" data-type="2019">2019</button>
+                            <div class="compact-divider"></div>
+                            <button class="btn-compact" data-type="2020">2020</button>
+                            <div class="compact-divider"></div>
+                            <button class="btn-compact" data-type="2021">2021</button>
+                            <div class="compact-divider"></div>
+                            <button class="btn-compact" data-type="2022">2022</button>
                         </div>
-                    </section>
+                    </div>
+            
+                    <div class="row justify-content-center">
+                        <div class="col-12">
+                            <div id="sankey-chart-wrapper" class="chart-wrapper-map" style="position: relative; border: 1px solid #dee2e6; border-radius: 8px; padding: 10px; background: white;">
+                                <div id="sankey_chart"></div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="row justify-content-center mt-4">
+                        
+                        <div class="col-10 col-md-8 col-lg-6"> 
+                            
+                            <div id="controls" class="d-flex align-items-center bg-white shadow-sm border rounded-pill py-3 px-4 gap-3">
+                                
+                                <div class="d-flex align-items-center gap-2 px-2">
+                                    <span class="fw-bold text-uppercase" style="font-size: 18px; font-weight: 700; color: #25282A; font-family: 'Fira Sans', sans-serif;">Month</span>
+                                </div>
+            
+                                <div class="d-flex align-items-center flex-grow-1 position-relative w-100" style="height: 20px;">
+                                    <div id="timeline-markers" class="position-absolute w-100 h-100 start-0 top-0" style="pointer-events: none; z-index: 5;"></div>
+                                    <div id="slider-ghost-thumb" style="position: absolute; top: 0; width: 1px; height: 100%; pointer-events: none; z-index: -1;"></div>
+                                    
+                                    <input type="range" id="monthSlider" class="form-range custom-range-slider flex-grow-1" min="1" max="12" value="1" step="1" style="position: relative; z-index: 10; width: 100%;">
+                                </div>
+            
+                                <span id="monthDisplay" class="fw-bold text-nowrap text-end" style="min-width: 100px;font-weight: 700; font-size: 18px; font-family: 'Fira Sans', sans-serif; color: #25282A;">
+                                    January
+                                </span>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div id="sankey-help-container" class="text-start"></div>
+                        </div>
+                    </div>
+            
+                </div>
+            </section>
  <!-- ########################################## LOLLO  ######################################################### -->
        
         </main>
