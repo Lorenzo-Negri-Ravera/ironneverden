@@ -201,6 +201,9 @@ Promise.all([
         .attr("d", pathGenerator).attr("fill", "none").attr("stroke", "#6a9c71").attr("stroke-width", 4)
         .attr("stroke-linejoin", "round").attr("stroke-linecap", "round");
 
+    
+    // Gruppo dedicato agli Highlights degli eventi
+    const highlightGroup = mapGroup.append("g").attr("class", "event-highlights");
 
     // --- Canvas Setup for Points (Responsive)---
     const canvas = container.append("canvas")
@@ -262,6 +265,59 @@ Promise.all([
         render();
     }
 
+    // Funzione per pulire l'highlight (usata quando si sposta lo slider manualmente o play)
+    function clearHighlight() {
+        highlightGroup.selectAll("*").transition().duration(300).style("opacity", 0).remove();
+    }
+
+    // Funzione per disegnare l'highlight
+    function drawEventHighlight(event) {
+        // Pulisci precedenti
+        clearHighlight();
+
+        if (!event.coords) return;
+
+        // Proietta le coordinate
+        const [x, y] = projection(event.coords);
+
+        // Aggiungi il cerchio
+        const circle = highlightGroup.append("circle")
+            .attr("cx", x)
+            .attr("cy", y)
+            .attr("r", 0) // Parte da 0 per l'animazione
+            .attr("fill", "#ff0000") // Rosso
+            .attr("fill-opacity", 0.3) // Semitrasparente
+            .attr("stroke", "#ff0000")
+            .attr("stroke-width", 2)
+            .attr("pointer-events", "none"); // Importante: lascia passare il mouse sotto
+
+        // Animazione di apparizione (pop)
+        circle.transition().duration(600).ease(d3.easeElasticOut)
+            .attr("r", event.radius || 25);
+            
+        // Opzionale: Aggiungi un anello che pulsa per attirare l'attenzione
+        const pulse = highlightGroup.append("circle")
+            .attr("cx", x)
+            .attr("cy", y)
+            .attr("r", event.radius || 25)
+            .attr("fill", "none")
+            .attr("stroke", "#ff0000")
+            .attr("stroke-width", 2)
+            .style("opacity", 1);
+            
+        // Loop infinito di pulsazione
+        function repeatPulse() {
+            pulse.transition().duration(1500)
+                .attr("r", (event.radius || 25) * 1.5)
+                .style("opacity", 0)
+                .on("end", function() {
+                    d3.select(this).attr("r", event.radius || 25).style("opacity", 1);
+                    repeatPulse();
+                });
+        }
+        repeatPulse();
+    }
+
 
     // --- Zoom Logic (before) ---
     /*
@@ -315,8 +371,15 @@ Promise.all([
     }
 
     // Event Listener Slider 
+    /*
     slider.on("input", function() {
         currentIndex = +this.value;
+        updateStateAndRender();
+    });*/
+
+    slider.on("input", function() {
+        currentIndex = +this.value;
+        clearHighlight(); // <--- AGGIUNGI QUESTO: Rimuovi highlights se l'utente muove il tempo
         updateStateAndRender();
     });
 
@@ -337,6 +400,7 @@ Promise.all([
             }
             playText.text("Pause");
             isPlaying = true;
+            /*
             timer = setInterval(() => {
                 currentIndex++;
                 slider.property("value", currentIndex);
@@ -346,18 +410,64 @@ Promise.all([
                     isPlaying = false;
                     playText.text("Play");
                 }
-            }, 70); 
+            }, 70); */
+            // ... dentro playButton.on("click") ...
+            timer = setInterval(() => {
+                currentIndex++;
+                
+                // Se l'utente preme play, puliamo eventuali highlights attivi
+                if(currentIndex % 5 === 0) clearHighlight(); // Check leggero per non chiamarlo ogni ms
+                
+                slider.property("value", currentIndex);
+                updateStateAndRender();
+                // ...
+            }, 70);
         }
     });
 
 
     // --- Timeline Significant Events Markers ---
+    /*
     const significantEvents = [
         { date: "2022-02-24", title: "Invasione su larga scala" },
         { date: "2022-04-01", title: "Ritiro dal nord (Kyiv)" },
         { date: "2022-09-06", title: "Controffensiva Kharkiv" },
         { date: "2022-11-11", title: "Liberazione Kherson" },
         { date: "2023-05-20", title: "Presa di Bakhmut" }
+    ];*/
+
+    // Aggiungi coords: [lon, lat] e radius (opzionale, default a 20)
+    const significantEvents = [
+        { 
+            date: "2022-02-24", 
+            title: "Invasione su larga scala", 
+            coords: [30.5234, 50.4501], // Kyiv come centro simbolico
+            radius: 50 // Più grande per l'intero paese/invasione
+        },
+        { 
+            date: "2022-04-01", 
+            title: "Ritiro dal nord (Kyiv)", 
+            coords: [30.5234, 50.4501], // Kyiv
+            radius: 30
+        },
+        { 
+            date: "2022-09-06", 
+            title: "Controffensiva Kharkiv", 
+            coords: [36.2304, 49.9935], // Kharkiv
+            radius: 30
+        },
+        { 
+            date: "2022-11-11", 
+            title: "Liberazione Kherson", 
+            coords: [32.6169, 46.6354], // Kherson
+            radius: 25
+        },
+        { 
+            date: "2023-05-20", 
+            title: "Presa di Bakhmut", 
+            coords: [38.0025, 48.5947], // Bakhmut
+            radius: 15 // Più piccola, battaglia localizzata
+        }
     ];
 
     const markersContainer = document.getElementById('timeline-markers');
@@ -394,11 +504,26 @@ Promise.all([
         tick.setAttribute('title', fullLabel);
 
         // Click event to jump to date
+        /*
         tick.addEventListener('click', function(e) {
             e.stopPropagation(); 
             currentIndex = exactIndex;
             slider.property("value", currentIndex);            
             updateStateAndRender(); 
+        });*/
+
+        // ... dentro significantEvents.forEach ...
+
+        // Click event to jump to date
+        tick.addEventListener('click', function(e) {
+            e.stopPropagation(); 
+            currentIndex = exactIndex;
+            slider.property("value", currentIndex);            
+            
+            updateStateAndRender(); 
+            
+            // --- NUOVA RIGA: Disegna l'highlight specifico per questo evento ---
+            drawEventHighlight(event); 
         });
 
         if(markersContainer) markersContainer.appendChild(tick);
