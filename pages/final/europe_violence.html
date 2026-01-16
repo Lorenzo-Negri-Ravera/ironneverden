@@ -24,7 +24,7 @@
         </header>
 
         <main class="p-4">
-            
+
             <section id="geo-section" class="mb-5 position-relative">
                 <div class="container-fluid p-0">
 
@@ -58,10 +58,12 @@
                     <div class="row justify-content-center">
                         <div class="col-lg-10">
 
-                            <div id="map-wrapper" class="chart-wrapper-map position-relative border shadow-sm rounded-3 mb-2">
+                            <div id="map-wrapper"
+                                class="chart-wrapper-map position-relative border shadow-sm rounded-3 mb-2">
                                 <svg id="geo-container"></svg>
 
-                                <div id="zoom-controls" class="position-absolute d-flex flex-column gap-2 p-2" style="top: 10px; right: 10px; z-index: 100;">
+                                <div id="zoom-controls" class="position-absolute d-flex flex-column gap-2 p-2"
+                                    style="top: 10px; right: 10px; z-index: 100;">
                                     <button class="btn btn-sm btn-primary zoom-btn" id="zoom-in">+</button>
                                     <button class="btn btn-sm btn-primary zoom-btn" id="zoom-out">−</button>
                                     <button class="btn btn-sm btn-primary zoom-btn" id="zoom-reset">R</button>
@@ -76,15 +78,18 @@
                 </div>
             </section>
 
-        
+
             <section id="front-map-section" class="mt-5">
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
 
-                        <div id="tooltip" style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 4px; pointer-events: none; font-family: Arial; font-size: 12px; z-index: 3000;"></div>
+                        <div id="tooltip"
+                            style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 4px; pointer-events: none; font-family: Arial; font-size: 12px; z-index: 3000;">
+                        </div>
 
                         <div class="d-flex justify-content-center mb-3">
-                            <div id="filter-container" class="compact-menu-bar d-inline-flex justify-content-center" role="group">
+                            <div id="filter-container" class="compact-menu-bar d-inline-flex justify-content-center"
+                                role="group">
                                 <button class="btn-compact active" data-type="all">All Events</button>
                                 <div class="compact-divider"></div>
                                 <button class="btn-compact" data-type="Battles">Battles</button>
@@ -95,9 +100,11 @@
 
                         <div class="row mb-3">
                             <div class="col-12 p-0">
-                                <div id="front-map-wrapper" class="chart-wrapper-map position-relative border rounded" style="overflow: hidden;">
+                                <div id="front-map-wrapper" class="chart-wrapper-map position-relative border rounded"
+                                    style="overflow: hidden;">
                                     <div id="front-map-container"></div>
-                                    <div id="front-zoom-controls" class="position-absolute d-flex flex-column gap-2 p-2" style="top: 10px; right: 10px; z-index: 100;">
+                                    <div id="front-zoom-controls" class="position-absolute d-flex flex-column gap-2 p-2"
+                                        style="top: 10px; right: 10px; z-index: 100;">
                                         <button class="btn btn-sm btn-primary zoom-btn" id="front-zoom-in">+</button>
                                         <button class="btn btn-sm btn-primary zoom-btn" id="front-zoom-out">−</button>
                                         <button class="btn btn-sm btn-primary zoom-btn" id="front-zoom-reset">R</button>
@@ -108,19 +115,27 @@
 
                         <div class="row mb-2">
                             <div class="col-12 p-0">
-                                <div id="controls" class="d-flex align-items-center bg-white shadow-sm border rounded-pill py-2 px-3 gap-3">
-                                    
-                                    <button id="play-button" class="btn btn-primary btn-sm btn-player d-flex align-items-center gap-2 px-3">
+                                <div id="controls"
+                                    class="d-flex align-items-center bg-white shadow-sm border rounded-pill py-2 px-3 gap-3">
+
+                                    <button id="play-button"
+                                        class="btn btn-primary btn-sm btn-player d-flex align-items-center gap-2 px-3">
                                         <span id="play-text" class="fw-bold">Play</span>
                                     </button>
 
                                     <div class="d-flex align-items-center flex-grow-1 position-relative w-100">
-                                        <div id="timeline-markers" class="position-absolute w-100 h-100 start-0 top-0" style="pointer-events: none; z-index: 5;"></div>
-                                        <div id="slider-ghost-thumb" style="position: absolute; top: 0; width: 1px; height: 100%; pointer-events: none; z-index: -1;"></div>
-                                        <input type="range" id="time-slider" class="form-range custom-range-slider flex-grow-1" style="position: relative; z-index: 1; width: 100%;">
+                                        <div id="timeline-markers" class="position-absolute w-100 h-100 start-0 top-0"
+                                            style="pointer-events: none; z-index: 5;"></div>
+                                        <div id="slider-ghost-thumb"
+                                            style="position: absolute; top: 0; width: 1px; height: 100%; pointer-events: none; z-index: -1;">
+                                        </div>
+                                        <input type="range" id="time-slider"
+                                            class="form-range custom-range-slider flex-grow-1"
+                                            style="position: relative; z-index: 1; width: 100%;">
                                     </div>
 
-                                    <span id="current-date-display" class="fw-bold small text-nowrap text-end" style="min-width: 80px; font-family: 'Fira Sans', sans-serif;">
+                                    <span id="current-date-display" class="fw-bold small text-nowrap text-end"
+                                        style="min-width: 80px; font-family: 'Fira Sans', sans-serif;">
                                         Date
                                     </span>
                                 </div>
@@ -130,71 +145,76 @@
                         <div class="row">
                             <div class="col-12 p-0">
                                 <div id="front-help-container" class="mt-1">
-                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                    </div> 
-                </div>    
+                    </div>
+                </div>
             </section>
-            
+
 
             <section id="spike-map-section" class="mt-5">
                 <div class="row justify-content-center">
                     <div class="col-lg-10 text-center">
-                        
+
                         <div class="text-container mb-4">
                             <h3>Intensità del Conflitto per Regione</h3>
                             <p class="text-muted">
                                 Totale vittime raggruppate per regione. Clicca su una regione per i dettagli.
                             </p>
                         </div>
-            
+
                         <div id="static-spike-controls" class="d-flex justify-content-center flex-wrap gap-3 mb-4">
-                
+
                             <div class="compact-menu-bar d-inline-flex align-items-center" role="group">
-                                
-                                <input type="radio" class="btn-check" name="mapLevel" id="lvl-region" value="region" autocomplete="off">
+
+                                <input type="radio" class="btn-check" name="mapLevel" id="lvl-region" value="region"
+                                    autocomplete="off">
                                 <label class="btn-compact" for="lvl-region">Regions</label>
-                                
+
                                 <div class="compact-divider"></div>
-                                
-                                <input type="radio" class="btn-check" name="mapLevel" id="lvl-district" value="district" autocomplete="off" checked>
+
+                                <input type="radio" class="btn-check" name="mapLevel" id="lvl-district" value="district"
+                                    autocomplete="off" checked>
                                 <label class="btn-compact active" for="lvl-district">Districts</label>
-                                
+
                                 <div class="compact-divider"></div>
-                                
-                                <input type="radio" class="btn-check" name="mapLevel" id="lvl-comuni" value="comuni" autocomplete="off">
+
+                                <input type="radio" class="btn-check" name="mapLevel" id="lvl-comuni" value="comuni"
+                                    autocomplete="off">
                                 <label class="btn-compact" for="lvl-comuni">Municipals</label>
                             </div>
-            
+
                             <div class="compact-menu-bar d-inline-flex align-items-center" role="group">
-                                
+
                                 <input type="checkbox" class="btn-check" id="check-battles" checked>
                                 <label class="btn-compact active" for="check-battles">Battles</label>
-                                
+
                                 <div class="compact-divider"></div>
-                                
+
                                 <input type="checkbox" class="btn-check" id="check-explosions" checked>
                                 <label class="btn-compact active" for="check-explosions">Explosions</label>
                             </div>
-            
+
                         </div>
-            
-                        <div id="spike-map-wrapper" class="position-relative border rounded bg-light mb-2" style="overflow: hidden;">
+
+                        <div id="spike-map-wrapper" class="position-relative border rounded bg-light mb-2"
+                            style="overflow: hidden;">
                             <svg id="spike-container" style="width: 100%; height: auto; display: block;"></svg>
-                            
-                            <div id="spike-zoom-controls" class="position-absolute d-flex flex-column gap-2 p-2" style="top: 10px; right: 10px; z-index: 100;">
+
+                            <div id="spike-zoom-controls" class="position-absolute d-flex flex-column gap-2 p-2"
+                                style="top: 10px; right: 10px; z-index: 100;">
                                 <button class="btn btn-sm btn-primary zoom-btn" id="spike-zoom-in">+</button>
                                 <button class="btn btn-sm btn-primary zoom-btn" id="spike-zoom-out">−</button>
                                 <button class="btn btn-sm btn-primary zoom-btn" id="spike-zoom-reset">R</button>
                             </div>
                         </div>
-                        
+
                         <div class="d-flex justify-content-start align-items-center mt-3 w-100">
                             <div id="spike-help-container"></div>
                         </div>
-            
+
                     </div>
                 </div>
             </section>
@@ -203,12 +223,13 @@
             <section id="stacked-bar-section" class="mt-5">
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
-                        
+
                         <div id="tooltip-bar"
                             style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 4px; pointer-events: none; font-family: 'Fira Sans', sans-serif; font-size: 12px; z-index: 3000;">
                         </div>
 
-                        <div id="stacked-bar-wrapper" class="chart-wrapper-map position-relative mb-0" style="overflow: hidden;">
+                        <div id="stacked-bar-wrapper" class="chart-wrapper-map position-relative mb-0"
+                            style="overflow: hidden;">
                             <div id="stacked-bar-chart-container" class="w-100"></div>
                         </div>
 
@@ -231,12 +252,13 @@
             <section id="sub-event-line-section" class="mt-5">
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
-                        
+
                         <div id="sub-event-tooltip"
                             style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 4px; pointer-events: none; font-family: 'Fira Sans', sans-serif; font-size: 12px; z-index: 3000;">
                         </div>
 
-                        <div id="sub-event-wrapper" class="chart-wrapper-map position-relative mb-0" style="overflow: hidden;">
+                        <div id="sub-event-wrapper" class="chart-wrapper-map position-relative mb-0"
+                            style="overflow: hidden;">
                             <div id="sub-event-line-chart-container" class="w-100"></div>
                         </div>
 
@@ -255,11 +277,66 @@
                 </div>
             </section>
 
+            <section id="sunburst-section" class="mb-5 position-relative">
+                <div class="container-fluid p-0">
+
+                    <div class="row justify-content-center mb-4">
+                        <div class="col-lg-10">
+                            <div class="compact-menu-bar d-flex justify-content-center align-items-center gap-3">
+
+                                <span class="fw-bold text-muted">UKRAINE</span>
+
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="country-toggle"
+                                        style="width: 3em; height: 1.5em; cursor: pointer;">
+                                </div>
+
+                                <span class="fw-bold text-muted">RUSSIA</span>
+
+                            </div>
+                            <div class="text-center mt-2 text-muted small">
+                                <i class="bi bi-info-circle"></i> Click on a segment to zoom in. Click center to zoom
+                                out.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-center">
+                        <div class="col-lg-12">
+                            <div id="sunburst-wrapper"
+                                class="chart-wrapper-map position-relative border shadow-sm rounded-3 mb-2 bg-white"
+                                style="min-height: 500px;">
+
+                                <div class="d-flex flex-wrap justify-content-center align-items-start py-4">
+
+                                    <div class="text-center px-2" style="flex: 1; min-width: 350px;">
+                                        <h5 class="fw-bold mb-0">2021 (Pre-War)</h5>
+                                        <div class="text-muted small mb-2" id="total-label-2021">Total Export: -</div>
+                                        <div id="chart-2021"></div>
+                                    </div>
+
+                                    <div class="d-none d-md-block border-end mx-2" style="height: 400px; opacity: 0.3;">
+                                    </div>
+
+                                    <div class="text-center px-2" style="flex: 1; min-width: 350px;">
+                                        <h5 class="fw-bold mb-0">2023 (War Time)</h5>
+                                        <div class="text-muted small mb-2" id="total-label-2023">Total Export: -</div>
+                                        <div id="chart-2023"></div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
 
             <section id="chart-section" class="mt-5">
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
-                        
+
                         <!--
                         <div class="text-center mb-4">
                             <h2 class="mb-0">Andamento Indice Prezzi Cibo (FAO)</h2>
@@ -269,7 +346,8 @@
                             style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 4px; pointer-events: none; font-family: 'Fira Sans', sans-serif; font-size: 12px; z-index: 3000;">
                         </div>
 
-                        <div id="food-chart-wrapper" class="chart-wrapper-map position-relative mb-0" style="overflow: hidden;">
+                        <div id="food-chart-wrapper" class="chart-wrapper-map position-relative mb-0"
+                            style="overflow: hidden;">
                             <div id="food-chart-container" class="w-100"></div>
                         </div>
 
@@ -287,26 +365,28 @@
                     </div>
                 </div>
             </section>
-            
 
-           
+
+
 
             <!-- ########################################## LOLLO  ######################################################### -->
             <section id="race-chart-section" class="mt-5">
                 <div class="row justify-content-center">
-                    <div class="col-lg-10">         
+                    <div class="col-lg-10">
                         <div id="race-chart-tooltip"
                             style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 4px; pointer-events: none; font-family: 'Fira Sans', sans-serif; font-size: 12px; z-index: 3000;">
                         </div>
-                                    
-                        <div id="race-chart-wrapper" class="chart-wrapper-map position-relative mb-0" style="overflow: hidden;">
-                            <div id="race-chart-container"class="w-100"></div>
+
+                        <div id="race-chart-wrapper" class="chart-wrapper-map position-relative mb-0"
+                            style="overflow: hidden;">
+                            <div id="race-chart-container" class="w-100"></div>
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-start"> 
+                        <div class="d-flex justify-content-between align-items-start">
                             <div id="race-help-container" class="text-start mt-3"></div>
 
-                            <button id="replay-btn" class="btn btn-sm btn-dark d-flex align-items-center gap-2 mt-1" onclick="replay()">
+                            <button id="replay-btn" class="btn btn-sm btn-dark d-flex align-items-center gap-2 mt-1"
+                                onclick="replay()">
                                 <span style="font-size: 14px; font-weight: bold;">⟳</span> REPLAY
                             </button>
                         </div>
@@ -317,69 +397,82 @@
                     </div>
                 </div>
             </section>
-        
-                   
 
-                    <section id="sankey-section" class="py-5" style="background-color: #fff; position: relative;">
-                        <div class="container">
-                            
-                            <div id="tooltip" style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 20px; border-radius: 4px; pointer-events: none; font-family: Arial; font-size: 12px; z-index: 3000;"></div>
-                    
-                            <div class="d-flex justify-content-center mb-3">
-                                <div id="sankey-filter-container" class="compact-menu-bar d-inline-flex justify-content-center" role="group">
-                                    <button class="btn-compact active" data-type="2019">2019</button>
-                                    <div class="compact-divider"></div>
-                                    <button class="btn-compact" data-type="2020">2020</button>
-                                    <div class="compact-divider"></div>
-                                    <button class="btn-compact" data-type="2021">2021</button>
-                                    <div class="compact-divider"></div>
-                                    <button class="btn-compact" data-type="2022">2022</button>
-                                </div>
-                            </div>
-                    
-                            <div class="row justify-content-center">
-                                <div class="col-12 col-md-10">
-                                    <div id="sankey-chart-wrapper" class="chart-wrapper-map" style="position: relative; border: none; border-radius: 8px; padding: 0; background: white;">
-                                        <div id="sankey_chart"></div>
-                                    </div>
-                                </div>
-                            </div>
-                    
-                            <div class="row justify-content-center mt-4">
-                                
-                                <div class="col-12 col-md-10 col-lg-8"> 
-                                    
-                                    <div id="controls" class="d-flex align-items-center bg-white shadow-sm border rounded-pill py-3 px-4 gap-3">
-                                        
-                                        <div class="d-flex align-items-center gap-2 px-2">
-                                            <span class="fw-bold text-uppercase" style="font-size: 18px; font-weight: 700; color: #999; font-family: 'Fira Sans', sans-serif;">Month</span>
-                                        </div>
-                    
-                                        <div class="d-flex align-items-center flex-grow-1 position-relative w-100" style="height: 20px;">
-                                            <div id="timeline-markers" class="position-absolute w-100 h-100 start-0 top-0" style="pointer-events: none; z-index: 5;"></div>
-                                            <div id="slider-ghost-thumb" style="position: absolute; top: 0; width: 1px; height: 100%; pointer-events: none; z-index: -1;"></div>
-                                            
-                                            <input type="range" id="monthSlider" class="form-range custom-range-slider flex-grow-1" min="1" max="12" value="1" step="1" style="position: relative; z-index: 10; width: 100%;">
-                                        </div>
-                    
-                                        <span id="monthDisplay" class="fw-bold text-nowrap text-end" style="min-width: 100px; font-weight: 700; font-size: 18px; font-family: 'Fira Sans', sans-serif; color: #25282A;">
-                                            January
-                                        </span>
-                                    </div>
-                    
-                                </div>
-                            </div>
-                            
-                            <div class="row justify-content-center mt-3">
-                                <div class="col-12 col-md-10">
-                                    <div id="sankey-help-container" class="text-start"></div>
-                                </div>
-                            </div>
-                    
+
+
+            <section id="sankey-section" class="py-5" style="background-color: #fff; position: relative;">
+                <div class="container">
+
+                    <div id="tooltip"
+                        style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 20px; border-radius: 4px; pointer-events: none; font-family: Arial; font-size: 12px; z-index: 3000;">
+                    </div>
+
+                    <div class="d-flex justify-content-center mb-3">
+                        <div id="sankey-filter-container" class="compact-menu-bar d-inline-flex justify-content-center"
+                            role="group">
+                            <button class="btn-compact active" data-type="2019">2019</button>
+                            <div class="compact-divider"></div>
+                            <button class="btn-compact" data-type="2020">2020</button>
+                            <div class="compact-divider"></div>
+                            <button class="btn-compact" data-type="2021">2021</button>
+                            <div class="compact-divider"></div>
+                            <button class="btn-compact" data-type="2022">2022</button>
                         </div>
-                    </section>
- <!-- ########################################## LOLLO  ######################################################### -->
-       
+                    </div>
+
+                    <div class="row justify-content-center">
+                        <div class="col-12 col-md-10">
+                            <div id="sankey-chart-wrapper" class="chart-wrapper-map"
+                                style="position: relative; border: none; border-radius: 8px; padding: 0; background: white;">
+                                <div id="sankey_chart"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-center mt-4">
+
+                        <div class="col-12 col-md-10 col-lg-8">
+
+                            <div id="controls"
+                                class="d-flex align-items-center bg-white shadow-sm border rounded-pill py-3 px-4 gap-3">
+
+                                <div class="d-flex align-items-center gap-2 px-2">
+                                    <span class="fw-bold text-uppercase"
+                                        style="font-size: 18px; font-weight: 700; color: #999; font-family: 'Fira Sans', sans-serif;">Month</span>
+                                </div>
+
+                                <div class="d-flex align-items-center flex-grow-1 position-relative w-100"
+                                    style="height: 20px;">
+                                    <div id="timeline-markers" class="position-absolute w-100 h-100 start-0 top-0"
+                                        style="pointer-events: none; z-index: 5;"></div>
+                                    <div id="slider-ghost-thumb"
+                                        style="position: absolute; top: 0; width: 1px; height: 100%; pointer-events: none; z-index: -1;">
+                                    </div>
+
+                                    <input type="range" id="monthSlider"
+                                        class="form-range custom-range-slider flex-grow-1" min="1" max="12" value="1"
+                                        step="1" style="position: relative; z-index: 10; width: 100%;">
+                                </div>
+
+                                <span id="monthDisplay" class="fw-bold text-nowrap text-end"
+                                    style="min-width: 100px; font-weight: 700; font-size: 18px; font-family: 'Fira Sans', sans-serif; color: #25282A;">
+                                    January
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-center mt-3">
+                        <div class="col-12 col-md-10">
+                            <div id="sankey-help-container" class="text-start"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+            <!-- ########################################## LOLLO  ######################################################### -->
+
         </main>
     </div>
 
@@ -399,6 +492,7 @@
     <script src="../../scripts/final/linechart.js"></script>
     <script src="../../scripts/final/stacked_barchart.js"></script>
     <script src="../../scripts/final/linechartsubevents.js"></script>
+    <script src="../../scripts/final/sunburst.js"></script>
     <script src="../../scripts/final/race_bar_chart.js"></script>
     <script src="../../scripts/final/sankey_focus.js"></script>
 </body>

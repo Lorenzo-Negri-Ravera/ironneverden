@@ -1,1 +1,806 @@
-[{"Continent":"Africa","Country":"Egypt","ISO 3":"EGY","Trade Value":4957671099.0},{"Continent":"Africa","Country":"Morocco","ISO 3":"MAR","Trade Value":895864310.0},{"Continent":"Africa","Country":"Tunisia","ISO 3":"TUN","Trade Value":2117546472.0},{"Continent":"Africa","Country":"Ethiopia","ISO 3":"ETH","Trade Value":18780666.0},{"Continent":"Africa","Country":"Kenya","ISO 3":"KEN","Trade Value":590394497.0},{"Continent":"Africa","Country":"Madagascar","ISO 3":"MDG","Trade Value":419901.0},{"Continent":"Africa","Country":"Mozambique","ISO 3":"MOZ","Trade Value":144029000.0},{"Continent":"Africa","Country":"Mauritius","ISO 3":"MUS","Trade Value":689423.0},{"Continent":"Africa","Country":"Malawi","ISO 3":"MWI","Trade Value":37475686.0},{"Continent":"Africa","Country":"Seychelles","ISO 3":"SYC","Trade Value":401487.0},{"Continent":"Africa","Country":"Tanzania","ISO 3":"TZA","Trade Value":384388429.0},{"Continent":"Africa","Country":"Uganda","ISO 3":"UGA","Trade Value":201856744.0},{"Continent":"Africa","Country":"Angola","ISO 3":"AGO","Trade Value":89108181.0},{"Continent":"Africa","Country":"Central African Republic","ISO 3":"CAF","Trade Value":661009.0},{"Continent":"Africa","Country":"Gabon","ISO 3":"GAB","Trade Value":5179964.0},{"Continent":"Africa","Country":"Botswana","ISO 3":"BWA","Trade Value":145642.0},{"Continent":"Africa","Country":"Namibia","ISO 3":"NAM","Trade Value":33096829.0},{"Continent":"Africa","Country":"Eswatini","ISO 3":"SWZ","Trade Value":1270387.0},{"Continent":"Africa","Country":"South Africa","ISO 3":"ZAF","Trade Value":522779056.0},{"Continent":"Africa","Country":"Zambia","ISO 3":"ZMB","Trade Value":33675109.0},{"Continent":"Africa","Country":"Zimbabwe","ISO 3":"ZWE","Trade Value":172327016.0},{"Continent":"Africa","Country":"Benin","ISO 3":"BEN","Trade Value":70752050.0},{"Continent":"Africa","Country":"Burkina Faso","ISO 3":"BFA","Trade Value":523904793.0},{"Continent":"Africa","Country":"Cote d'Ivoire","ISO 3":"CIV","Trade Value":499079181.0},{"Continent":"Africa","Country":"Cape Verde","ISO 3":"CPV","Trade Value":50082.0},{"Continent":"Africa","Country":"Ghana","ISO 3":"GHA","Trade Value":1051877125.0},{"Continent":"Africa","Country":"Gambia","ISO 3":"GMB","Trade Value":11531169.0},{"Continent":"Africa","Country":"Liberia","ISO 3":"LBR","Trade Value":1668444.0},{"Continent":"Africa","Country":"Mauritania","ISO 3":"MRT","Trade Value":3875011.0},{"Continent":"Africa","Country":"Niger","ISO 3":"NER","Trade Value":12754088.9999999981},{"Continent":"Africa","Country":"Nigeria","ISO 3":"NGA","Trade Value":1508224692.0},{"Continent":"Africa","Country":"Senegal","ISO 3":"SEN","Trade Value":828440503.0},{"Continent":"Africa","Country":"Togo","ISO 3":"TGO","Trade Value":15742379.0000000019},{"Continent":"Asia","Country":"Kazakhstan","ISO 3":"KAZ","Trade Value":16140036041.0},{"Continent":"Asia","Country":"Kyrgyzstan","ISO 3":"KGZ","Trade Value":2176322185.0},{"Continent":"Asia","Country":"Uzbekistan","ISO 3":"UZB","Trade Value":6540923765.0},{"Continent":"Asia","Country":"China","ISO 3":"CHN","Trade Value":129002538475.0},{"Continent":"Asia","Country":"Hong Kong","ISO 3":"HKG","Trade Value":8260043897.0},{"Continent":"Asia","Country":"Japan","ISO 3":"JPN","Trade Value":7365517734.0},{"Continent":"Asia","Country":"Macau","ISO 3":"MAC","Trade Value":5880999.0},{"Continent":"Asia","Country":"Chinese Taipei","ISO 3":"TWN","Trade Value":4282941413.0},{"Continent":"Asia","Country":"Brunei","ISO 3":"BRN","Trade Value":239932500.0},{"Continent":"Asia","Country":"Indonesia","ISO 3":"IDN","Trade Value":2433798069.0},{"Continent":"Asia","Country":"Cambodia","ISO 3":"KHM","Trade Value":23100753.0},{"Continent":"Asia","Country":"Burma","ISO 3":"MMR","Trade Value":24984067.0},{"Continent":"Asia","Country":"Malaysia","ISO 3":"MYS","Trade Value":2490451579.0},{"Continent":"Asia","Country":"Philippines","ISO 3":"PHL","Trade Value":166720563.0},{"Continent":"Asia","Country":"Singapore","ISO 3":"SGP","Trade Value":3546788094.0},{"Continent":"Asia","Country":"Thailand","ISO 3":"THA","Trade Value":686756157.0},{"Continent":"Asia","Country":"India","ISO 3":"IND","Trade Value":66149331880.9999923706},{"Continent":"Asia","Country":"Sri Lanka","ISO 3":"LKA","Trade Value":395039374.0},{"Continent":"Asia","Country":"Maldives","ISO 3":"MDV","Trade Value":195822.0},{"Continent":"Asia","Country":"Pakistan","ISO 3":"PAK","Trade Value":885593269.0},{"Continent":"Asia","Country":"United Arab Emirates","ISO 3":"ARE","Trade Value":6447135576.0},{"Continent":"Asia","Country":"Armenia","ISO 3":"ARM","Trade Value":3879597234.0},{"Continent":"Asia","Country":"Azerbaijan","ISO 3":"AZE","Trade Value":3155709273.0},{"Continent":"Asia","Country":"Bahrain","ISO 3":"BHR","Trade Value":8559128.0},{"Continent":"Asia","Country":"Georgia","ISO 3":"GEO","Trade Value":1744449569.0},{"Continent":"Asia","Country":"Israel","ISO 3":"ISR","Trade Value":2050656945.0},{"Continent":"Asia","Country":"Jordan","ISO 3":"JOR","Trade Value":204593663.0},{"Continent":"Asia","Country":"Kuwait","ISO 3":"KWT","Trade Value":59582273.0},{"Continent":"Asia","Country":"Lebanon","ISO 3":"LBN","Trade Value":586260144.9999998808},{"Continent":"Asia","Country":"Oman","ISO 3":"OMN","Trade Value":490003360.0},{"Continent":"Asia","Country":"Qatar","ISO 3":"QAT","Trade Value":10929644.0},{"Continent":"Asia","Country":"Saudi Arabia","ISO 3":"SAU","Trade Value":3701954752.0},{"Continent":"Asia","Country":"Turkey","ISO 3":"TUR","Trade Value":30978941787.0},{"Continent":"Europe","Country":"Cyprus","ISO 3":"CYP","Trade Value":18324172.0},{"Continent":"Europe","Country":"Bulgaria","ISO 3":"BGR","Trade Value":3507514302.0},{"Continent":"Europe","Country":"Czechia","ISO 3":"CZE","Trade Value":3468417667.0},{"Continent":"Europe","Country":"Hungary","ISO 3":"HUN","Trade Value":6187518647.0},{"Continent":"Europe","Country":"Moldova","ISO 3":"MDA","Trade Value":321637208.0},{"Continent":"Europe","Country":"Poland","ISO 3":"POL","Trade Value":2588048200.0},{"Continent":"Europe","Country":"Romania","ISO 3":"ROU","Trade Value":349097993.0},{"Continent":"Europe","Country":"Slovakia","ISO 3":"SVK","Trade Value":4943722035.0},{"Continent":"Europe","Country":"Ukraine","ISO 3":"UKR","Trade Value":4557753.0},{"Continent":"Europe","Country":"Denmark","ISO 3":"DNK","Trade Value":346906086.0000000596},{"Continent":"Europe","Country":"Estonia","ISO 3":"EST","Trade Value":194367708.0},{"Continent":"Europe","Country":"Finland","ISO 3":"FIN","Trade Value":1284678018.0},{"Continent":"Europe","Country":"United Kingdom","ISO 3":"GBR","Trade Value":342974953.0},{"Continent":"Europe","Country":"Ireland","ISO 3":"IRL","Trade Value":79207927.0},{"Continent":"Europe","Country":"Iceland","ISO 3":"ISL","Trade Value":4279030.0},{"Continent":"Europe","Country":"Lithuania","ISO 3":"LTU","Trade Value":356724162.0},{"Continent":"Europe","Country":"Latvia","ISO 3":"LVA","Trade Value":655964187.0},{"Continent":"Europe","Country":"Norway","ISO 3":"NOR","Trade Value":287713122.0},{"Continent":"Europe","Country":"Sweden","ISO 3":"SWE","Trade Value":46279270.0},{"Continent":"Europe","Country":"Albania","ISO 3":"ALB","Trade Value":35619404.0},{"Continent":"Europe","Country":"Andorra","ISO 3":"AND","Trade Value":26515.0},{"Continent":"Europe","Country":"Bosnia and Herzegovina","ISO 3":"BIH","Trade Value":255722166.0},{"Continent":"Europe","Country":"Spain","ISO 3":"ESP","Trade Value":3380027859.0},{"Continent":"Europe","Country":"Greece","ISO 3":"GRC","Trade Value":2644653509.0},{"Continent":"Europe","Country":"Croatia","ISO 3":"HRV","Trade Value":63271094.0},{"Continent":"Europe","Country":"Italy","ISO 3":"ITA","Trade Value":4379684623.0},{"Continent":"Europe","Country":"North Macedonia","ISO 3":"MKD","Trade Value":265340934.0},{"Continent":"Europe","Country":"Malta","ISO 3":"MLT","Trade Value":1103701.0},{"Continent":"Europe","Country":"Montenegro","ISO 3":"MNE","Trade Value":8088374.0000000009},{"Continent":"Europe","Country":"Portugal","ISO 3":"PRT","Trade Value":361367327.0},{"Continent":"Europe","Country":"Serbia","ISO 3":"SRB","Trade Value":1694784474.0},{"Continent":"Europe","Country":"Slovenia","ISO 3":"SVN","Trade Value":258125417.0},{"Continent":"Europe","Country":"Austria","ISO 3":"AUT","Trade Value":264177617.0},{"Continent":"Europe","Country":"Belgium","ISO 3":"BEL","Trade Value":3725612491.0},{"Continent":"Europe","Country":"Switzerland","ISO 3":"CHE","Trade Value":3968177668.0},{"Continent":"Europe","Country":"Germany","ISO 3":"DEU","Trade Value":3927507548.0},{"Continent":"Europe","Country":"France","ISO 3":"FRA","Trade Value":3646111716.0},{"Continent":"Europe","Country":"Luxembourg","ISO 3":"LUX","Trade Value":24526095.0},{"Continent":"Europe","Country":"Netherlands","ISO 3":"NLD","Trade Value":3030884531.0},{"Continent":"North America","Country":"Bahamas","ISO 3":"BHS","Trade Value":812.0},{"Continent":"North America","Country":"Barbados","ISO 3":"BRB","Trade Value":431.0},{"Continent":"North America","Country":"Dominica","ISO 3":"DMA","Trade Value":541.0},{"Continent":"North America","Country":"Dominican Republic","ISO 3":"DOM","Trade Value":53072719.0},{"Continent":"North America","Country":"Jamaica","ISO 3":"JAM","Trade Value":100520641.0},{"Continent":"North America","Country":"Saint Vincent and the Grenadines","ISO 3":"VCT","Trade Value":740.0},{"Continent":"North America","Country":"Belize","ISO 3":"BLZ","Trade Value":140875.0},{"Continent":"North America","Country":"Costa Rica","ISO 3":"CRI","Trade Value":60362888.9999999925},{"Continent":"North America","Country":"Guatemala","ISO 3":"GTM","Trade Value":144935880.0},{"Continent":"North America","Country":"Honduras","ISO 3":"HND","Trade Value":191305216.0},{"Continent":"North America","Country":"Mexico","ISO 3":"MEX","Trade Value":504538599.0},{"Continent":"North America","Country":"Nicaragua","ISO 3":"NIC","Trade Value":105299730.0},{"Continent":"North America","Country":"Panama","ISO 3":"PAN","Trade Value":25095488.0},{"Continent":"North America","Country":"El Salvador","ISO 3":"SLV","Trade Value":45292981.0},{"Continent":"North America","Country":"Canada","ISO 3":"CAN","Trade Value":51894039.0},{"Continent":"North America","Country":"United States","ISO 3":"USA","Trade Value":4872581814.0},{"Continent":"Oceania","Country":"Australia","ISO 3":"AUS","Trade Value":8607378.0},{"Continent":"Oceania","Country":"New Zealand","ISO 3":"NZL","Trade Value":1299510.0},{"Continent":"Oceania","Country":"Fiji","ISO 3":"FJI","Trade Value":324.0},{"Continent":"South America","Country":"Argentina","ISO 3":"ARG","Trade Value":139817268.0},{"Continent":"South America","Country":"Bolivia","ISO 3":"BOL","Trade Value":55493939.0},{"Continent":"South America","Country":"Brazil","ISO 3":"BRA","Trade Value":11134261884.0},{"Continent":"South America","Country":"Chile","ISO 3":"CHL","Trade Value":49145776.0},{"Continent":"South America","Country":"Colombia","ISO 3":"COL","Trade Value":325758291.0},{"Continent":"South America","Country":"Ecuador","ISO 3":"ECU","Trade Value":157115177.0},{"Continent":"South America","Country":"Guyana","ISO 3":"GUY","Trade Value":50981.0},{"Continent":"South America","Country":"Peru","ISO 3":"PER","Trade Value":331188720.0},{"Continent":"South America","Country":"Paraguay","ISO 3":"PRY","Trade Value":76072152.0},{"Continent":"South America","Country":"Uruguay","ISO 3":"URY","Trade Value":27868347.0}]
+[
+    {
+        "Continent": "Africa",
+        "Country": "Egypt",
+        "ISO 3": "EGY",
+        "Trade Value": 4957671099.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Morocco",
+        "ISO 3": "MAR",
+        "Trade Value": 895864310.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Tunisia",
+        "ISO 3": "TUN",
+        "Trade Value": 2117546472.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Ethiopia",
+        "ISO 3": "ETH",
+        "Trade Value": 18780666.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Kenya",
+        "ISO 3": "KEN",
+        "Trade Value": 590394497.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Madagascar",
+        "ISO 3": "MDG",
+        "Trade Value": 419901.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Mozambique",
+        "ISO 3": "MOZ",
+        "Trade Value": 144029000.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Mauritius",
+        "ISO 3": "MUS",
+        "Trade Value": 689423.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Malawi",
+        "ISO 3": "MWI",
+        "Trade Value": 37475686.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Seychelles",
+        "ISO 3": "SYC",
+        "Trade Value": 401487.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Tanzania",
+        "ISO 3": "TZA",
+        "Trade Value": 384388429.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Uganda",
+        "ISO 3": "UGA",
+        "Trade Value": 201856744.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Angola",
+        "ISO 3": "AGO",
+        "Trade Value": 89108181.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Central African Republic",
+        "ISO 3": "CAF",
+        "Trade Value": 661009.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Gabon",
+        "ISO 3": "GAB",
+        "Trade Value": 5179964.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Botswana",
+        "ISO 3": "BWA",
+        "Trade Value": 145642.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Namibia",
+        "ISO 3": "NAM",
+        "Trade Value": 33096829.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Eswatini",
+        "ISO 3": "SWZ",
+        "Trade Value": 1270387.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "South Africa",
+        "ISO 3": "ZAF",
+        "Trade Value": 522779056.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Zambia",
+        "ISO 3": "ZMB",
+        "Trade Value": 33675109.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Zimbabwe",
+        "ISO 3": "ZWE",
+        "Trade Value": 172327016.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Benin",
+        "ISO 3": "BEN",
+        "Trade Value": 70752050.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Burkina Faso",
+        "ISO 3": "BFA",
+        "Trade Value": 523904793.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Cote d'Ivoire",
+        "ISO 3": "CIV",
+        "Trade Value": 499079181.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Cape Verde",
+        "ISO 3": "CPV",
+        "Trade Value": 50082.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Ghana",
+        "ISO 3": "GHA",
+        "Trade Value": 1051877125.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Gambia",
+        "ISO 3": "GMB",
+        "Trade Value": 11531169.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Liberia",
+        "ISO 3": "LBR",
+        "Trade Value": 1668444.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Mauritania",
+        "ISO 3": "MRT",
+        "Trade Value": 3875011.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Niger",
+        "ISO 3": "NER",
+        "Trade Value": 12754088.9999999981
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Nigeria",
+        "ISO 3": "NGA",
+        "Trade Value": 1508224692.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Senegal",
+        "ISO 3": "SEN",
+        "Trade Value": 828440503.0
+    },
+    {
+        "Continent": "Africa",
+        "Country": "Togo",
+        "ISO 3": "TGO",
+        "Trade Value": 15742379.0000000019
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Kazakhstan",
+        "ISO 3": "KAZ",
+        "Trade Value": 16140036041.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Kyrgyzstan",
+        "ISO 3": "KGZ",
+        "Trade Value": 2176322185.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Uzbekistan",
+        "ISO 3": "UZB",
+        "Trade Value": 6540923765.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "China",
+        "ISO 3": "CHN",
+        "Trade Value": 129002538475.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Hong Kong",
+        "ISO 3": "HKG",
+        "Trade Value": 8260043897.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Japan",
+        "ISO 3": "JPN",
+        "Trade Value": 7365517734.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Macau",
+        "ISO 3": "MAC",
+        "Trade Value": 5880999.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Chinese Taipei",
+        "ISO 3": "TWN",
+        "Trade Value": 4282941413.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Brunei",
+        "ISO 3": "BRN",
+        "Trade Value": 239932500.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Indonesia",
+        "ISO 3": "IDN",
+        "Trade Value": 2433798069.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Cambodia",
+        "ISO 3": "KHM",
+        "Trade Value": 23100753.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Burma",
+        "ISO 3": "MMR",
+        "Trade Value": 24984067.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Malaysia",
+        "ISO 3": "MYS",
+        "Trade Value": 2490451579.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Philippines",
+        "ISO 3": "PHL",
+        "Trade Value": 166720563.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Singapore",
+        "ISO 3": "SGP",
+        "Trade Value": 3546788094.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Thailand",
+        "ISO 3": "THA",
+        "Trade Value": 686756157.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "India",
+        "ISO 3": "IND",
+        "Trade Value": 66149331880.9999923706
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Sri Lanka",
+        "ISO 3": "LKA",
+        "Trade Value": 395039374.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Maldives",
+        "ISO 3": "MDV",
+        "Trade Value": 195822.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Pakistan",
+        "ISO 3": "PAK",
+        "Trade Value": 885593269.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "United Arab Emirates",
+        "ISO 3": "ARE",
+        "Trade Value": 6447135576.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Armenia",
+        "ISO 3": "ARM",
+        "Trade Value": 3879597234.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Azerbaijan",
+        "ISO 3": "AZE",
+        "Trade Value": 3155709273.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Bahrain",
+        "ISO 3": "BHR",
+        "Trade Value": 8559128.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Georgia",
+        "ISO 3": "GEO",
+        "Trade Value": 1744449569.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Israel",
+        "ISO 3": "ISR",
+        "Trade Value": 2050656945.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Jordan",
+        "ISO 3": "JOR",
+        "Trade Value": 204593663.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Kuwait",
+        "ISO 3": "KWT",
+        "Trade Value": 59582273.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Lebanon",
+        "ISO 3": "LBN",
+        "Trade Value": 586260144.9999998808
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Oman",
+        "ISO 3": "OMN",
+        "Trade Value": 490003360.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Qatar",
+        "ISO 3": "QAT",
+        "Trade Value": 10929644.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Saudi Arabia",
+        "ISO 3": "SAU",
+        "Trade Value": 3701954752.0
+    },
+    {
+        "Continent": "Asia",
+        "Country": "Turkey",
+        "ISO 3": "TUR",
+        "Trade Value": 30978941787.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Cyprus",
+        "ISO 3": "CYP",
+        "Trade Value": 18324172.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Bulgaria",
+        "ISO 3": "BGR",
+        "Trade Value": 3507514302.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Czechia",
+        "ISO 3": "CZE",
+        "Trade Value": 3468417667.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Hungary",
+        "ISO 3": "HUN",
+        "Trade Value": 6187518647.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Moldova",
+        "ISO 3": "MDA",
+        "Trade Value": 321637208.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Poland",
+        "ISO 3": "POL",
+        "Trade Value": 2588048200.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Romania",
+        "ISO 3": "ROU",
+        "Trade Value": 349097993.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Slovakia",
+        "ISO 3": "SVK",
+        "Trade Value": 4943722035.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Ukraine",
+        "ISO 3": "UKR",
+        "Trade Value": 4557753.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Denmark",
+        "ISO 3": "DNK",
+        "Trade Value": 346906086.0000000596
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Estonia",
+        "ISO 3": "EST",
+        "Trade Value": 194367708.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Finland",
+        "ISO 3": "FIN",
+        "Trade Value": 1284678018.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "United Kingdom",
+        "ISO 3": "GBR",
+        "Trade Value": 342974953.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Ireland",
+        "ISO 3": "IRL",
+        "Trade Value": 79207927.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Iceland",
+        "ISO 3": "ISL",
+        "Trade Value": 4279030.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Lithuania",
+        "ISO 3": "LTU",
+        "Trade Value": 356724162.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Latvia",
+        "ISO 3": "LVA",
+        "Trade Value": 655964187.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Norway",
+        "ISO 3": "NOR",
+        "Trade Value": 287713122.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Sweden",
+        "ISO 3": "SWE",
+        "Trade Value": 46279270.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Albania",
+        "ISO 3": "ALB",
+        "Trade Value": 35619404.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Andorra",
+        "ISO 3": "AND",
+        "Trade Value": 26515.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Bosnia and Herzegovina",
+        "ISO 3": "BIH",
+        "Trade Value": 255722166.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Spain",
+        "ISO 3": "ESP",
+        "Trade Value": 3380027859.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Greece",
+        "ISO 3": "GRC",
+        "Trade Value": 2644653509.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Croatia",
+        "ISO 3": "HRV",
+        "Trade Value": 63271094.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Italy",
+        "ISO 3": "ITA",
+        "Trade Value": 4379684623.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "North Macedonia",
+        "ISO 3": "MKD",
+        "Trade Value": 265340934.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Malta",
+        "ISO 3": "MLT",
+        "Trade Value": 1103701.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Montenegro",
+        "ISO 3": "MNE",
+        "Trade Value": 8088374.0000000009
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Portugal",
+        "ISO 3": "PRT",
+        "Trade Value": 361367327.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Serbia",
+        "ISO 3": "SRB",
+        "Trade Value": 1694784474.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Slovenia",
+        "ISO 3": "SVN",
+        "Trade Value": 258125417.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Austria",
+        "ISO 3": "AUT",
+        "Trade Value": 264177617.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Belgium",
+        "ISO 3": "BEL",
+        "Trade Value": 3725612491.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Switzerland",
+        "ISO 3": "CHE",
+        "Trade Value": 3968177668.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Germany",
+        "ISO 3": "DEU",
+        "Trade Value": 3927507548.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "France",
+        "ISO 3": "FRA",
+        "Trade Value": 3646111716.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Luxembourg",
+        "ISO 3": "LUX",
+        "Trade Value": 24526095.0
+    },
+    {
+        "Continent": "Europe",
+        "Country": "Netherlands",
+        "ISO 3": "NLD",
+        "Trade Value": 3030884531.0
+    },
+    {
+        "Continent": "North America",
+        "Country": "Bahamas",
+        "ISO 3": "BHS",
+        "Trade Value": 812.0
+    },
+    {
+        "Continent": "North America",
+        "Country": "Barbados",
+        "ISO 3": "BRB",
+        "Trade Value": 431.0
+    },
+    {
+        "Continent": "North America",
+        "Country": "Dominica",
+        "ISO 3": "DMA",
+        "Trade Value": 541.0
+    },
+    {
+        "Continent": "North America",
+        "Country": "Dominican Republic",
+        "ISO 3": "DOM",
+        "Trade Value": 53072719.0
+    },
+    {
+        "Continent": "North America",
+        "Country": "Jamaica",
+        "ISO 3": "JAM",
+        "Trade Value": 100520641.0
+    },
+    {
+        "Continent": "North America",
+        "Country": "Saint Vincent and the Grenadines",
+        "ISO 3": "VCT",
+        "Trade Value": 740.0
+    },
+    {
+        "Continent": "North America",
+        "Country": "Belize",
+        "ISO 3": "BLZ",
+        "Trade Value": 140875.0
+    },
+    {
+        "Continent": "North America",
+        "Country": "Costa Rica",
+        "ISO 3": "CRI",
+        "Trade Value": 60362888.9999999925
+    },
+    {
+        "Continent": "North America",
+        "Country": "Guatemala",
+        "ISO 3": "GTM",
+        "Trade Value": 144935880.0
+    },
+    {
+        "Continent": "North America",
+        "Country": "Honduras",
+        "ISO 3": "HND",
+        "Trade Value": 191305216.0
+    },
+    {
+        "Continent": "North America",
+        "Country": "Mexico",
+        "ISO 3": "MEX",
+        "Trade Value": 504538599.0
+    },
+    {
+        "Continent": "North America",
+        "Country": "Nicaragua",
+        "ISO 3": "NIC",
+        "Trade Value": 105299730.0
+    },
+    {
+        "Continent": "North America",
+        "Country": "Panama",
+        "ISO 3": "PAN",
+        "Trade Value": 25095488.0
+    },
+    {
+        "Continent": "North America",
+        "Country": "El Salvador",
+        "ISO 3": "SLV",
+        "Trade Value": 45292981.0
+    },
+    {
+        "Continent": "North America",
+        "Country": "Canada",
+        "ISO 3": "CAN",
+        "Trade Value": 51894039.0
+    },
+    {
+        "Continent": "North America",
+        "Country": "United States",
+        "ISO 3": "USA",
+        "Trade Value": 4872581814.0
+    },
+    {
+        "Continent": "Oceania",
+        "Country": "Australia",
+        "ISO 3": "AUS",
+        "Trade Value": 8607378.0
+    },
+    {
+        "Continent": "Oceania",
+        "Country": "New Zealand",
+        "ISO 3": "NZL",
+        "Trade Value": 1299510.0
+    },
+    {
+        "Continent": "Oceania",
+        "Country": "Fiji",
+        "ISO 3": "FJI",
+        "Trade Value": 324.0
+    },
+    {
+        "Continent": "South America",
+        "Country": "Argentina",
+        "ISO 3": "ARG",
+        "Trade Value": 139817268.0
+    },
+    {
+        "Continent": "South America",
+        "Country": "Bolivia",
+        "ISO 3": "BOL",
+        "Trade Value": 55493939.0
+    },
+    {
+        "Continent": "South America",
+        "Country": "Brazil",
+        "ISO 3": "BRA",
+        "Trade Value": 11134261884.0
+    },
+    {
+        "Continent": "South America",
+        "Country": "Chile",
+        "ISO 3": "CHL",
+        "Trade Value": 49145776.0
+    },
+    {
+        "Continent": "South America",
+        "Country": "Colombia",
+        "ISO 3": "COL",
+        "Trade Value": 325758291.0
+    },
+    {
+        "Continent": "South America",
+        "Country": "Ecuador",
+        "ISO 3": "ECU",
+        "Trade Value": 157115177.0
+    },
+    {
+        "Continent": "South America",
+        "Country": "Guyana",
+        "ISO 3": "GUY",
+        "Trade Value": 50981.0
+    },
+    {
+        "Continent": "South America",
+        "Country": "Peru",
+        "ISO 3": "PER",
+        "Trade Value": 331188720.0
+    },
+    {
+        "Continent": "South America",
+        "Country": "Paraguay",
+        "ISO 3": "PRY",
+        "Trade Value": 76072152.0
+    },
+    {
+        "Continent": "South America",
+        "Country": "Uruguay",
+        "ISO 3": "URY",
+        "Trade Value": 27868347.0
+    }
+]
