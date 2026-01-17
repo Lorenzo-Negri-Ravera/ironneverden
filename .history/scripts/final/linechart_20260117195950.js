@@ -1,48 +1,5 @@
 // =============================================================================
-// 1. GESTIONE SCROLL (Intersection Observer)
-// =============================================================================
-document.addEventListener("DOMContentLoaded", function() {
-    
-    const options = { root: null, rootMargin: '0px', threshold: 0.1 };
-
-    const observer = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                
-                // Trigger per la sezione Violenza (Sub Events)
-                if (entry.target.id === "sub-event-line-section") {
-                    console.log("Avvio initSubEventLineChart...");
-                    initSubEventLineChart();
-                    observer.unobserve(entry.target);
-                }
-
-                // Trigger per la sezione Cibo (Food Price)
-                if (entry.target.id === "chart-section") {
-                    console.log("Avvio initFoodChart...");
-                    initFoodChart();
-                    observer.unobserve(entry.target);
-                }
-
-                // Trigger per la Mappa
-                if (entry.target.id === "map-section") {
-                    if (typeof initMap === "function") initMap();
-                    observer.unobserve(entry.target);
-                }
-            }
-        });
-    }, options);
-
-    // Attivazione sui target HTML
-    const targets = ["#sub-event-line-section", "#chart-section", "#map-section"];
-    targets.forEach(selector => {
-        const el = document.querySelector(selector);
-        if (el) observer.observe(el);
-    });
-});
-
-
-// =============================================================================
-// 2. FUNZIONE GRAFICO LINEE (Sub Events - Violence Trends)
+// FUNZIONE GRAFICO LINEE (Sub Events - Violence Trends)
 // =============================================================================
 function initSubEventLineChart() {
     // SELEZIONE CONTAINER
@@ -58,26 +15,22 @@ function initSubEventLineChart() {
     legendContainer.html("");
     helpContainer.html("");
 
-    // Reset stili wrapper per evitare conflitti con il popover dell'help
-    d3.select("#sub-event-wrapper")
-        .style("background", "transparent")
-        .style("border", "none")
-        .style("box-shadow", "none")
-        .style("overflow", "visible"); // "visible" permette al popover dell'help di non venire tagliato
+    // Rimuovi stili indesiderati dal wrapper
+    d3.select("#sub-event-wrapper").style("background", "transparent").style("border", "none").style("box-shadow", "none");
 
-    // CONFIGURAZIONE DIMENSIONI
+    // CONFIGURAZIONE
     const margin = {top: 40, right: 30, bottom: 40, left: 60}; 
     const width = 1000 - margin.left - margin.right;
     const height = 500 - margin.top - margin.bottom;
 
-    // CREAZIONE SVG
+    // SVG
     const svg = mainContainer.append("svg")
         .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
         .style("width", "100%").style("height", "auto").style("display", "block")
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // CARICAMENTO DATI
+    // DATI
     d3.json("../../data/final/sub_event_line_chart/sub_event_line_chart.json").then(function(raw_data) {
         
         const TARGET_TYPES = [
@@ -88,7 +41,7 @@ function initSubEventLineChart() {
 
         const parseDate = d3.timeParse("%Y-%m-%d");
 
-        // Pivoting dei dati
+        // 1. Pivoting dei dati settimanali
         const dataByWeek = d3.groups(raw_data, d => d.WEEK);
         const data = dataByWeek.map(([weekStr, values]) => {
             const entry = { Date: parseDate(weekStr) };
@@ -103,7 +56,9 @@ function initSubEventLineChart() {
         const x = d3.scaleTime().domain(d3.extent(data, d => d.Date)).range([0, width]);
         const maxY = d3.max(data, d => Math.max(...TARGET_TYPES.map(k => d[k])));
         const y = d3.scaleLinear().domain([0, maxY * 1.15]).range([height, 0]);
-        const color = d3.scaleOrdinal().domain(TARGET_TYPES).range(["#d62728", "#ff7f0e", "#1f77b4"]);
+        
+        const PALETTE = ["#d62728", "#ff7f0e", "#1f77b4"];
+        const color = d3.scaleOrdinal().domain(TARGET_TYPES).range(PALETTE);
 
         let activeFocusKey = null;
 
@@ -122,11 +77,15 @@ function initSubEventLineChart() {
             .call(d3.axisLeft(y).ticks(6).tickSize(-width).tickFormat("").tickSizeOuter(0))
             .call(g => g.select(".domain").remove())
             .selectAll("line")
-            .style("stroke", "#e0e0e0").style("stroke-dasharray", "4,4")
+            .style("stroke", "#e0e0e0")
+            .style("stroke-dasharray", "4,4")
             .filter(d => d === 0).remove();
 
-        // LINEE
-        const lineGenerator = (key) => d3.line().curve(d3.curveMonotoneX).x(d => x(d.Date)).y(d => y(d[key]));
+        // --- LINEE ---
+        const lineGenerator = (key) => d3.line()
+            .curve(d3.curveMonotoneX)
+            .x(d => x(d.Date))
+            .y(d => y(d[key]));
 
         TARGET_TYPES.forEach(key => {
             const safeId = "line-sub-" + key.replace(/[^a-zA-Z0-9]/g, '-');
@@ -141,43 +100,13 @@ function initSubEventLineChart() {
                 .style("transition", "opacity 0.3s");
         });
 
-        // LEGENDA (distanza column-gap-5 per matchare Food Chart)
-        legendContainer.attr("class", "d-flex flex-wrap justify-content-center align-items-center column-gap-5 row-gap-1 mt-1");
-
-        TARGET_TYPES.forEach(key => {
-            const btn = legendContainer.append("button")
-                .attr("class", "btn-compact d-flex align-items-center gap-2 p-0 w-auto flex-grow-0 border-0 bg-transparent");
-            
-            btn.append("span")
-                .style("width", "10px").style("height", "10px")
-                .style("background-color", color(key)).style("border-radius", "50%").style("display", "inline-block");
-            
-            btn.append("span")
-                .text(key).style("font-size", "12px").style("font-weight", "600").style("color", "#25282A").style("white-space", "nowrap");
-
-            btn.on("click", function() {
-                activeFocusKey = (activeFocusKey === key) ? null : key;
-                d3.selectAll(".line-trace-sub").transition().duration(200)
-                    .style("opacity", function() {
-                        const id = this.id.replace("line-sub-", "");
-                        const target = activeFocusKey ? activeFocusKey.replace(/[^a-zA-Z0-9]/g, '-') : null;
-                        return (!activeFocusKey || id === target) ? 1 : 0.15;
-                    });
-                legendContainer.selectAll("button")
-                    .style("opacity", function() {
-                        return (!activeFocusKey || this.__key__ === activeFocusKey) ? 1 : 0.4;
-                    });
-            });
-            btn.node().__key__ = key;
-        });
-
-        // HELP BUTTON
+        // --- HELP BUTTON (INTEGRATO) ---
         const helpContent = {
-            title: "Understanding Conflict Trends",
+            title: "Analyzing Conflict Events",
             steps: [
-                "<strong>Y-Axis:</strong> Number of weekly recorded events.",
-                "<strong>Categories:</strong> Shelling, strikes, and direct armed clashes.",
-                "<strong>Focus:</strong> Click a legend category to isolate its trend line."
+                "<strong>Y-axis:</strong> Number of recorded events per week.",
+                "<strong>Series:</strong> Differentiation between artillery attacks, air strikes, and direct clashes.",
+                "<strong>Interaction:</strong> Click the legend labels to focus on a specific type of violence."
             ]
         };
 
@@ -185,7 +114,43 @@ function initSubEventLineChart() {
             createChartHelp("#sub-event-help-container", "#sub-event-wrapper", helpContent);
         }
 
-        // TOOLTIP (Box unico + Linea verticale)
+        // --- FUNZIONE FOCUS ---
+        function updateFocusMode() {
+            d3.selectAll(".line-trace-sub").transition().duration(200)
+                .style("opacity", function() {
+                    const id = this.id.replace("line-sub-", "");
+                    const target = activeFocusKey ? activeFocusKey.replace(/[^a-zA-Z0-9]/g, '-') : null;
+                    return (!activeFocusKey || id === target) ? 1 : 0.15;
+                });
+            legendContainer.selectAll("button")
+                .style("opacity", function() {
+                    return (!activeFocusKey || this.__key__ === activeFocusKey) ? 1 : 0.4;
+                });
+        }
+
+        // --- LEGENDA ---
+        legendContainer.attr("class", "d-flex flex-wrap justify-content-center align-items-center column-gap-4 row-gap-2 mt-2");
+
+        TARGET_TYPES.forEach(key => {
+            const itemColor = color(key);
+            const btn = legendContainer.append("button")
+                .attr("class", "btn-compact d-flex align-items-center gap-2 p-0 w-auto flex-grow-0 border-0 bg-transparent");
+            
+            btn.append("span")
+                .style("width", "10px").style("height", "10px")
+                .style("background-color", itemColor).style("border-radius", "50%").style("display", "inline-block");
+            
+            btn.append("span")
+                .text(key).style("font-size", "12px").style("font-weight", "600").style("color", "#25282A").style("white-space", "nowrap");
+
+            btn.on("click", function() {
+                activeFocusKey = (activeFocusKey === key) ? null : key;
+                updateFocusMode();
+            });
+            btn.node().__key__ = key;
+        });
+
+        // --- TOOLTIP ---
         const mouseG = svg.append("g").attr("class", "mouse-over-effects");
         const mouseLine = mouseG.append("path")
             .style("stroke", "#555").style("stroke-width", "1px").style("stroke-dasharray", "4,4").style("opacity", "0");
@@ -217,4 +182,4 @@ function initSubEventLineChart() {
             });
 
     }).catch(err => { console.error("Errore caricamento dati:", err); });
-}   
+}

@@ -39,19 +39,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const mapTarget = document.querySelector("#map-section");
     if (mapTarget) observer.observe(mapTarget);
 });
-
-
-// =============================================================================
-// 2. FUNZIONE GRAFICO LINEE (Cibo - Food Price Index)
-// =============================================================================
-
-
-
-// ... (Observer rimane uguale) ...
-
-// =============================================================================
-// 2. FUNZIONE GRAFICO LINEE (Cibo - Food Price Index)
-// =============================================================================
 function initFoodChart() {
     // SELEZIONE CONTAINER
     const mainContainer = d3.select("#food-chart-container");

@@ -40,15 +40,6 @@ document.addEventListener("DOMContentLoaded", function() {
     if (mapTarget) observer.observe(mapTarget);
 });
 
-
-// =============================================================================
-// 2. FUNZIONE GRAFICO LINEE (Cibo - Food Price Index)
-// =============================================================================
-
-
-
-// ... (Observer rimane uguale) ...
-
 // =============================================================================
 // 2. FUNZIONE GRAFICO LINEE (Cibo - Food Price Index)
 // =============================================================================

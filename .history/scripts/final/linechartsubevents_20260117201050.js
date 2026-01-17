@@ -217,4 +217,4 @@ function initSubEventLineChart() {
             });
 
     }).catch(err => { console.error("Errore caricamento dati:", err); });
-}   
+}
