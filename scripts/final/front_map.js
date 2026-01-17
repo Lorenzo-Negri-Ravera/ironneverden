@@ -4,13 +4,13 @@
 const UKR_PATH = "../../data/final/geojson/countries/UKR.json";
 const RUS_PATH = "../../data/final/geojson/countries/RUS.json";
 // Borders countries
-const MDA_PATH = "../../data/final/geojson/countries/MDA.geojson"; 
-const ROU_PATH = "../../data/final/geojson/countries/ROU.geojson"; 
-const HUN_PATH = "../../data/final/geojson/countries/HUN.geojson"; 
-const SVK_PATH = "../../data/final/geojson/countries/SVK.geojson"; 
-const POL_PATH = "../../data/final/geojson/countries/POL.geojson"; 
-const BLR_PATH = "../../data/final/geojson/countries/BLR.geojson"; 
-const BGR_PATH = "../../data/final/geojson/countries/BGR.geojson"; 
+const MDA_PATH = "../../data/final/geojson/countries/MDA.geojson";
+const ROU_PATH = "../../data/final/geojson/countries/ROU.geojson";
+const HUN_PATH = "../../data/final/geojson/countries/HUN.geojson";
+const SVK_PATH = "../../data/final/geojson/countries/SVK.geojson";
+const POL_PATH = "../../data/final/geojson/countries/POL.geojson";
+const BLR_PATH = "../../data/final/geojson/countries/BLR.geojson";
+const BGR_PATH = "../../data/final/geojson/countries/BGR.geojson";
 const MKD_PATH = "../../data/final/geojson/countries/MKD.geojson";
 const SRB_PATH = "../../data/final/geojson/countries/SRB.geojson";
 const XKO_PATH = "../../data/final/geojson/countries/XKO.geojson";
@@ -36,47 +36,48 @@ Promise.all([
     d3.json(XKO_PATH),
     d3.csv(FRONT_UKR_PATH),
     d3.csv(FRONT_RU_PATH)
-]).then(function([
-    ukrGeo, rusGeo, 
+]).then(function ([
+    ukrGeo, rusGeo,
     mdaGeo, rouGeo, hunGeo, svkGeo, polGeo, blrGeo, bgrGeo, mkdGeo, srbGeo, xkoGeo,
     ukrBattlesData, ruBattlesData
-]) { 
+]) {
 
     // Setup container
     const container = d3.select("#front-map-container");
-    container.html(""); 
-    
+    container.html("");
+
     // Dimensions
     const width = 1000;
     const height = 700;
-    
+
     // Geo Features    
     const neighborsFeatures = [
         ...mdaGeo.features, ...rouGeo.features, ...hunGeo.features,
-        ...svkGeo.features, ...polGeo.features, ...blrGeo.features, 
+        ...svkGeo.features, ...polGeo.features, ...blrGeo.features,
         ...bgrGeo.features, ...mkdGeo.features, ...srbGeo.features, ...xkoGeo.features
     ];
 
     // Western Russia IDs to show
     const westernRussiaIds = [
-        "RUORL", "RUBEL", "RUKRS", "RUBRY", "RUVOR", "RUROS", "RUVGG", "RUTAM", 
-        "RULIP", "RUMOS", "RUMOW", "RUKLU", "RUTUL", "RURYA", "RUAST", "RUKL", 
+        "RUORL", "RUBEL", "RUKRS", "RUBRY", "RUVOR", "RUROS", "RUVGG", "RUTAM",
+        "RULIP", "RUMOS", "RUMOW", "RUKLU", "RUTUL", "RURYA", "RUAST", "RUKL",
         "RUSTA", "RUKDA", "RUSAR", "RUPNZ", "RUDA"
-    ]; 
-    
+    ];
+
     const visibleRusFeatures = rusGeo.features.filter(d => westernRussiaIds.includes(d.properties.id));
     const restOfRusFeatures = rusGeo.features.filter(d => !westernRussiaIds.includes(d.properties.id));
-    
-    // Projection and Path
-    const projection = d3.geoConicConformal()
-        .parallels([44, 52])
-        .rotate([-31, 0]);
 
-    // Fit projection to combined extent of Ukraine + visible Russia
-    const extentFeatures = { type: "FeatureCollection", features: [...ukrGeo.features, ...visibleRusFeatures] };
+    const projection = d3.geoIdentity()
+        .reflectY(true); // Fondamentale per non avere la mappa capovolta con dati Lat/Lon
+
+    // --- MODIFICA QUI ---
+    // Invece di [...ukrGeo.features, ...visibleRusFeatures], usiamo solo ukrGeo.features
+    // Questo farà sì che lo zoom iniziale riempia lo schermo con l'Ucraina.
+    const extentFeatures = { type: "FeatureCollection", features: ukrGeo.features };
 
     // Apply a zoom level to have some margin
-    const ZOOM_LEVEL = 1.25; 
+    // Puoi lasciare 1.1 o ridurlo a 1.0 se la vuoi ancora più grande
+    const ZOOM_LEVEL = 1.1;
     const expandedWidth = (width * 0.9) * ZOOM_LEVEL;
     const expandedHeight = (height - 30) * ZOOM_LEVEL;
     const dx = (width - expandedWidth) / 2;
@@ -84,16 +85,18 @@ Promise.all([
 
     // Fit with margins
     projection.fitExtent(
-        [[dx, dy], [dx + expandedWidth, dy + expandedHeight]], 
+        [[dx, dy], [dx + expandedWidth, dy + expandedHeight]],
         extentFeatures
     );
-    
-    // Adjust translate for better centering
-    const currentTranslate = projection.translate();
+
+    // Adjust translate for better centering (Opzionale: aggiusta questi valori se la mappa non è perfettamente centrata)
+    // Con geoIdentity spesso il fitExtent è più preciso e potresti non aver bisogno di offset manuali grandi.
+    /* const currentTranslate = projection.translate();
     projection.translate([
-        currentTranslate[0] + 55,  
-        currentTranslate[1] - 80 
+        currentTranslate[0] + 20,  
+        currentTranslate[1] - 20 
     ]);
+    */
 
     // Path generator
     const pathGenerator = d3.geoPath().projection(projection);
@@ -102,7 +105,7 @@ Promise.all([
     const processData = (data, type) => {
         data.forEach(d => {
             d.date = parseDate(d.event_date);
-            d.datasetType = type; 
+            d.datasetType = type;
             const coords = projection([+d.longitude, +d.latitude]);
             if (coords) { d.x = coords[0]; d.y = coords[1]; }
         });
@@ -116,15 +119,15 @@ Promise.all([
 
     // --- SVG Setup (Responsive) ---        check with css style, could be redundant
     container
-        .style("position", "relative") 
-        .style("width", "100%")       
-        .style("height", "auto")      
-        .style("aspect-ratio", "1000 / 700") 
-        .style("background-color", "#f8f9fa") 
-        .style("border", "1px solid #dee2e6")  
-        .style("border-radius", "8px")         
+        .style("position", "relative")
+        .style("width", "100%")
+        .style("height", "auto")
+        .style("aspect-ratio", "1000 / 700")
+        .style("background-color", "#f8f9fa")
+        .style("border", "1px solid #dee2e6")
+        .style("border-radius", "8px")
         .style("margin", "0 auto")
-        .style("overflow", "hidden"); 
+        .style("overflow", "hidden");
 
     // SVG Element                          check with css style, could be redundant
     const svg = container.append("svg")
@@ -132,8 +135,8 @@ Promise.all([
         .style("position", "absolute")
         .style("top", 0)
         .style("left", 0)
-        .style("width", "100%")  
-        .style("height", "100%")  
+        .style("width", "100%")
+        .style("height", "100%")
         .style("z-index", 1);
 
     // Clip Path for Russia Mask
@@ -142,7 +145,7 @@ Promise.all([
     defs.append("clipPath")
         .attr("id", "clip-russia-full-mask")
         .selectAll("path")
-        .data(rusGeo.features) 
+        .data(rusGeo.features)
         .join("path")
         .attr("d", pathGenerator);
 
@@ -161,62 +164,93 @@ Promise.all([
         .style("z-index", 9999);
 
     // Tooltip Handlers
-    const handleMouseOver = function(event, d) {
+    const handleMouseOver = function (event, d) {
         d3.select(this).attr("fill-opacity", 0.8);
         const regionName = d.properties.COUNTRY || d.properties.name || d.properties.NAME || "Region";
         tooltip.style("opacity", 1).text(regionName);
     };
-    const handleMouseMove = function(event) {
+    const handleMouseMove = function (event) {
         tooltip.style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 15) + "px");
     };
-    const handleMouseOut = function() {
-        d3.select(this).attr("fill-opacity", 1); 
+    const handleMouseOut = function () {
+        d3.select(this).attr("fill-opacity", 1);
         tooltip.style("opacity", 0);
     };
 
     // --- Draw map ---
-    // Neighbor Countries
+
+    // 1. Neighbor Countries (Sfondo)
     mapGroup.append("g").selectAll("path").data(neighborsFeatures).join("path")
-        .attr("d", pathGenerator).attr("fill", "#e9ecef").attr("stroke", "#ffffff").attr("stroke-width", 1)
+        .attr("d", pathGenerator)
+        .attr("fill", "#e9ecef")
+        .attr("stroke", "#ffffff")
+        .attr("stroke-width", 1)
+        .attr("vector-effect", "non-scaling-stroke")
         .on("mouseover", handleMouseOver).on("mousemove", handleMouseMove).on("mouseout", handleMouseOut);
 
-    // Rest of Russia
+    // 2. Rest of Russia (Sfondo)
     mapGroup.append("g").selectAll("path").data(restOfRusFeatures).join("path")
-        .attr("d", pathGenerator).attr("fill", "#cfd2d6").attr("fill-opacity", 1).attr("stroke", "#ffffff").attr("stroke-width", 0.5)
+        .attr("d", pathGenerator)
+        .attr("fill", "#cfd2d6")
+        .attr("fill-opacity", 1)
+        .attr("stroke", "#ffffff")
+        .attr("stroke-width", 0.5)
+        .attr("vector-effect", "non-scaling-stroke")
         .on("mouseover", handleMouseOver).on("mousemove", handleMouseMove).on("mouseout", handleMouseOut);
 
-    // Ukraine
+    // 3. Ukraine (Livello medio)
     mapGroup.append("g").selectAll("path").data(ukrGeo.features).join("path")
-        .attr("d", pathGenerator).attr("fill", "#cfd2d6").attr("stroke", "#ffffff").attr("stroke-width", 1)
+        .attr("d", pathGenerator)
+        .attr("fill", "#cfd2d6")
+        .attr("stroke", "#ffffff")
+        .attr("stroke-width", 1)
+        .attr("vector-effect", "non-scaling-stroke")
         .on("mouseover", handleMouseOver).on("mousemove", handleMouseMove).on("mouseout", handleMouseOut);
 
-    // Western Russia
+    // 4. Western Russia (Livello medio)
     mapGroup.append("g").selectAll("path").data(visibleRusFeatures).join("path")
-        .attr("d", pathGenerator).attr("fill", "#cfd2d6").attr("stroke", "#ffffff").attr("stroke-width", 1)
+        .attr("d", pathGenerator)
+        .attr("fill", "#cfd2d6")
+        .attr("stroke", "#ffffff")
+        .attr("stroke-width", 1)
+        .attr("vector-effect", "non-scaling-stroke")
         .on("mouseover", handleMouseOver).on("mousemove", handleMouseMove).on("mouseout", handleMouseOut);
 
-    // Russia-Ukraine Border Highlight
-    mapGroup.append("g").attr("clip-path", "url(#clip-russia-full-mask)").style("pointer-events", "none") 
-        .selectAll("path").data(ukrGeo.features).join("path")
-        .attr("d", pathGenerator).attr("fill", "none").attr("stroke", "#6a9c71").attr("stroke-width", 4)
-        .attr("stroke-linejoin", "round").attr("stroke-linecap", "round");
+    // 5. Russia-Ukraine Border Highlight (PRIMO PIANO)
+    // Usiamo .raise() per assicurarci che sia l'ultimo elemento SVG disegnato
+    const borderGroup = mapGroup.append("g")
+        .attr("clip-path", "url(#clip-russia-full-mask)")
+        .style("pointer-events", "none"); // Click passano attraverso
 
-    
+    borderGroup.selectAll("path")
+        .data(ukrGeo.features)
+        .join("path")
+        .attr("d", pathGenerator)
+        .attr("fill", "none")
+        .attr("stroke", "#6a9c71")
+        .attr("stroke-width", 4)
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-linecap", "round")
+        .attr("vector-effect", "non-scaling-stroke");
+
+    // FORZA IN PRIMO PIANO:
+    borderGroup.raise();
+
     // Gruppo dedicato agli Highlights degli eventi
     const highlightGroup = mapGroup.append("g").attr("class", "event-highlights");
 
     // --- Canvas Setup for Points (Responsive)---
     const canvas = container.append("canvas")
-        .attr("width", width)  
-        .attr("height", height) 
+        .attr("width", width)
+        .attr("height", height)
         .style("position", "absolute")
         .style("top", 0)
         .style("left", 0)
-        .style("width", "100%")  
-        .style("height", "100%") 
+        .style("width", "100%")
+        .style("height", "100%")
         .style("z-index", 2)
-        .style("pointer-events", "none"); 
-    
+        .style("pointer-events", "none");
+
     const ctx = canvas.node().getContext("2d");
 
     // --- Canvas Drawing Logic ---
@@ -234,7 +268,7 @@ Promise.all([
         ctx.scale(currentTransform.k, currentTransform.k);
 
         const currentDate = days[currentIndex];
-        const r = 4 / currentTransform.k; 
+        const r = 4 / currentTransform.k;
         const lineWidth = 0.5 / currentTransform.k;
 
         for (let i = 0; i < visiblePoints.length; i++) {
@@ -294,7 +328,7 @@ Promise.all([
         // Animazione di apparizione (pop)
         circle.transition().duration(600).ease(d3.easeElasticOut)
             .attr("r", event.radius || 25);
-            
+
         // Opzionale: Aggiungi un anello che pulsa per attirare l'attenzione
         const pulse = highlightGroup.append("circle")
             .attr("cx", x)
@@ -304,13 +338,13 @@ Promise.all([
             .attr("stroke", "#ff0000")
             .attr("stroke-width", 2)
             .style("opacity", 1);
-            
+
         // Loop infinito di pulsazione
         function repeatPulse() {
             pulse.transition().duration(1500)
                 .attr("r", (event.radius || 25) * 1.5)
                 .style("opacity", 0)
-                .on("end", function() {
+                .on("end", function () {
                     d3.select(this).attr("r", event.radius || 25).style("opacity", 1);
                     repeatPulse();
                 });
@@ -319,25 +353,13 @@ Promise.all([
     }
 
 
-    // --- Zoom Logic (before) ---
-    /*
     const zoom = d3.zoom()
         .scaleExtent([1, 12])
+        // .translateExtent([[-80, -100], [width + 120, height + 20]]) // <--- RIMUOVI O COMMENTA QUESTA RIGA
         .on("zoom", (event) => {
             mapGroup.attr("transform", event.transform);
             currentTransform = event.transform;
-            render(); // Ridisegna i punti
-            tooltip.style("opacity", 0);
-        });*/
-
-    // --- Zoom Logic with limit box ---    
-    const zoom = d3.zoom()
-        .scaleExtent([1, 12])
-        .translateExtent([[-80, -100], [width + 120, height + 20]])
-        .on("zoom", (event) => {
-            mapGroup.attr("transform", event.transform);
-            currentTransform = event.transform;
-            render(); 
+            render();
             tooltip.style("opacity", 0);
         });
 
@@ -350,18 +372,18 @@ Promise.all([
 
 
     // --- Filter Buttons Logic ---
-    d3.selectAll("#filter-container .btn-compact").on("click", function() {
-        d3.selectAll("#filter-container .btn-compact").classed("active", false); 
-        d3.select(this).classed("active", true); 
-        activeFilter = d3.select(this).attr("data-type"); 
-        updateVisibleData(); 
+    d3.selectAll("#filter-container .btn-compact").on("click", function () {
+        d3.selectAll("#filter-container .btn-compact").classed("active", false);
+        d3.select(this).classed("active", true);
+        activeFilter = d3.select(this).attr("data-type");
+        updateVisibleData();
     });
 
-    
+
     // --- Timeline Slider and Play/Pause Logic ---
     const slider = d3.select("#time-slider").attr("max", days.length - 1);
     const playButton = d3.select("#play-button");
-    const playText = d3.select("#play-text"); 
+    const playText = d3.select("#play-text");
 
     // Function to update state and render: overlap effect
     function updateStateAndRender() {
@@ -377,7 +399,7 @@ Promise.all([
         updateStateAndRender();
     });*/
 
-    slider.on("input", function() {
+    slider.on("input", function () {
         currentIndex = +this.value;
         clearHighlight(); // <--- AGGIUNGI QUESTO: Rimuovi highlights se l'utente muove il tempo
         updateStateAndRender();
@@ -387,7 +409,7 @@ Promise.all([
     let isPlaying = false;
 
     // Play/Pause Logic
-    playButton.on("click", function() {
+    playButton.on("click", function () {
         if (isPlaying) {
             clearInterval(timer);
             playText.text("Play");
@@ -414,10 +436,10 @@ Promise.all([
             // ... dentro playButton.on("click") ...
             timer = setInterval(() => {
                 currentIndex++;
-                
+
                 // Se l'utente preme play, puliamo eventuali highlights attivi
-                if(currentIndex % 5 === 0) clearHighlight(); // Check leggero per non chiamarlo ogni ms
-                
+                if (currentIndex % 5 === 0) clearHighlight(); // Check leggero per non chiamarlo ogni ms
+
                 slider.property("value", currentIndex);
                 updateStateAndRender();
                 // ...
@@ -438,42 +460,42 @@ Promise.all([
 
     // Aggiungi coords: [lon, lat] e radius (opzionale, default a 20)
     const significantEvents = [
-        { 
-            date: "2022-02-24", 
-            title: "Invasione su larga scala", 
+        {
+            date: "2022-02-24",
+            title: "Invasione su larga scala",
             coords: [30.5234, 50.4501], // Kyiv come centro simbolico
             radius: 50 // Più grande per l'intero paese/invasione
         },
-        { 
-            date: "2022-04-01", 
-            title: "Ritiro dal nord (Kyiv)", 
+        {
+            date: "2022-04-01",
+            title: "Ritiro dal nord (Kyiv)",
             coords: [30.5234, 50.4501], // Kyiv
             radius: 30
         },
-        { 
-            date: "2022-09-06", 
-            title: "Controffensiva Kharkiv", 
+        {
+            date: "2022-09-06",
+            title: "Controffensiva Kharkiv",
             coords: [36.2304, 49.9935], // Kharkiv
             radius: 30
         },
-        { 
-            date: "2022-11-11", 
-            title: "Liberazione Kherson", 
+        {
+            date: "2022-11-11",
+            title: "Liberazione Kherson",
             coords: [32.6169, 46.6354], // Kherson
             radius: 25
         },
-        { 
-            date: "2023-05-20", 
-            title: "Presa di Bakhmut", 
+        {
+            date: "2023-05-20",
+            title: "Presa di Bakhmut",
             coords: [38.0025, 48.5947], // Bakhmut
             radius: 15 // Più piccola, battaglia localizzata
         }
     ];
 
     const markersContainer = document.getElementById('timeline-markers');
-    if(markersContainer) markersContainer.innerHTML = "";
+    if (markersContainer) markersContainer.innerHTML = "";
 
-    const mapStartDate = days[0]; 
+    const mapStartDate = days[0];
     const mapEndDate = days[days.length - 1];
     const totalTime = mapEndDate - mapStartDate;
 
@@ -492,15 +514,15 @@ Promise.all([
         // Create tick element
         const tick = document.createElement('div');
         tick.className = 'timeline-tick';
-        
+
         // Set ID for reference (important to manage visibility on update)
-        tick.id = `tick-${exactIndex}`; 
-        
+        tick.id = `tick-${exactIndex}`;
+
         tick.style.left = percent + '%';
-        
+
         // Bootstrap Tooltip attributes
         tick.setAttribute('data-bs-toggle', 'tooltip');
-        tick.setAttribute('data-bs-placement', 'top'); 
+        tick.setAttribute('data-bs-placement', 'top');
         tick.setAttribute('title', fullLabel);
 
         // Click event to jump to date
@@ -515,18 +537,18 @@ Promise.all([
         // ... dentro significantEvents.forEach ...
 
         // Click event to jump to date
-        tick.addEventListener('click', function(e) {
-            e.stopPropagation(); 
+        tick.addEventListener('click', function (e) {
+            e.stopPropagation();
             currentIndex = exactIndex;
-            slider.property("value", currentIndex);            
-            
-            updateStateAndRender(); 
-            
+            slider.property("value", currentIndex);
+
+            updateStateAndRender();
+
             // --- NUOVA RIGA: Disegna l'highlight specifico per questo evento ---
-            drawEventHighlight(event); 
+            drawEventHighlight(event);
         });
 
-        if(markersContainer) markersContainer.appendChild(tick);
+        if (markersContainer) markersContainer.appendChild(tick);
         new bootstrap.Tooltip(tick);
     });
 
