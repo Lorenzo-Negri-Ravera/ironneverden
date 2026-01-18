@@ -96,46 +96,55 @@ function initFoodChart() {
                     return (!activeFocusKey || id === targetId) ? 3.5 : 2;
                 });
 
-            legendContainer.selectAll("button")
+            legendContainer.selectAll(".legend-btn")
                 .style("opacity", function() {
-                    return (!activeFocusKey || this.__key__ === activeFocusKey) ? 1 : 0.4;
+                    return (!activeFocusKey || this.__key__ === activeFocusKey) ? 1 : 0.35;
+                })
+                .style("background", function() {
+                    return (activeFocusKey && this.__key__ === activeFocusKey) ? "#f0f0f0" : "transparent";
                 });
         }
 
-        // LEGENDA (distanza column-gap-5 per matchare Food Chart)
-        legendContainer.attr("class", "d-flex flex-wrap justify-content-center align-items-center column-gap-5 row-gap-1 mt-1");
+        // --- CREAZIONE LEGENDA CON DISTANZA MAGGIORE ---
+        // column-gap-5 (Bootstrap) o gap: 3rem aumenta lo spazio orizzontale
+        legendContainer.attr("class", "d-flex flex-wrap justify-content-center align-items-center mt-4")
+            .style("column-gap", "50px") // Spazio orizzontale tra i blocchi
+            .style("row-gap", "15px");    // Spazio verticale se vanno a capo
+
         keys.forEach(key => {
-            const btn = legendContainer.append("button")
-                .attr("class", "btn-compact d-flex align-items-center gap-2 p-0 w-auto flex-grow-0 border-0 bg-transparent");
-            
+            const btn = legendContainer.append("div")
+                .attr("class", "legend-btn d-flex align-items-center gap-2")
+                .style("cursor", "pointer")
+                .style("padding", "6px 12px") // Spazio interno al tasto
+                .style("border-radius", "20px")
+                .style("transition", "all 0.2s ease");
+
             btn.append("span")
-                .style("width", "10px").style("height", "10px")
-                .style("background-color", color(key)).style("border-radius", "50%").style("display", "inline-block");
-            
+                .style("width", "14px").style("height", "14px")
+                .style("background-color", color(key))
+                .style("border-radius", "50%")
+                .style("display", "inline-block");
+
             btn.append("span")
-                .text(key).style("font-size", "12px").style("font-weight", "600").style("color", "#25282A").style("white-space", "nowrap");
-            
+                .text(key)
+                .style("font-size", "14px")
+                .style("font-weight", "600")
+                .style("color", "#444");
+
+            btn.node().__key__ = key;
+
             btn.on("click", function() {
                 activeFocusKey = (activeFocusKey === key) ? null : key;
                 updateFocus();
             });
             
-            btn.node().__key__ = key;
+            // Hover effect leggero
+            btn.on("mouseover", function() {
+                if (!activeFocusKey) d3.select(this).style("background", "#f8f9fa");
+            }).on("mouseout", function() {
+                if (!activeFocusKey || activeFocusKey !== key) d3.select(this).style("background", "transparent");
+            });
         });
-
-        // HELP BUTTON
-        const helpContent = {
-            title: "Understanding Food Price Trends",
-            steps: [
-                "<strong>Y-Axis:</strong> Food price index values over time.",
-                "<strong>Categories:</strong> Different food categories tracked monthly.",
-                "<strong>Focus:</strong> Click a legend category to isolate its trend line."
-            ]
-        };
-
-        if (typeof createChartHelp === "function") {
-            createChartHelp("#food-help-container", "#food-chart-container", helpContent);
-        }
 
         // --- TOOLTIP ---
         const tooltip = d3.select("#food-chart-tooltip");
