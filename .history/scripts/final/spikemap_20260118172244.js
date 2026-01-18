@@ -14,8 +14,8 @@
     const SPIKE_WIDTH = 8; 
 
     // Colors
-    const COLOR_BATTLES = "#ff6361"; // Rosso
-    const COLOR_EXPLOSIONS = "#ffa600"; // Giallo
+    const COLOR_BATTLES = "#dc3545"; // Rosso
+    const COLOR_EXPLOSIONS = "#ffd700"; // Giallo
     const COLOR_STROKE = "#8e0000";
 
     // Regions name
