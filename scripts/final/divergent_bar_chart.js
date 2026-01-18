@@ -218,4 +218,18 @@
 
     }).catch(e => console.error("Error loading divergence data:", e));
 
+    // How to read the chart
+    const divergingHelpContent = {
+        title: "How to read the Map",
+        steps: [
+            "<strong>TODO</strong>",
+            ]
+        };
+
+        if (typeof createChartHelp === "function") {
+            createChartHelp("#diverging-help-container", "#divergence-wrapper", divergingHelpContent);
+        } else {
+            console.warn("createChartHelp non trovata.");
+        }
+
 })();

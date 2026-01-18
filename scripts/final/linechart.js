@@ -187,5 +187,19 @@ function initFoodChart() {
                 mouseLine.style("opacity", 0);
             });
 
+            // How to read the chart
+        const linechartHelp = {
+            title: "How to read the Map",
+            steps: [
+                "<strong>TODO</strong>",
+                ]
+            };
+
+            if (typeof createChartHelp === "function") {
+                createChartHelp("#food-help-container", "#food-chart-wrapper", linechartHelp);
+            } else {
+                console.warn("createChartHelp non trovata.");
+            }
+
     }).catch(err => console.error("Errore Food Chart:", err));
 }

@@ -253,4 +253,18 @@
         }
     }
 
+    // How to read the chart
+    const sunburstHelpContent = {
+        title: "How to read the Map",
+        steps: [
+            "<strong>TODO</strong>",
+            ]
+        };
+
+        if (typeof createChartHelp === "function") {
+            createChartHelp("#sunburts-help-container", "#sunburst-wrapper", sunburstHelpContent);
+        } else {
+            console.warn("createChartHelp non trovata.");
+        }
+
 })();
