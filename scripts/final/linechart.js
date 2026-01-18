@@ -63,7 +63,8 @@ function initFoodChart() {
             .call(g => g.select(".domain").remove())
             .selectAll("line")
             .style("stroke", "#eee")
-            .style("stroke-dasharray", "4,4");
+            .style("stroke-dasharray", "4,4")
+            .filter(d => d === 0).remove();
 
         // LINEE
         const lineGen = (key) => d3.line().curve(d3.curveMonotoneX).x(d => x(d.Date)).y(d => y(d[key]));
@@ -150,7 +151,9 @@ function initFoodChart() {
         const tooltip = d3.select("#food-chart-tooltip");
         const mouseLine = svg.append("line")
             .attr("y1", 0).attr("y2", height)
-            .style("stroke", "#ccc").style("stroke-width", "1px").style("stroke-dasharray", "4,4")
+            .style("stroke", "#ccc")
+            .style("stroke-width", "1px")
+            .style("stroke-dasharray", "4,4")
             .style("opacity", 0);
 
         const bisect = d3.bisector(d => d.Date).left;
