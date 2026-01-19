@@ -1,0 +1,11 @@
+unit,Unit of measure,Currency,TIME_PERIOD,OBS_VALUE
+KWH,Kilowatt-hour,Euro,2020-S2,0.048
+KWH,Kilowatt-hour,Euro,2021-S1,0.0412
+KWH,Kilowatt-hour,Euro,2021-S2,0.0548
+KWH,Kilowatt-hour,Euro,2022-S1,0.0621
+KWH,Kilowatt-hour,Euro,2022-S2,0.0971
+KWH,Kilowatt-hour,Euro,2023-S1,0.0936
+KWH,Kilowatt-hour,Euro,2023-S2,0.091
+KWH,Kilowatt-hour,Euro,2024-S1,0.0802
+KWH,Kilowatt-hour,Euro,2024-S2,0.0871
+KWH,Kilowatt-hour,Euro,2025-S1,0.0788
