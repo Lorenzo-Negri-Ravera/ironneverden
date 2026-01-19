@@ -354,8 +354,13 @@ Promise.all([
 
 
     const zoom = d3.zoom()
-        .scaleExtent([1, 12])
-        // .translateExtent([[-80, -100], [width + 120, height + 20]]) // <--- RIMUOVI O COMMENTA QUESTA RIGA
+        .scaleExtent([1, 12]) // Limita lo zoom in/out (min 1x, max 12x)
+        // Definisce il recinto: [[minX, minY], [maxX, maxY]]
+        // Aggiungiamo un margine di 100px per dare un po' di respiro ai bordi
+        .translateExtent([
+            [-100, -100],
+            [width + 100, height + 100]
+        ])
         .on("zoom", (event) => {
             mapGroup.attr("transform", event.transform);
             currentTransform = event.transform;
