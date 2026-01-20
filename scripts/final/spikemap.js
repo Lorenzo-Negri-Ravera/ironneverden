@@ -1,17 +1,17 @@
-(function() { 
-    
+(function () {
+
     // --- Configurations ---
     const PATHS = {
-        geoRegion: "../../data/final/spike/region/UKR.json", 
+        geoRegion: "../../data/final/spike/region/UKR.json",
         geoDistrict: "../../data/final/spike/district/Ukraine_ADM2.topojson",
-        geoComuni: "../../data/final/spike/municipals/Ukraine_ADM3.topojson", 
-        dataRegion: "../../data/final/spike/region/spikemap_ukr_region.csv", 
+        geoComuni: "../../data/final/spike/municipals/Ukraine_ADM3.topojson",
+        dataRegion: "../../data/final/spike/region/spikemap_ukr_region.csv",
         dataDistrict: "../../data/final/spike/district/spikemap_ukr_province.csv",
         dataComuni: "../../data/final/spike/municipals/spikemap_ukr_municipal.csv"
     };
     const width = 1000;
-    const height = 650;
-    const SPIKE_WIDTH = 8; 
+    const height = 700;
+    const SPIKE_WIDTH = 8;
 
     // Colors
     const COLOR_BATTLES = "#ff6361"; // Rosso
@@ -41,16 +41,19 @@
         return geoName;
     };
 
-    d3.select("#spike-controls").remove();
-    d3.select("#spike-container").style("position", "relative");
-    
-    const svg = d3.select("#spike-container")
-        .attr("viewBox", [0, 0, width, height])
-        .style("overflow", "hidden")
-        .style("cursor", "move");
+    // SOSTITUISCI CON QUESTO:
+    const container = d3.select("#spike-container");
+    container.selectAll("*").remove(); // Pulisci eventuali vecchi SVG
 
-    svg.selectAll("*").remove();
-    
+    // Crea l'SVG dentro il DIV container
+    const svg = container.append("svg")
+        .attr("viewBox", [0, 0, width, height]) // Mantiene la responsività
+        .style("overflow", "hidden")
+        .style("cursor", "grab")
+        .style("display", "block")
+        .style("width", "100%")
+        .style("height", "100%");
+
     // Aggiungi definizione gradiente
     const defs = svg.append("defs");
     const gradient = defs.append("linearGradient")
@@ -59,35 +62,35 @@
         .attr("y1", "100%")
         .attr("x2", "0%")
         .attr("y2", "0%");
-    
+
     gradient.append("stop")
         .attr("offset", "0%")
         .attr("stop-color", COLOR_EXPLOSIONS);
-    
+
     gradient.append("stop")
         .attr("offset", "100%")
         .attr("stop-color", COLOR_BATTLES);
 
     const g = svg.append("g");
 
-    const lenScale = d3.scaleSqrt().range([0, 180]); 
+    const lenScale = d3.scaleSqrt().range([0, 180]);
 
     // --- Zoom Logic ---
     const zoom = d3.zoom()
-        .scaleExtent([1, 8]) 
-        .translateExtent([[0, 0], [width, height]]) 
+        .scaleExtent([1, 8])
+        .translateExtent([[0, 0], [width, height]])
         .on("zoom", (event) => {
-            const currentK = event.transform.k; 
+            const currentK = event.transform.k;
             g.attr("transform", event.transform);
             g.selectAll(".map-layer path").attr("stroke-width", 1.5 / currentK);
             const scaledWidth = SPIKE_WIDTH / currentK;
-            d3.select("#spike-container").selectAll(".spike-group").each(function(d) {
-                const val = d.value; 
+            d3.select("#spike-container").selectAll(".spike-group").each(function (d) {
+                const val = d.value;
                 const h = (lenScale(val) < 2 && val === 0) ? 5 : lenScale(val);
                 d3.select(this).select(".spike-visual")
-                    .attr("d", `M${d.x-scaledWidth/2},${d.y} L${d.x},${d.y-h} L${d.x+scaledWidth/2},${d.y} Z`);
+                    .attr("d", `M${d.x - scaledWidth / 2},${d.y} L${d.x},${d.y - h} L${d.x + scaledWidth / 2},${d.y} Z`);
                 d3.select(this).select(".spike-hitbox")
-                    .attr("d", `M${d.x-Math.max(scaledWidth, 5/currentK)/2},${d.y} L${d.x},${d.y-(h < 25 ? 25 : h)} L${d.x+Math.max(scaledWidth, 5/currentK)/2},${d.y} Z`); 
+                    .attr("d", `M${d.x - Math.max(scaledWidth, 5 / currentK) / 2},${d.y} L${d.x},${d.y - (h < 25 ? 25 : h)} L${d.x + Math.max(scaledWidth, 5 / currentK) / 2},${d.y} Z`);
             });
         });
 
@@ -103,9 +106,9 @@
         tooltip = d3.select("body").append("div").attr("class", "shared-tooltip")
             .style("position", "absolute").style("visibility", "hidden")
             .style("background", "rgba(255, 255, 255, 0.96)")
-            .style("border", "1px solid #ccc") 
-            .style("padding", "8px 10px") 
-            .style("border-radius", "4px") 
+            .style("border", "1px solid #ccc")
+            .style("padding", "8px 10px")
+            .style("border-radius", "4px")
             .style("font-family", "sans-serif").style("font-size", "12px")
             .style("pointer-events", "none").style("z-index", "10000")
             .style("box-shadow", "0 2px 8px rgba(0,0,0,0.15)");
@@ -115,7 +118,7 @@
     const path = d3.geoPath().projection(projection);
 
     const mapLayer = g.append("g").attr("class", "map-layer");
-    const spikeLayer = g.append("g").attr("class", "spike-layer"); 
+    const spikeLayer = g.append("g").attr("class", "spike-layer");
     const legendLayer = svg.append("g").attr("class", "legend-layer");
 
     const safeJson = (url) => d3.json(url).catch(e => { console.warn("Missing JSON:", url); return null; });
@@ -123,14 +126,14 @@
 
     Promise.all([
         d3.json(PATHS.geoRegion),
-        d3.json(PATHS.geoDistrict), 
-        safeJson(PATHS.geoComuni), 
+        d3.json(PATHS.geoDistrict),
+        safeJson(PATHS.geoComuni),
         safeCsv(PATHS.dataRegion),
-        d3.csv(PATHS.dataDistrict), 
+        d3.csv(PATHS.dataDistrict),
         d3.csv(PATHS.dataComuni)
     ]).then(([geoReg, topoDist, geoComuniRaw, csvRegion, csvDist, csvComuni]) => {
 
-        let currentK = 1; 
+        let currentK = 1;
         const getGeo = (topo) => (topo && topo.type === "Topology") ? topojson.feature(topo, topo.objects[Object.keys(topo.objects)[0]]) : topo;
         const geoDist = getGeo(topoDist);
         const geoComuni = getGeo(geoComuniRaw);
@@ -152,7 +155,7 @@
                     const match = uniqueNames.find(c => {
                         const normCsv = normalize(c);
                         if (NAME_MAPPING[normCsv]) return normGeo.includes(NAME_MAPPING[normCsv]);
-                        if (normCsv === "kyiv" && normGeo.includes("city")) return false; 
+                        if (normCsv === "kyiv" && normGeo.includes("city")) return false;
                         if (normCsv === "kyiv city" && !normGeo.includes("city")) return false;
                         return normCsv === normGeo || normGeo.includes(normCsv) || normCsv.includes(normGeo);
                     });
@@ -172,26 +175,26 @@
         // --- MAP LAYER ---
         mapLayer.selectAll("path").data(geoReg.features).join("path")
             .attr("d", path).attr("fill", "#e9ecef").attr("stroke", "#fff").attr("stroke-width", 1.5)
-            .on("mouseover", function(e, d) {
+            .on("mouseover", function (e, d) {
                 d3.select(this).attr("fill", "#dee2e6");
                 tooltip.style("visibility", "visible")
                     .html(`<div style="font-weight:700; font-size:13px; color:#222;">${getCleanNameFromGeo(d.properties.NAME_1 || d.properties.name)}</div>`);
             })
-            .on("mousemove", e => tooltip.style("top", (e.pageY-15)+"px").style("left", (e.pageX+15)+"px"))
-            .on("mouseout", function() { d3.select(this).attr("fill", "#e9ecef"); tooltip.style("visibility", "hidden"); });
+            .on("mousemove", e => tooltip.style("top", (e.pageY - 15) + "px").style("left", (e.pageX + 15) + "px"))
+            .on("mouseout", function () { d3.select(this).attr("fill", "#e9ecef"); tooltip.style("visibility", "hidden"); });
 
-        function spikePath(x, y, h, w) { return `M${x-w/2},${y} L${x},${y-h} L${x+w/2},${y} Z`; }
+        function spikePath(x, y, h, w) { return `M${x - w / 2},${y} L${x},${y - h} L${x + w / 2},${y} Z`; }
         function getHeight(val) { const h = lenScale(val); return (h < 2 && val === 0) ? 5 : h; }
 
         zoom.on("zoom", (event) => {
-            currentK = event.transform.k; 
+            currentK = event.transform.k;
             g.attr("transform", event.transform);
             g.selectAll(".map-layer path").attr("stroke-width", 1.5 / currentK);
             const scaledWidth = SPIKE_WIDTH / currentK;
-            spikeLayer.selectAll(".spike-group").each(function(d) {
+            spikeLayer.selectAll(".spike-group").each(function (d) {
                 const h = getHeight(d.value);
                 d3.select(this).select(".spike-visual").attr("d", spikePath(d.x, d.y, h, scaledWidth));
-                d3.select(this).select(".spike-hitbox").attr("d", spikePath(d.x, d.y, h < 25 ? 25 : h, Math.max(scaledWidth, 5/currentK))); 
+                d3.select(this).select(".spike-hitbox").attr("d", spikePath(d.x, d.y, h < 25 ? 25 : h, Math.max(scaledWidth, 5 / currentK)));
             });
         });
 
@@ -199,10 +202,10 @@
         function updateControlStyles() {
             const batCheck = d3.select("#check-battles");
             const expCheck = d3.select("#check-explosions");
-            
+
             const batLabel = d3.select('label[for="check-battles"]');
             const expLabel = d3.select('label[for="check-explosions"]');
-            
+
             if (batCheck.property("checked")) {
                 batLabel.style("background", `linear-gradient(90deg, ${COLOR_BATTLES} 0%, ${COLOR_BATTLES} 20px, rgba(220, 53, 69, 0.1) 20px)`);
                 batLabel.style("border-left", `4px solid ${COLOR_BATTLES}`);
@@ -212,7 +215,7 @@
                 batLabel.style("border-left", "");
                 batLabel.style("font-weight", "normal");
             }
-            
+
             if (expCheck.property("checked")) {
                 expLabel.style("background", `linear-gradient(90deg, ${COLOR_EXPLOSIONS} 0%, ${COLOR_EXPLOSIONS} 20px, rgba(255, 215, 0, 0.1) 20px)`);
                 expLabel.style("border-left", `4px solid ${COLOR_EXPLOSIONS}`);
@@ -222,12 +225,12 @@
                 expLabel.style("border-left", "");
                 expLabel.style("font-weight", "normal");
             }
-            
+
             // Stili per i radio buttons dei livelli (region, district, municipals)
-            d3.selectAll('input[name="mapLevel"]').each(function() {
+            d3.selectAll('input[name="mapLevel"]').each(function () {
                 const radio = d3.select(this);
                 const label = d3.select(`label[for="${this.id}"]`);
-                
+
                 if (radio.property("checked")) {
                     label.style("font-weight", "bold");
                     label.style("color", "#000");
@@ -243,7 +246,7 @@
         function createSharpGradient(id, battlesPerc) {
             // Rimuovi gradiente esistente se presente
             defs.select(`#${id}`).remove();
-            
+
             // Crea nuovo gradiente con cambio netto
             const grad = defs.append("linearGradient")
                 .attr("id", id)
@@ -251,33 +254,33 @@
                 .attr("y1", "100%")
                 .attr("x2", "0%")
                 .attr("y2", "0%");
-            
+
             // Stop esplosioni (giallo in basso)
             grad.append("stop")
                 .attr("offset", "0%")
                 .attr("stop-color", COLOR_EXPLOSIONS);
-            
+
             // Cambio netto al punto di transizione
             grad.append("stop")
                 .attr("offset", battlesPerc + "%")
                 .attr("stop-color", COLOR_EXPLOSIONS);
-            
+
             grad.append("stop")
                 .attr("offset", battlesPerc + "%")
                 .attr("stop-color", COLOR_BATTLES);
-            
+
             // Stop battles (rosso in alto)
             grad.append("stop")
                 .attr("offset", "100%")
                 .attr("stop-color", COLOR_BATTLES);
-            
+
             return `url(#${id})`;
         }
 
         function getSpikeColor(d, showBat, showExp) {
             const b = d.details["Battles"] || 0;
             const ex = d.details["Explosions/Remote violence"] || 0;
-            
+
             if (showBat && showExp && b > 0 && ex > 0) {
                 // Modalità gradient con cambio netto
                 const total = b + ex;
@@ -293,7 +296,7 @@
         }
 
         function updateSpikes() {
-            updateControlStyles(); 
+            updateControlStyles();
             const radioNode = d3.select('input[name="mapLevel"]:checked').node();
             const level = radioNode ? radioNode.value : "district";
             const showBat = d3.select("#check-battles").property("checked");
@@ -327,15 +330,15 @@
                 // Verifica che ci sia almeno un evento del tipo selezionato
                 const b = v.dets["Battles"] || 0;
                 const ex = v.dets["Explosions/Remote violence"] || 0;
-                
+
                 let shouldInclude = false;
                 if (showBat && b > 0) shouldInclude = true;
                 if (showExp && ex > 0) shouldInclude = true;
-                
+
                 if (shouldInclude && (v.val > 0 || v.count > 0)) {
                     let px, py;
                     if (v.lat && v.lon) { const p = projection([v.lon, v.lat]); if (p) [px, py] = p; }
-                    else if (currentCentroids.has(k)) { const c = currentCentroids.get(k); [px, py] = c; }
+                    else if (currentCentroids.has(k)) { const c = currentCentroids.get(k);[px, py] = c; }
                     if (px !== undefined) {
                         data.push({ name: k, value: v.val, count: v.count, details: v.dets, x: px, y: py });
                         if (v.val > maxVal) maxVal = v.val;
@@ -363,9 +366,9 @@
 
             const all = enter.merge(spikes);
 
-            all.each(function(d) {
+            all.each(function (d) {
                 const spikeColor = getSpikeColor(d, showBat, showExp);
-                
+
                 d3.select(this).select(".spike-visual")
                     .attr("fill", spikeColor)
                     .transition().duration(1200).ease(d3.easeCubicInOut)
@@ -375,18 +378,18 @@
 
             all.select(".spike-hitbox")
                 .attr("d", d => spikePath(d.x, d.y, getHeight(d.value) < 25 ? 25 : getHeight(d.value), currentSpikeWidth));
-            
+
             // --- SPIKE TOOLTIP ---
             all.on("mouseover", (e, d) => {
-                const b = d.details["Battles"] || 0; 
+                const b = d.details["Battles"] || 0;
                 const ex = d.details["Explosions/Remote violence"] || 0;
-                const total = d.value || 1; 
-                
+                const total = d.value || 1;
+
                 const bPerc = ((b / total) * 100).toFixed(1);
                 const exPerc = ((ex / total) * 100).toFixed(1);
 
                 const maxVal = Math.max(b, ex, 1);
-                
+
                 tooltip.style("visibility", "visible").html(`
                     <div style="border-bottom: 1px solid #ddd; font-weight: 700; margin-bottom: 8px; padding-bottom: 4px; font-size: 14px; color: #222;">
                         ${d.name}
@@ -398,13 +401,13 @@
                     </div>
 
                     <svg width="220" height="45" style="background: #fafafa; border: 1px solid #eee; border-radius: 4px;">
-                        <rect x="0" y="0" width="${(b/maxVal)*100}%" height="18" fill="${COLOR_BATTLES}" fill-opacity="0.3"></rect>
+                        <rect x="0" y="0" width="${(b / maxVal) * 100}%" height="18" fill="${COLOR_BATTLES}" fill-opacity="0.3"></rect>
                         <rect x="0" y="0" width="3" height="18" fill="${COLOR_BATTLES}"></rect> 
                         <text x="6" y="13" style="font-size: 11px; font-weight: 600; fill: #222; font-family: sans-serif; pointer-events: none;">
                             Bat: ${b.toLocaleString()} (${bPerc}%)
                         </text>
 
-                        <rect x="0" y="22" width="${(ex/maxVal)*100}%" height="18" fill="${COLOR_EXPLOSIONS}" fill-opacity="0.3"></rect>
+                        <rect x="0" y="22" width="${(ex / maxVal) * 100}%" height="18" fill="${COLOR_EXPLOSIONS}" fill-opacity="0.3"></rect>
                         <rect x="0" y="22" width="3" height="18" fill="${COLOR_EXPLOSIONS}"></rect>
                         <text x="6" y="35" style="font-size: 11px; font-weight: 600; fill: #222; font-family: sans-serif; pointer-events: none;">
                             Exp: ${ex.toLocaleString()} (${exPerc}%)
@@ -412,30 +415,32 @@
                     </svg>
                 `);
             })
-            .on("mousemove", (e) => {
-                tooltip.style("top", (e.pageY - 15) + "px").style("left", (e.pageX + 15) + "px");
-            })
-            .on("mouseout", (e) => {
-                tooltip.style("visibility", "hidden");
-            });
+                .on("mousemove", (e) => {
+                    tooltip.style("top", (e.pageY - 15) + "px").style("left", (e.pageX + 15) + "px");
+                })
+                .on("mouseout", (e) => {
+                    tooltip.style("visibility", "hidden");
+                });
         }
 
         function drawLegend(mx, showBat, showExp) {
             legendLayer.selectAll("*").remove();
             const lx = 30, ly = height - 40;
             const g = legendLayer.append("g").attr("transform", `translate(${lx},${ly})`);
-            
-            const steps = [{l:"0-100",v:100}, {l:"1k-5k",v:5000}];
-            if (mx > 7500) steps.push({l: d3.format(".1s")(mx), v: mx});
-            
+
+            const steps = [{ l: "0-100", v: 100 }, { l: "1k-5k", v: 5000 }];
+            if (mx > 7500) steps.push({ l: d3.format(".1s")(mx), v: mx });
+
             let cx = 0;
             steps.forEach(s => {
-                if (s.v <= mx || (s.v===5000 && mx>=1000)) {
-                    const h = lenScale(s.v) * 0.5; 
-                    
+                if (s.v <= mx || (s.v === 5000 && mx >= 1000)) {
+                    // --- CORREZIONE QUI SOTTO ---
+                    // Prima era: const h = lenScale(s.v) * 0.5;
+                    // Ora togliamo il moltiplicatore per avere la scala 1:1 con la mappa
+                    const h = lenScale(s.v);
+
                     let fillColor;
                     if (showBat && showExp) {
-                        // Crea gradiente di esempio per la legenda (50/50)
                         const legendGradId = `legend-gradient-${s.v}`;
                         fillColor = createSharpGradient(legendGradId, 50);
                     } else if (showBat) {
@@ -445,20 +450,20 @@
                     } else {
                         fillColor = COLOR_BATTLES;
                     }
-                    
+
                     g.append("path")
-                        .attr("d", spikePath(cx+5, 0, h, SPIKE_WIDTH))
+                        .attr("d", spikePath(cx + 5, 0, h, SPIKE_WIDTH))
                         .attr("fill", fillColor).attr("stroke", COLOR_STROKE).attr("stroke-width", 0.5);
-                    
+
                     g.append("text")
-                        .attr("x", cx+12)
+                        .attr("x", cx + 12)
                         .attr("y", 0)
                         .text(s.l)
                         .attr("font-size", "11px")
                         .attr("fill", "#555")
                         .attr("font-family", "sans-serif")
                         .attr("font-weight", "600");
-                    
+
                     cx += 60;
                 }
             });
@@ -475,7 +480,7 @@
 
         d3.selectAll('input[name="mapLevel"]').on("change", updateSpikes);
         d3.selectAll("#check-battles, #check-explosions").on("change", updateSpikes);
-        
+
         updateSpikes();
 
         const mapHelpContent = {

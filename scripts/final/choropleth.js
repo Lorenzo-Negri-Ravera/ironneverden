@@ -1,4 +1,4 @@
-// File: geoChoropleth.js 
+// File: choropleth.js 
 
 const GENERAL_GEOJSON_PATH = "../../data/final/geojson/europe_final_simplest.geojson";
 const COUNTRIES_EVENTS_PATH = "../../data/final/df_country_summary_v4.json";
@@ -11,7 +11,7 @@ const width = 1000;
 const height = 700;
 
 // Creazione Container SVG
-const svg = d3.select("#geo-container")
+const svg = d3.select("#choropleth-container")
     .attr("viewBox", [0, 0, width, height]);
 
 // Parent per bottoni e loader
@@ -452,7 +452,7 @@ Promise.all([
 
     // Chiamo utils.js: funzione creerà i div e gestirà il mouseover
     if (typeof createChartHelp === "function") {
-        createChartHelp("#geo-help-container", "#map-wrapper", mapHelpContent);
+        createChartHelp("#choropleth-help-container", "#choropleth-wrapper", mapHelpContent);
     }
 
 }).catch(err => {

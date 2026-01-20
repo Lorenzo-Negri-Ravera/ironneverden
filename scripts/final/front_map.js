@@ -89,14 +89,6 @@ Promise.all([
         extentFeatures
     );
 
-    // Adjust translate for better centering (Opzionale: aggiusta questi valori se la mappa non è perfettamente centrata)
-    // Con geoIdentity spesso il fitExtent è più preciso e potresti non aver bisogno di offset manuali grandi.
-    /* const currentTranslate = projection.translate();
-    projection.translate([
-        currentTranslate[0] + 20,  
-        currentTranslate[1] - 20 
-    ]);
-    */
 
     // Path generator
     const pathGenerator = d3.geoPath().projection(projection);
@@ -118,25 +110,25 @@ Promise.all([
 
 
     // --- SVG Setup (Responsive) ---        check with css style, could be redundant
-    container
-        .style("position", "relative")
-        .style("width", "100%")
-        .style("height", "auto")
-        .style("aspect-ratio", "1000 / 700")
-        .style("background-color", "#f8f9fa")
-        .style("border", "1px solid #dee2e6")
-        .style("border-radius", "8px")
-        .style("margin", "0 auto")
-        .style("overflow", "hidden");
+    // container
+    //     .style("position", "relative")
+    //     .style("width", "100%")
+    //     .style("height", "auto")
+    //     .style("aspect-ratio", "1000 / 700")
+    //     .style("background-color", "#f8f9fa")
+    //     .style("border", "1px solid #dee2e6")
+    //     .style("border-radius", "8px")
+    //     .style("margin", "0 auto")
+    //     .style("overflow", "hidden");
 
     // SVG Element                          check with css style, could be redundant
     const svg = container.append("svg")
         .attr("viewBox", [0, 0, width, height])
-        .style("position", "absolute")
-        .style("top", 0)
-        .style("left", 0)
-        .style("width", "100%")
-        .style("height", "100%")
+        // .style("position", "absolute")
+        // .style("top", 0)
+        // .style("left", 0)
+        // .style("width", "100%")
+        // .style("height", "100%")
         .style("z-index", 1);
 
     // Clip Path for Russia Mask
@@ -243,11 +235,11 @@ Promise.all([
     const canvas = container.append("canvas")
         .attr("width", width)
         .attr("height", height)
-        .style("position", "absolute")
-        .style("top", 0)
-        .style("left", 0)
-        .style("width", "100%")
-        .style("height", "100%")
+        // .style("position", "absolute")
+        // .style("top", 0)
+        // .style("left", 0)
+        // .style("width", "100%")
+        // .style("height", "100%")
         .style("z-index", 2)
         .style("pointer-events", "none");
 
@@ -397,12 +389,7 @@ Promise.all([
         d3.select(`#tick-${currentIndex}`).style('opacity', 0);
     }
 
-    // Event Listener Slider 
-    /*
-    slider.on("input", function() {
-        currentIndex = +this.value;
-        updateStateAndRender();
-    });*/
+
 
     slider.on("input", function () {
         currentIndex = +this.value;
@@ -427,18 +414,7 @@ Promise.all([
             }
             playText.text("Pause");
             isPlaying = true;
-            /*
-            timer = setInterval(() => {
-                currentIndex++;
-                slider.property("value", currentIndex);
-                updateStateAndRender();
-                if (currentIndex >= days.length - 1) {
-                    clearInterval(timer);
-                    isPlaying = false;
-                    playText.text("Play");
-                }
-            }, 70); */
-            // ... dentro playButton.on("click") ...
+            
             timer = setInterval(() => {
                 currentIndex++;
 
@@ -453,15 +429,7 @@ Promise.all([
     });
 
 
-    // --- Timeline Significant Events Markers ---
-    /*
-    const significantEvents = [
-        { date: "2022-02-24", title: "Invasione su larga scala" },
-        { date: "2022-04-01", title: "Ritiro dal nord (Kyiv)" },
-        { date: "2022-09-06", title: "Controffensiva Kharkiv" },
-        { date: "2022-11-11", title: "Liberazione Kherson" },
-        { date: "2023-05-20", title: "Presa di Bakhmut" }
-    ];*/
+
 
     // Aggiungi coords: [lon, lat] e radius (opzionale, default a 20)
     const significantEvents = [
@@ -530,16 +498,6 @@ Promise.all([
         tick.setAttribute('data-bs-placement', 'top');
         tick.setAttribute('title', fullLabel);
 
-        // Click event to jump to date
-        /*
-        tick.addEventListener('click', function(e) {
-            e.stopPropagation(); 
-            currentIndex = exactIndex;
-            slider.property("value", currentIndex);            
-            updateStateAndRender(); 
-        });*/
-
-        // ... dentro significantEvents.forEach ...
 
         // Click event to jump to date
         tick.addEventListener('click', function (e) {

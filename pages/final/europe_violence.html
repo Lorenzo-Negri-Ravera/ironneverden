@@ -25,7 +25,7 @@
 
         <main class="p-4">
 
-            <section id="geo-section" class="mb-5 position-relative">
+            <section id="choropleth-section" class="mb-5 position-relative">
                 <div class="container-fluid p-0">
 
                     <div class="row justify-content-center mb-4">
@@ -58,12 +58,10 @@
                     <div class="row justify-content-center">
                         <div class="col-lg-10">
 
-                            <div id="map-wrapper"
-                                class="chart-wrapper-map position-relative border shadow-sm rounded-3 mb-2">
-                                <svg id="geo-container"></svg>
+                            <div id="choropleth-wrapper" class="map-container-responsive mb-2">
+                                <svg id="choropleth-container"></svg>
 
-                                <div id="zoom-controls" class="position-absolute d-flex flex-column gap-2 p-2"
-                                    style="top: 10px; right: 10px; z-index: 100;">
+                                <div id="zoom-controls" class="zoom-controls-overlay">
                                     <button class="btn btn-sm btn-primary zoom-btn" id="zoom-in">+</button>
                                     <button class="btn btn-sm btn-primary zoom-btn" id="zoom-out">−</button>
                                     <button class="btn btn-sm btn-primary zoom-btn" id="zoom-reset">R</button>
@@ -71,7 +69,7 @@
                             </div>
 
                             <div class="d-flex justify-content-start align-items-center mt-3 w-100">
-                                <div id="geo-help-container"></div>
+                                <div id="choropleth-help-container"></div>
                             </div>
                         </div>
                     </div>
@@ -100,11 +98,9 @@
 
                         <div class="row mb-3">
                             <div class="col-12 p-0">
-                                <div id="front-map-wrapper" class="chart-wrapper-map position-relative border rounded"
-                                    style="overflow: hidden;">
+                                <div id="front-map-wrapper" class="map-container-responsive mb-2">
                                     <div id="front-map-container"></div>
-                                    <div id="front-zoom-controls" class="position-absolute d-flex flex-column gap-2 p-2"
-                                        style="top: 10px; right: 10px; z-index: 100;">
+                                    <div id="front-zoom-controls" class="zoom-controls-overlay">
                                         <button class="btn btn-sm btn-primary zoom-btn" id="front-zoom-in">+</button>
                                         <button class="btn btn-sm btn-primary zoom-btn" id="front-zoom-out">−</button>
                                         <button class="btn btn-sm btn-primary zoom-btn" id="front-zoom-reset">R</button>
@@ -153,58 +149,39 @@
                 </div>
             </section>
 
-
             <section id="spike-map-section" class="mt-5">
                 <div class="row justify-content-center">
                     <div class="col-lg-10 text-center">
 
-                        <div class="text-container mb-4">
-                            <h3>Intensità del Conflitto per Regione</h3>
-                            <p class="text-muted">
-                                Totale vittime raggruppate per regione. Clicca su una regione per i dettagli.
-                            </p>
-                        </div>
-
                         <div id="static-spike-controls" class="d-flex justify-content-center flex-wrap gap-3 mb-4">
-
                             <div class="compact-menu-bar d-inline-flex align-items-center" role="group">
-
                                 <input type="radio" class="btn-check" name="mapLevel" id="lvl-region" value="region"
                                     autocomplete="off">
                                 <label class="btn-compact" for="lvl-region">Regions</label>
-
                                 <div class="compact-divider"></div>
-
                                 <input type="radio" class="btn-check" name="mapLevel" id="lvl-district" value="district"
                                     autocomplete="off" checked>
                                 <label class="btn-compact active" for="lvl-district">Districts</label>
-
                                 <div class="compact-divider"></div>
-
                                 <input type="radio" class="btn-check" name="mapLevel" id="lvl-comuni" value="comuni"
                                     autocomplete="off">
                                 <label class="btn-compact" for="lvl-comuni">Municipals</label>
                             </div>
 
                             <div class="compact-menu-bar d-inline-flex align-items-center" role="group">
-
                                 <input type="checkbox" class="btn-check" id="check-battles" checked>
                                 <label class="btn-compact active" for="check-battles">Battles</label>
-
                                 <div class="compact-divider"></div>
-
                                 <input type="checkbox" class="btn-check" id="check-explosions" checked>
                                 <label class="btn-compact active" for="check-explosions">Explosions</label>
                             </div>
-
                         </div>
 
-                        <div id="spike-map-wrapper" class="position-relative border rounded bg-light mb-2"
-                            style="overflow: hidden;">
-                            <svg id="spike-container" style="width: 100%; height: auto; display: block;"></svg>
+                        <div id="spike-map-wrapper" class="map-container-responsive mb-2">
 
-                            <div id="spike-zoom-controls" class="position-absolute d-flex flex-column gap-2 p-2"
-                                style="top: 10px; right: 10px; z-index: 100;">
+                            <div id="spike-container"></div>
+
+                            <div id="spike-zoom-controls" class="zoom-controls-overlay">
                                 <button class="btn btn-sm btn-primary zoom-btn" id="spike-zoom-in">+</button>
                                 <button class="btn btn-sm btn-primary zoom-btn" id="spike-zoom-out">−</button>
                                 <button class="btn btn-sm btn-primary zoom-btn" id="spike-zoom-reset">R</button>
@@ -219,7 +196,6 @@
                 </div>
             </section>
 
-            <!-- Modified the stacked bar chart section: removal of the background (grey box) -->
             <section id="stacked-bar-section" class="mt-5">
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
@@ -248,7 +224,6 @@
                 </div>
             </section>
 
-
             <section id="sub-event-line-section" class="mt-5">
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
@@ -276,8 +251,6 @@
                     </div>
                 </div>
             </section>
-
-            
 
             <section id="slope-chart-section" class="mt-5">
                 <div class="row justify-content-center">
@@ -419,7 +392,6 @@
                 </div>
             </section>
 
-
             <section id="chart-section" class="mt-5">
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
@@ -488,7 +460,6 @@
             </section>
 
 
-           <!-- ########################################## LOLLO  ######################################################### -->
             <section id="race-chart-section" class="mt-5">
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
@@ -554,8 +525,6 @@
                 </div>
             </section>
 
-
-
         </main>
     </div>
 
@@ -573,7 +542,7 @@
     <script src="../../scripts/final/utils.js"></script>
 
     <!-- charts scripts -->
-    <script src="../../scripts/final/map.js"></script>
+    <script src="../../scripts/final/choropleth.js"></script>
     <script src="../../scripts/final/front_map.js"></script>
     <script src="../../scripts/final/spikemap.js"></script>
     <script src="../../scripts/final/linechart.js"></script>
