@@ -1,3 +1,5 @@
+// File: divergent_bar_chart.js
+
 (function() {
     
     // --- Configurations ---
@@ -5,19 +7,29 @@
         dataPath: "../../data/final/FlightsUKR/divergence_final.json", 
         margin: { top: 40, right: 60, bottom: 20, left: 140 }, 
         barHeight: 30,
-        width: 1000
+        width: 1000 
     };
 
     // Formatter
-    const formatAbs = d3.format("+,d");     // Es: +1,200
-    const formatRel = d3.format("+.0%");    // Es: -89%
-    const formatPerc = d3.format(".1f");    // Per il tooltip (valore statico)
-    // Formatter specifico per Market Share (Punti Percentuali)
-    // Dato che i dati sono già es. 13.4, usiamo "+.1f" e aggiungiamo "%"
+    const formatAbs = d3.format("+,d");     
+    const formatRel = d3.format("+.0%");    
+    const formatPerc = d3.format(".1f");    
     const formatShare = d => d3.format("+.1f")(d) + "%"; 
 
     // --- Setup Container ---
-    const svg = d3.select("#divergence-container");
+    const container = d3.select("#divergence-container");
+    
+    if (container.empty()) return;
+
+    // Pulizia
+    container.html("");
+
+    // Creazione SVG
+    const svg = container.append("svg")
+        .style("width", "100%")
+        .style("height", "auto")
+        .style("display", "block");
+
     const g = svg.append("g");
     
     const xAxisGroup = g.append("g").attr("class", "x-axis");
@@ -32,7 +44,7 @@
             .style("border", "1px solid #ccc") 
             .style("padding", "8px 10px") 
             .style("border-radius", "4px") 
-            .style("font-family", "sans-serif").style("font-size", "12px")
+            .style("font-family", "'Fira Sans', sans-serif").style("font-size", "12px")
             .style("pointer-events", "none").style("z-index", "10000")
             .style("box-shadow", "0 2px 8px rgba(0,0,0,0.15)");
     }
@@ -40,7 +52,7 @@
     // --- Data Loading ---
     d3.json(CONFIG.dataPath).then(raw_data => {
         
-        // 1. Filter out "World" and clean data
+        // Data Cleaning
         const data = raw_data
             .filter(d => d.origin_name !== "World")
             .map(d => ({
@@ -49,7 +61,6 @@
                 Perc_diff: +d.Perc_diff,
                 Freq_2021: +d.Freq_2021,
                 Freq_2022: +d.Freq_2022,
-                // Pre-calcoliamo la differenza di quota di mercato
                 Share_diff: (+d.Freq_2022) - (+d.Freq_2021)
             }));
 
@@ -65,7 +76,7 @@
                 d3.select(`label[for="${this.id}"]`).classed("active", isChecked);
             });
 
-            // Prepare Data for current view & Determine Formatter
+            // Prepare Data & Formatter
             let currentFormat;
 
             data.forEach(d => {
@@ -76,16 +87,15 @@
                     d.value = d.Perc_diff;
                     currentFormat = formatRel;
                 } else {
-                    // Case: Market Share
                     d.value = d.Share_diff;
                     currentFormat = formatShare;
                 }
             });
 
-            // Sorting: negativi in alto, positivi in basso
+            // Sorting
             data.sort((a, b) => d3.ascending(a.value, b.value));
 
-            // Update Dimensions
+            // --- Dynamic Dimensions ---
             const height = Math.ceil((data.length + 0.1) * CONFIG.barHeight) + CONFIG.margin.top + CONFIG.margin.bottom;
             
             svg.transition().duration(750)
@@ -93,13 +103,18 @@
             
             g.attr("transform", `translate(0,${CONFIG.margin.top})`);
 
-            // Scales
-            const x = d3.scaleLinear()
-                .domain(d3.extent(data, d => d.value))
-                .rangeRound([CONFIG.margin.left, CONFIG.width - CONFIG.margin.right]);
+            // --- SCALES (FIXED OVERLAP) ---
             
-            // Se siamo in "Relative" o "Share", assicuriamoci che lo 0 sia centrato o ben visibile se i dati lo permettono,
-            // ma d3.extent gestisce bene i range dinamici.
+            // 1. Calcola l'estensione dei dati (min e max)
+            const extent = d3.extent(data, d => d.value);
+            
+            // 2. Aggiungi "respiro" (padding) del 15% al dominio
+            // Questo assicura che la barra più lunga non tocchi il bordo, lasciando spazio all'etichetta
+            const rangePadding = Math.abs(extent[1] - extent[0]) * 0.15;
+            
+            const x = d3.scaleLinear()
+                .domain([extent[0] - rangePadding, extent[1] + rangePadding])
+                .rangeRound([CONFIG.margin.left, CONFIG.width - CONFIG.margin.right]);
 
             const y = d3.scaleBand()
                 .domain(data.map(d => d.origin_name))
@@ -108,13 +123,15 @@
 
             // Axes
             const xAxis = d3.axisTop(x)
-                .ticks(CONFIG.width / 80)
+                .ticks(CONFIG.width / 100) // Meno ticks per pulizia
                 .tickFormat(currentFormat);
 
             xAxisGroup.transition().duration(750)
                 .call(xAxis)
                 .call(g => g.select(".domain").remove())
-                .call(g => g.selectAll(".tick line").attr("stroke-opacity", 0.2).attr("y2", height - CONFIG.margin.top));
+                .call(g => g.selectAll(".tick line").attr("stroke-opacity", 0.2).attr("y2", height - CONFIG.margin.top))
+                .selectAll("text")
+                .style("font-family", "'Fira Sans', sans-serif");
 
             const yAxis = d3.axisLeft(y).tickSize(0).tickPadding(6);
             yAxisGroup.attr("transform", `translate(${CONFIG.margin.left}, 0)`)
@@ -122,7 +139,8 @@
                 .call(yAxis)
                 .call(g => g.select(".domain").remove())
                 .style("font-size", "11px")
-                .style("font-weight", "600");
+                .style("font-weight", "600")
+                .style("font-family", "'Fira Sans', sans-serif");
 
             // Bars
             const bars = g.selectAll(".bar").data(data, d => d.origin_name);
@@ -156,13 +174,14 @@
                 .attr("y", d => y(d.origin_name) + y.bandwidth() / 2)
                 .attr("dy", "0.35em")
                 .attr("font-size", "10px")
-                .attr("font-family", "sans-serif")
+                .attr("font-family", "'Fira Sans', sans-serif")
                 .attr("opacity", 0);
 
             labelsEnter.merge(labels)
                 .transition().duration(750)
                 .text(d => currentFormat(d.value))
-                .attr("x", d => x(d.value) + (d.value < 0 ? -4 : 4))
+                // MODIFICA: Aumentato il margine da 4 a 10px
+                .attr("x", d => x(d.value) + (d.value < 0 ? -10 : 10))
                 .attr("text-anchor", d => d.value < 0 ? "end" : "start")
                 .attr("y", d => y(d.origin_name) + y.bandwidth() / 2)
                 .attr("opacity", 1);
@@ -175,11 +194,8 @@
                     const isNeg = d.Divergence < 0;
                     const color = isNeg ? "#b2182b" : "#2166ac";
                     const icon = isNeg ? "↘" : "↗";
-
-                    // Calcolo dinamico dello share change per il testo
                     const shareChange = d.Share_diff > 0 ? "+" + formatPerc(d.Share_diff) : formatPerc(d.Share_diff);
                     
-                    // Highlight logic: Se siamo in modalità share, evidenziamo quella riga
                     const hlShare = metric === "share" ? "background:#fff3cd;" : "";
                     const hlFlights = metric !== "share" ? "background:#fff3cd;" : "";
 
@@ -218,18 +234,20 @@
 
     }).catch(e => console.error("Error loading divergence data:", e));
 
-    // How to read the chart
+    // Help Content
     const divergingHelpContent = {
-        title: "How to read the Map",
+        title: "Reading the Divergence Chart",
         steps: [
-            "<strong>TODO</strong>",
-            ]
-        };
+            "<strong>Positive (Blue):</strong> Increased traffic or market share.",
+            "<strong>Negative (Red):</strong> Decreased traffic or market share.",
+            "<strong>Metrics:</strong> Toggle between Absolute flights, Relative %, or Market Share shifts."
+        ]
+    };
 
-        if (typeof createChartHelp === "function") {
-            createChartHelp("#diverging-help-container", "#divergence-wrapper", divergingHelpContent);
-        } else {
-            console.warn("createChartHelp non trovata.");
-        }
+    if (typeof createChartHelp === "function") {
+        createChartHelp("#diverging-help-container", "#divergence-wrapper", divergingHelpContent);
+    } else {
+        console.warn("createChartHelp non trovata.");
+    }
 
 })();

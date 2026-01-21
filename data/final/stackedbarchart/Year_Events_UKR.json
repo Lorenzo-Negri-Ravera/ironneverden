@@ -2,17 +2,17 @@
     {
         "YEAR": 2017,
         "EVENT_TYPE": "Battles",
-        "count": 2
+        "count": 37
     },
     {
         "YEAR": 2017,
         "EVENT_TYPE": "Explosions\/Remote violence",
-        "count": 3
+        "count": 49
     },
     {
         "YEAR": 2017,
         "EVENT_TYPE": "Protests",
-        "count": 15
+        "count": 27
     },
     {
         "YEAR": 2017,
@@ -27,117 +27,117 @@
     {
         "YEAR": 2018,
         "EVENT_TYPE": "Battles",
-        "count": 115
+        "count": 8050
     },
     {
         "YEAR": 2018,
         "EVENT_TYPE": "Explosions\/Remote violence",
-        "count": 222
+        "count": 5148
     },
     {
         "YEAR": 2018,
         "EVENT_TYPE": "Protests",
-        "count": 578
+        "count": 1291
     },
     {
         "YEAR": 2018,
+        "EVENT_TYPE": "Riots",
+        "count": 156
+    },
+    {
+        "YEAR": 2018,
+        "EVENT_TYPE": "Violence against civilians",
+        "count": 123
+    },
+    {
+        "YEAR": 2019,
+        "EVENT_TYPE": "Battles",
+        "count": 7841
+    },
+    {
+        "YEAR": 2019,
+        "EVENT_TYPE": "Explosions\/Remote violence",
+        "count": 6817
+    },
+    {
+        "YEAR": 2019,
+        "EVENT_TYPE": "Protests",
+        "count": 1431
+    },
+    {
+        "YEAR": 2019,
         "EVENT_TYPE": "Riots",
         "count": 128
     },
     {
-        "YEAR": 2018,
-        "EVENT_TYPE": "Violence against civilians",
-        "count": 108
-    },
-    {
-        "YEAR": 2019,
-        "EVENT_TYPE": "Battles",
-        "count": 112
-    },
-    {
-        "YEAR": 2019,
-        "EVENT_TYPE": "Explosions\/Remote violence",
-        "count": 207
-    },
-    {
-        "YEAR": 2019,
-        "EVENT_TYPE": "Protests",
-        "count": 634
-    },
-    {
-        "YEAR": 2019,
-        "EVENT_TYPE": "Riots",
-        "count": 119
-    },
-    {
         "YEAR": 2019,
         "EVENT_TYPE": "Violence against civilians",
-        "count": 114
+        "count": 124
     },
     {
         "YEAR": 2020,
         "EVENT_TYPE": "Battles",
-        "count": 103
+        "count": 3356
     },
     {
         "YEAR": 2020,
         "EVENT_TYPE": "Explosions\/Remote violence",
-        "count": 182
+        "count": 4941
     },
     {
         "YEAR": 2020,
         "EVENT_TYPE": "Protests",
-        "count": 594
+        "count": 1363
     },
     {
         "YEAR": 2020,
         "EVENT_TYPE": "Riots",
-        "count": 81
+        "count": 90
     },
     {
         "YEAR": 2020,
         "EVENT_TYPE": "Violence against civilians",
-        "count": 57
+        "count": 59
     },
     {
         "YEAR": 2021,
         "EVENT_TYPE": "Battles",
-        "count": 104
+        "count": 2405
     },
     {
         "YEAR": 2021,
         "EVENT_TYPE": "Explosions\/Remote violence",
-        "count": 171
+        "count": 4822
     },
     {
         "YEAR": 2021,
         "EVENT_TYPE": "Protests",
-        "count": 533
+        "count": 1169
     },
     {
         "YEAR": 2021,
         "EVENT_TYPE": "Riots",
-        "count": 41
+        "count": 43
     },
     {
         "YEAR": 2021,
         "EVENT_TYPE": "Violence against civilians",
-        "count": 37
+        "count": 38
     },
     {
         "YEAR": 2022,
         "EVENT_TYPE": "Battles",
-        "count": 501
+        "count": 7569
     },
     {
         "YEAR": 2022,
         "EVENT_TYPE": "Explosions\/Remote violence",
-        "count": 1309
+        "count": 31993
     },
     {
         "YEAR": 2022,
         "EVENT_TYPE": "Protests",
-        "count": 170
+        "count": 294
     },
     {
         "YEAR": 2022,
@@ -147,42 +147,42 @@
     {
         "YEAR": 2022,
         "EVENT_TYPE": "Violence against civilians",
-        "count": 345
+        "count": 988
     },
     {
         "YEAR": 2023,
         "EVENT_TYPE": "Battles",
-        "count": 328
+        "count": 10971
     },
     {
         "YEAR": 2023,
         "EVENT_TYPE": "Explosions\/Remote violence",
-        "count": 1454
+        "count": 43396
     },
     {
         "YEAR": 2023,
         "EVENT_TYPE": "Protests",
-        "count": 123
+        "count": 134
     },
     {
         "YEAR": 2023,
         "EVENT_TYPE": "Violence against civilians",
-        "count": 65
+        "count": 79
     },
     {
         "YEAR": 2024,
         "EVENT_TYPE": "Battles",
-        "count": 357
+        "count": 17323
     },
     {
         "YEAR": 2024,
         "EVENT_TYPE": "Explosions\/Remote violence",
-        "count": 1467
+        "count": 35491
     },
     {
         "YEAR": 2024,
         "EVENT_TYPE": "Protests",
-        "count": 289
+        "count": 339
     },
     {
         "YEAR": 2024,
@@ -192,22 +192,22 @@
     {
         "YEAR": 2024,
         "EVENT_TYPE": "Violence against civilians",
-        "count": 70
+        "count": 88
     },
     {
         "YEAR": 2025,
         "EVENT_TYPE": "Battles",
-        "count": 380
+        "count": 22353
     },
     {
         "YEAR": 2025,
         "EVENT_TYPE": "Explosions\/Remote violence",
-        "count": 1210
+        "count": 35361
     },
     {
         "YEAR": 2025,
         "EVENT_TYPE": "Protests",
-        "count": 240
+        "count": 327
     },
     {
         "YEAR": 2025,
@@ -217,6 +217,6 @@
     {
         "YEAR": 2025,
         "EVENT_TYPE": "Violence against civilians",
-        "count": 44
+        "count": 49
     }
 ]

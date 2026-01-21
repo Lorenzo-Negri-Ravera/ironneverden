@@ -10,152 +10,156 @@
         "MD": "Moldova", "BY": "Belarus", "DE": "Germany", "TR": "Turkey"
     };
 
-    // VELOCITÀ: 40000 = 40 secondi
     const duration = 40000; 
-    
     const k = 10;           
     const width = 1000;
-    const barSize = 48;
-    const margin = { top: 16, right: 6, bottom: 6, left: 90 };    //CHANGED: left (before 160)
+    const barSize = 50;     
+    
+    // MODIFICA QUI: Aumentato margin.right a 120 per far stare le etichette
+    const margin = { top: 60, right: 120, bottom: 10, left: 140 }; 
 
     const customPalette = ["#003f5c", "#374c80", "#7a5195", "#bc5090", "#ef5675", "#ff764a", "#ffa600"];
     const neigh = ["Russia", "Ukraine", "Poland", "Hungary", "Romania", "Lithuania", "Slovakia"];
 
-    // Variabili di Stato
-    let n, height, svg, keyframes;
-    let globalMax; 
-    let isAnimationRunning = false; 
+    let currentRaceId = 0;
 
     // ==========================================
-    // --- 2. CARICAMENTO DATI ---
+    // --- 2. INIT OBSERVER ---
     // ==========================================
-    d3.csv(path).then(function(rawData) {
-
-        let data = processHybridData(rawData);
-        data = data.filter(d => neigh.includes(d.name));
-
-        if (data.length === 0) {
-            console.error("Race Chart: Dati vuoti.");
-            return;
+    document.addEventListener("DOMContentLoaded", function() {
+        const target = document.querySelector("#race-chart-section");
+        if(target) {
+            const observer = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        startRaceChart(); 
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            observer.observe(target);
         }
-
-        const names = new Set(data.map(d => d.name));
-        n = names.size;
-        height = margin.top + barSize * n + margin.bottom;
-        globalMax = d3.max(data, d => d.value);
-
-        const dateValues = Array.from(d3.rollup(data, ([d]) => d.value, d => d.date, d => d.name))
-            .map(([date, data]) => [new Date(date), data])
-            .sort(([a], [b]) => d3.ascending(a, b));
-
-        keyframes = [];
-        let ka, a, kb, b;
-        for ([[ka, a], [kb, b]] of d3.pairs(dateValues)) {
-            for (let i = 0; i < k; ++i) {
-                const t = i / k;
-                keyframes.push([
-                    new Date(ka * (1 - t) + kb * t),
-                    rank(name => (a.get(name) || 0) * (1 - t) + (b.get(name) || 0) * t, names)
-                ]);
-            }
-        }
-        if(kb) keyframes.push([new Date(kb), rank(name => b.get(name) || 0, names)]);
-
-        // --- SETUP UI ---
-        
-        // 1. REPLAY
-        setupReplayButton(); 
-
-        // 2. HELP (Usa utils.js)
-        if (typeof createChartHelp === "function") {
-            createChartHelp("#race-help-container", "#race-chart-wrapper", {
-                title: "How to read the Race Chart",
-                steps: [
-                    "<strong>Bars:</strong> Represent flight volume per destination.",
-                    "<strong>Rank:</strong> Watch countries rise and fall in rank over time.",
-                    "<strong>Numbers:</strong> The monthly total flights.",
-                    "<strong>Replay:</strong> Use the button to restart the animation."
-                ]
-            });
-        } else {
-            console.warn("createChartHelp non è definita. Hai importato utils.js?");
-        }
-
-        // --- AVVIO GRAFICO ---
-        initChart();
-        runAnimation();
-
-    }).catch(err => {
-        console.error("ERRORE CARICAMENTO:", err);
-        d3.select("#race-chart-container").html(`<p style="color:red; text-align:center;">Errore caricamento: ${path}</p>`);
     });
 
-
     // ==========================================
-    // --- 3. DISEGNO GRAFICO (INIT) ---
+    // --- 3. LOGICA PRINCIPALE ---
     // ==========================================
-    function initChart() {
-        d3.select("#race-chart-container svg").remove();
-        
-        svg = d3.select("#race-chart-container").append("svg")
-            .attr("viewBox", [0, 0, width, height]);
+    function startRaceChart() {
+        const myRaceId = ++currentRaceId;
+        const container = d3.select("#race-chart-container");
+        container.selectAll("*").remove(); 
 
-        // Assi e Gruppi
-        svg.append("g").attr("class", "axis axis--top").attr("transform", `translate(0,${margin.top})`);
-        svg.append("g").attr("class", "bars");
-        svg.append("g").attr("class", "labels-name");
-        svg.append("g").attr("class", "labels-value");
-        
-        // Ticker Anno
-        svg.append("text")
-            .attr("class", "year-ticker")
-            .attr("x", width - 60)
-            .attr("y", height - 30)
-            .style("font-size", "24px") 
-            .style("opacity", 0.6)
-            .style("font-weight", "bold")
-            .attr("text-anchor", "end")
-            .text("");
+        d3.csv(path).then(function(rawData) {
+            
+            if (currentRaceId !== myRaceId) return; 
+
+            let data = processHybridData(rawData);
+            data = data.filter(d => neigh.includes(d.name));
+
+            if (data.length === 0) return;
+
+            const names = new Set(data.map(d => d.name));
+            const n = names.size;
+            
+            const height = margin.top + barSize * n + margin.bottom;
+            const globalMax = d3.max(data, d => d.value);
+
+            const dateValues = Array.from(d3.rollup(data, ([d]) => d.value, d => d.date, d => d.name))
+                .map(([date, data]) => [new Date(date), data])
+                .sort(([a], [b]) => d3.ascending(a, b));
+
+            let keyframes = [];
+            let ka, a, kb, b;
+            for ([[ka, a], [kb, b]] of d3.pairs(dateValues)) {
+                for (let i = 0; i < k; ++i) {
+                    const t = i / k;
+                    keyframes.push([
+                        new Date(ka * (1 - t) + kb * t),
+                        rank(name => (a.get(name) || 0) * (1 - t) + (b.get(name) || 0) * t, names, n)
+                    ]);
+                }
+            }
+            if(kb) keyframes.push([new Date(kb), rank(name => b.get(name) || 0, names, n)]);
+
+            const svg = container.append("svg")
+                .attr("viewBox", [0, 0, width, height])
+                .style("width", "100%")
+                .style("height", "auto")
+                .style("display", "block");
+
+            setupUI();
+            runAnimation(svg, keyframes, n, height, globalMax, myRaceId);
+
+        }).catch(err => {
+            console.error("Errore Race Chart:", err);
+            container.html(`<div class="alert alert-danger">Error loading data</div>`);
+        });
     }
 
     // ==========================================
-    // --- 4. ANIMAZIONE (LOOP) ---
+    // --- 4. ANIMAZIONE ---
     // ==========================================
-    async function runAnimation() {
-        if (!svg) return;
-        isAnimationRunning = true;
-
-        // Added factor to increase bar size for better visibility (1,2)
-        const x = d3.scaleLinear([0, globalMax * 1.2], [margin.left, width - margin.right]);
-        const y = d3.scaleBand()
-            .domain(d3.range(n + 2))
-            .rangeRound([margin.top, margin.top + barSize * (n + 2 + 0.1)])
-            .padding(0.1);
+    async function runAnimation(svg, keyframes, n, height, globalMax, myRaceId) {
         
+        // MODIFICA QUI: Aggiunto * 1.05 per dare un po' di "respiro" alla barra più lunga
+        const x = d3.scaleLinear([0, globalMax * 1.05], [margin.left, width - margin.right]);
+        
+        const y = d3.scaleBand()
+            .domain(d3.range(n + 2)) 
+            .rangeRound([margin.top, margin.top + barSize * (n + 2)])
+            .padding(0.1);
+
         const colorScale = d3.scaleOrdinal(customPalette).domain(neigh);
         const getColor = (name) => colorScale(name) || "#ccc";
         const formatNumber = d3.format(",d");
-        const formatDate = d3.utcFormat("%B %Y"); 
+        const formatDate = d3.utcFormat("%B %Y");
 
-        svg.select(".axis--top")
-            .call(d3.axisTop(x).ticks(width / 160).tickSizeOuter(0).tickSizeInner(-barSize * (n + y.padding())));
-        svg.select(".axis--top .domain").remove();
+        const gAxis = svg.append("g").attr("class", "axis axis--top").attr("transform", `translate(0,${margin.top})`);
+        const gBars = svg.append("g").attr("class", "bars");
+        const gLabels = svg.append("g").attr("class", "labels");
+        
+        const dateLabel = svg.append("text")
+            .attr("class", "year-ticker")
+            .attr("x", width - 40)
+            .attr("y", height - 30)
+            .style("font-family", "'Roboto Slab', serif")
+            .style("font-size", "48px")
+            .style("font-weight", "700")
+            .style("fill", "#e0e0e0")
+            .style("opacity", 0.8)
+            .attr("text-anchor", "end");
+
+        // DISEGNO INIZIALE ASSE
+        gAxis.call(d3.axisTop(x)
+                .ticks(width / 160)
+                .tickSizeOuter(0)
+                .tickSizeInner(- (barSize * (n + 2))) 
+            )
+            .call(g => g.select(".domain").remove())
+            .call(g => g.selectAll(".tick line")
+                .attr("stroke-opacity", 0.4)
+                .attr("stroke-dasharray", "2,2")
+                .attr("stroke", "#ccc")
+            )
+            .selectAll("text")
+            .style("font-family", "'Fira Sans', sans-serif")
+            .style("font-size", "12px");
 
         for (const keyframe of keyframes) {
-            if (!isAnimationRunning) break; 
+            if (currentRaceId !== myRaceId) return; 
 
             const transition = svg.transition().duration(duration / keyframes.length).ease(d3.easeLinear);
             const [date, data] = keyframe;
 
-            // Rettangoli
-            svg.select(".bars").selectAll("rect")
+            // --- BARRE ---
+            gBars.selectAll("rect")
                 .data(data.slice(0, n), d => d.name)
                 .join(
                     enter => enter.append("rect")
                         .attr("fill", d => getColor(d.name))
                         .attr("height", y.bandwidth())
                         .attr("x", x(0))
-                        .attr("y", d => y(n + 1))
+                        .attr("y", d => y(n + 1)) 
                         .attr("width", d => x(d.value) - x(0)),
                     update => update,
                     exit => exit.transition(transition).remove()
@@ -168,15 +172,19 @@
                     .attr("fill", d => getColor(d.name))
                 );
 
-            // Nomi
-            svg.select(".labels-name").selectAll("text")
+            // --- LABELS (Nomi) ---
+            gLabels.selectAll("text.label-name")
                 .data(data.slice(0, n), d => d.name)
                 .join(
                     enter => enter.append("text")
+                        .attr("class", "label-name")
                         .attr("text-anchor", "end")
-                        .attr("x", margin.left - 10)
-                        .attr("y", d => y(n + 1) + y.bandwidth() / 2)
+                        .attr("x", margin.left - 10) 
+                        .attr("y", d => y(n + 1) + y.bandwidth() / 2) 
                         .attr("dy", "0.35em")
+                        .style("font-family", "'Fira Sans', sans-serif")
+                        .style("font-weight", "bold")
+                        .style("font-size", "14px")
                         .text(d => d.name),
                     update => update,
                     exit => exit.transition(transition).remove()
@@ -184,26 +192,29 @@
                 )
                 .call(text => text.transition(transition)
                     .attr("y", d => y(d.rank) + y.bandwidth() / 2)
-                    .style("font-weight", "bold")
                 );
 
-            // Valori
-            svg.select(".labels-value").selectAll("text")
+            // --- VALUES (Numeri) ---
+            gLabels.selectAll("text.label-value")
                 .data(data.slice(0, n), d => d.name)
                 .join(
                     enter => enter.append("text")
+                        .attr("class", "label-value")
                         .attr("text-anchor", "start")
-                        .attr("x", d => x(d.value) + 6)
-                        .attr("y", d => y(n + 1) + y.bandwidth() / 2)
+                        .attr("x", d => x(d.value) + 8) 
+                        .attr("y", d => y(n + 1) + y.bandwidth() / 2) 
                         .attr("dy", "0.35em")
+                        .style("font-family", "'Fira Sans', sans-serif")
+                        .style("font-size", "14px")
+                        .style("font-variant-numeric", "tabular-nums")
                         .text(d => formatNumber(d.value)),
                     update => update,
                     exit => exit.transition(transition).remove()
-                        .attr("x", d => x(d.value) + 6)
+                        .attr("x", d => x(d.value) + 8)
                         .attr("y", d => y(n + 1) + y.bandwidth() / 2)
                 )
                 .call(text => text.transition(transition)
-                    .attr("x", d => x(d.value) + 6)
+                    .attr("x", d => x(d.value) + 8)
                     .attr("y", d => y(d.rank) + y.bandwidth() / 2)
                     .tween("text", function(d) {
                         const i = d3.interpolateNumber(this.textContent.replace(/,/g, "") || 0, d.value);
@@ -211,13 +222,13 @@
                     })
                 );
 
-            svg.select(".year-ticker").text(formatDate(date));
-            try { await transition.end(); } catch(e) { }
+            dateLabel.text(formatDate(date));
+            try { await transition.end(); } catch(e) { return; }
         }
     }
 
     // ==========================================
-    // --- 5. FUNZIONI DATI ---
+    // --- 5. UTILS DATI ---
     // ==========================================
     function processHybridData(data) {
         const output = [];
@@ -244,7 +255,7 @@
         return output.sort((a, b) => a.date - b.date);
     }
 
-    function rank(value, names) {
+    function rank(value, names, n) {
         const data = Array.from(names, name => ({name, value: value(name)}));
         data.sort((a, b) => d3.descending(a.value, b.value));
         for (let i = 0; i < data.length; ++i) data[i].rank = Math.min(n, i);
@@ -252,28 +263,21 @@
     }
 
     // ==========================================
-    // --- 6. GESTIONE REPLAY ---
+    // --- 6. SETUP UI ---
     // ==========================================
-    function setupReplayButton() {
-        const triggerReplay = () => {
-            if(svg && keyframes) {
-                isAnimationRunning = false; 
-                svg.selectAll("*").interrupt(); 
-                setTimeout(() => {
-                    initChart();
-                    runAnimation();
-                }, 50);
-            }
+    function setupUI() {
+        window.replay = function() {
+            startRaceChart();
         };
 
-        window.replay = triggerReplay;
-
-        const btn = document.getElementById("replay-btn");
-        if(btn) {
-            btn.onclick = null;
-            btn.addEventListener("click", function(e) {
-                e.preventDefault();
-                triggerReplay();
+        if (typeof createChartHelp === "function") {
+            createChartHelp("#race-help-container", "#race-chart-wrapper", {
+                title: "How to read the Race Chart",
+                steps: [
+                    "<strong>Bars:</strong> Represent flight volume per destination.",
+                    "<strong>Rank:</strong> Watch countries rise and fall in rank over time.",
+                    "<strong>Replay:</strong> Use the button to restart the animation."
+                ]
             });
         }
     }

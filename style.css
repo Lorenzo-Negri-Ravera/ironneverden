@@ -70,11 +70,14 @@ body {
     background-color: #f8f9fa;
 }
 
+.text-container {
+    max-width: 75ch;
+    margin: 0 auto;
+}
+
 /* ------------------- SVG CONTAINERS ------------------- */
 
 /* Responsive mode */
-#stacked-bar-chart-container,
-#sub-event-line-chart-container,
 #chart-container,
 #chart svg {
     width: 100% !important;
@@ -111,12 +114,52 @@ body {
     max-width: 100%;
 }
 
+/* NUOVO: Griglia per grafici affiancati (Sunburst, Sankey, ecc.) */
+.chart-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    /* Default Mobile: 1 colonna (uno sotto l'altro) */
+    gap: 2rem;
+    /* Spazio tra i grafici */
+    width: 100%;
+    align-items: start;
+}
+
+/* Separatore visuale opzionale */
+.chart-grid-separator {
+    display: none;
+    /* Nascosto su mobile */
+}
+
+/* Desktop (Large screens): Diventa 2 colonne */
+@media (min-width: 992px) {
+    .chart-grid-2 {
+        grid-template-columns: 1fr 1px 1fr;
+        /* Grafico - Linea - Grafico */
+        gap: 0;
+    }
+
+    .chart-grid-item {
+        padding: 0 1rem;
+    }
+
+    .chart-grid-separator {
+        display: block;
+        width: 1px;
+        height: 100%;
+        min-height: 400px;
+        background-color: #dee2e6;
+        opacity: 0.5;
+        margin: 0 auto;
+    }
+}
+
 /* --- Classe Universale per Mappe (Layered) --- */
 .map-container-responsive {
     position: relative;
     width: 100%;
     /* Mantiene sempre la proporzione 1000:700 (la stessa del viewBox di D3) */
-    aspect-ratio: 1000 / 700; 
+    aspect-ratio: 1000 / 700;
     overflow: hidden;
     background-color: #f8f9fa;
     border: 1px solid #dee2e6;
@@ -126,7 +169,8 @@ body {
 /* Forza SVG e Canvas a riempire esattamente il contenitore */
 .map-container-responsive svg,
 .map-container-responsive canvas {
-    position: absolute !important; /* Forza absolute per sovrapporli */
+    position: absolute !important;
+    /* Forza absolute per sovrapporli */
     top: 0;
     left: 0;
     width: 100% !important;
@@ -283,7 +327,8 @@ body {
     justify-content: space-between;
     gap: 15px;
     width: 100%;
-    max-width: 500px;
+    /*max-width: 500px;*/
+    max-width: fit-content;
 }
 
 .compact-group {
@@ -339,13 +384,13 @@ body {
     letter-spacing: 0.5px;
 
     /* Centering of the text within the buttons */
-    display: flex;            
-    justify-content: center;  
-    align-items: center;      
-    flex: 1;                  
-    width: 100%;              
-    text-align: center;       
-    margin: 0;                
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    width: 100%;
+    text-align: center;
+    margin: 0;
 }
 
 .btn-compact:hover {
@@ -355,6 +400,36 @@ body {
 .btn-compact.active {
     color: #25282A;
     font-weight: 700;
+}
+
+/* NUOVO: Stile Bottone Replay (Race Chart) */
+.btn-replay {
+    background-color: #343a40;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 6px 20px;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-replay:hover {
+    background-color: #23272b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
+    color: white;
+}
+
+.btn-replay:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 
@@ -475,6 +550,7 @@ body {
 
 /* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
+
     #zoom-controls .zoom-btn,
     #front-zoom-controls .zoom-btn,
     #spike-zoom-controls .zoom-btn {
@@ -552,7 +628,7 @@ body {
     position: relative;
     z-index: 20;
     background: transparent;
-    width: 100%; 
+    width: 100%;
 }
 
 /* Timeline ticker */
@@ -598,28 +674,49 @@ body {
 }
 
 
-/* --- LINE CHART: FAO Chart --- */
-#chart-section .axis path,
-#chart-section .axis line {
+/* ------------------- UNIVERSAL LINE CHART THEME ------------------- */
+
+/* 1. Nascondi di base tutti i bordi e i tick */
+.chart-theme-line .axis path,
+.chart-theme-line .axis line {
     display: none;
 }
 
-#chart-section .grid line {
+.chart-theme-line .grid line {
     stroke: #e0e0e0;
     stroke-opacity: 0.7;
     stroke-dasharray: 4, 4;
 }
 
-#chart-section .axis-x path {
-    stroke: #333;
+/* 2. ECCEZIONE: Mostra la linea dell'asse X (Domain) */
+.chart-theme-line .axis-x path.domain {
     display: block !important;
+    stroke: #333;
+    stroke-width: 1px;
+    /* Opzionale: se vuoi che l'asse sembri "sopra" alle linee del grafico, usa z-index via JS o ordine di disegno */
 }
 
-#chart-section path.line {
+/* 3. ECCEZIONE: Mostra i TICK solo sull'asse X */
+.chart-theme-line .axis-x .tick line {
+    display: block !important;
+    stroke: #666;
+    /* Colore del tick */
+    stroke-width: 1px;
+}
+
+/* 4. Stile Linee Grafico */
+.chart-theme-line .line-path {
     fill: none;
     stroke-width: 3px;
     stroke-linecap: round;
     filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.1));
+    transition: opacity 0.3s ease;
+}
+
+.chart-theme-line .axis text {
+    font-family: 'Fira Sans', sans-serif;
+    font-size: 12px;
+    fill: #666;
 }
 
 
@@ -673,44 +770,6 @@ body {
     text-anchor: end;
     opacity: 0.5;
     pointer-events: none;
-}
-
-/* ============================================== */
-/* FIX REPLAY BUTTON RACE CHART                   */
-/* ============================================== */
-
-/* Resetta la posizione assoluta per farlo tornare nel flusso normale (flex) */
-#race-chart-section #replay-btn {
-    position: static !important; /* Fondamentale: toglie il position absolute */
-    bottom: auto !important;
-    right: auto !important;
-
-    margin-right: 50px !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    margin-left: 0 !important;
-    
-    z-index: 10;
-    
-    /* Stile estetico (opzionale, per uniformarlo) */
-    background-color: #343a40;
-    border-radius: 20px;
-    padding: 6px 16px;
-    text-transform: uppercase;
-    font-weight: 700;
-    font-size: 12px;
-    letter-spacing: 0.5px;
-    border: none;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-#race-chart-section #replay-btn:hover {
-    background-color: #23272b;
-    transform: translateY(-1px);
-}
-
-#race-chart-section #replay-btn:active {
-    transform: translateY(0);
 }
 
 
@@ -774,4 +833,61 @@ body {
 .axis--top text {
     fill: #666;
     font-size: 12px;
+}
+
+
+
+
+
+
+/* --- SPIKE MAP TOGGLES CUSTOM STYLE (Short Underline) --- */
+
+/* 1. Configurazione base delle Label */
+label[for="check-battles"],
+label[for="check-explosions"] {
+    position: relative; /* Necessario per posizionare la linea */
+    opacity: 0.7;
+    transition: color 0.2s ease, opacity 0.2s ease;
+    /* Rimuoviamo eventuali bordi precedenti se presenti */
+    border-bottom: none !important; 
+    padding-bottom: 10px; /* Un po' di spazio per la linea sotto */
+}
+
+/* 2. Creazione della "barretta" (pseudo-elemento) */
+label[for="check-battles"]::after,
+label[for="check-explosions"]::after {
+    content: '';
+    position: absolute;
+    bottom: 5px; /* Distanza dal testo */
+    left: 50%; /* Posiziona al centro orizzontale... */
+    transform: translateX(-50%); /* ...e corregge il centraggio esatto */
+    
+    width: 24px; /* LARGHEZZA DELLA LINEA (Modifica qui se serve) */
+    height: 3px; /* Spessore della linea */
+    border-radius: 2px; /* Arrotonda leggermente gli angoli della linea */
+    
+    background-color: transparent; /* Invisibile di base */
+    transition: background-color 0.2s ease;
+}
+
+/* 3. Stile Testo quando attivo/hover (comune) */
+label[for="check-battles"]:hover,
+label[for="check-battles"].active,
+label[for="check-explosions"]:hover,
+label[for="check-explosions"].active {
+    color: #25282A !important;
+    font-weight: 700 !important;
+    opacity: 1;
+}
+
+/* 4. Colorazione della linea per BATTLES (Rosso) */
+label[for="check-battles"]:hover::after,
+label[for="check-battles"].active::after {
+    background-color: #ff6361;
+}
+
+/* 5. Colorazione della linea per EXPLOSIONS (Giallo) */
+label[for="check-explosions"]:hover::after,
+label[for="check-explosions"].active::after {
+    background-color: #ffa600;
 }

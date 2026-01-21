@@ -1,14 +1,21 @@
+// File: sankey.js
+
 (function() {
 
     // --- CONFIGURAZIONE ---
     const CSV_PATH = "../../data/final/trade-data/final_datasets/output_data.csv"; 
     
-    // Configurazione Soglie
-    const MIN_PERCENTAGE = 0.03; // 1% soglia minima
-    const TOP_N_COUNTRIES = 6;   // Top 6 Paesi
+    // Configurazione Logica (Dimensioni interne per il calcolo Sankey)
+    // Il CSS scalerà tutto, ma queste proporzioni determinano l'aspect ratio.
+    const LOGICAL_WIDTH = 800;
+    const LOGICAL_HEIGHT = 900;
 
-    // Stato Iniziale
-    let isUkraine = false; 
+    // Configurazione Soglie
+    const MIN_PERCENTAGE = 0.03; 
+    const TOP_N_COUNTRIES = 6;   
+
+    let isUkraine = false; // False = Russia (Default)
+    let globalRawData = null;
 
     // Colori
     const NODE_COLORS = {
@@ -17,18 +24,11 @@
         "Rest of EU": "#999999",     
         "Other Products": "#d9d9d9", 
 
-        "Natural Gas": "#f46d43",
-        "Crude/Refined Petroleum": "#fdae61",
-        "Cereals": "#abd9e9",
-        "Oils Seeds & Oleaginous Fruits": "#74add1",
-        "Metals": "#8073ac",
-        "Wood": "#8c510a",
-        "Chemicals": "#c51b7d",
-        "Coal": "#4d4d4d",
-        "Minerals": "#bab0ac",
-        "Machines": "#dfc27d",
-        "Seed Oils": "#35978f",
-        "Precious stones, metals, & pearls": "#e7ba52",
+        "Natural Gas": "#f46d43", "Crude/Refined Petroleum": "#fdae61",
+        "Cereals": "#abd9e9", "Oils Seeds & Oleaginous Fruits": "#74add1",
+        "Metals": "#8073ac", "Wood": "#8c510a", "Chemicals": "#c51b7d",
+        "Coal": "#4d4d4d", "Minerals": "#bab0ac", "Machines": "#dfc27d",
+        "Seed Oils": "#35978f", "Precious stones, metals, & pearls": "#e7ba52",
 
         "Germany": "#1f77b4", "Italy": "#2ca02c", "Netherlands": "#ff7f0e",
         "Poland": "#9467bd", "Belgium": "#8c564b", "Spain": "#e377c2",
@@ -49,7 +49,69 @@
         return "€" + value.toLocaleString();
     };
 
-    // --- LOGICA DATI ---
+    // --- 1. OBSERVER INTERNO ---
+    document.addEventListener("DOMContentLoaded", function() {
+        const target = document.querySelector("#sankey-section");
+        if(target) {
+            const observer = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        console.log("Observer: Avvio Sankey...");
+                        initSankey();
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            observer.observe(target);
+        }
+    });
+
+    // --- 2. INIT FUNCTION ---
+    async function initSankey() {
+        try {
+            globalRawData = await d3.csv(CSV_PATH);
+            setupControls();
+            updateCharts();
+        } catch (error) {
+            console.error("Error Sankey:", error);
+            d3.select("#sankey-controls").html(`<span style="color:red">Error loading data</span>`);
+        }
+    }
+
+    // --- 3. CONTROLS SETUP (Standardizzato) ---
+    function setupControls() {
+        const container = d3.select("#sankey-controls");
+        if(container.empty()) return;
+
+        container.attr("class", "compact-menu-bar d-inline-flex align-items-center");
+        container.html("");
+
+        const options = [
+            { label: "Russia", value: false }, // Value false -> isUkraine = false
+            { label: "Ukraine", value: true }
+        ];
+
+        options.forEach((opt, index) => {
+            const btn = container.append("button")
+                .attr("class", "btn-compact")
+                .text(opt.label)
+                .on("click", function() {
+                    container.selectAll(".btn-compact").classed("active", false);
+                    d3.select(this).classed("active", true);
+                    isUkraine = opt.value;
+                    updateCharts();
+                });
+
+            // Set active state
+            if (isUkraine === opt.value) btn.classed("active", true);
+
+            if (index < options.length - 1) {
+                container.append("div").attr("class", "compact-divider");
+            }
+        });
+    }
+
+    // --- 4. DATA PROCESSING ---
     function prepareSankeyData(rawCsv, year, targetPartner) {
         
         const yearData = rawCsv.filter(d => 
@@ -89,7 +151,6 @@
 
         // Build Links
         const linksMap = new Map();
-        // Calcoliamo anche i valori dei nodi per il pre-sorting
         const nodeValues = new Map();
 
         yearData.forEach(row => {
@@ -109,10 +170,7 @@
             linksMap.set(key2, (linksMap.get(key2) || 0) + val);
 
             // Accumulate Node Values for Sorting
-            nodeValues.set(partner, (nodeValues.get(partner) || 0) + val); // Outgoing
-            // Note: Section value is sum of incoming (from partner) AND outgoing (to reporter). 
-            // Usually Sankey calculates value as max(source, target). 
-            // Here we just need a weight to sort them. Simple accumulation works.
+            nodeValues.set(partner, (nodeValues.get(partner) || 0) + val);
             nodeValues.set(section, (nodeValues.get(section) || 0) + val);
             nodeValues.set(reporter, (nodeValues.get(reporter) || 0) + val);
         });
@@ -129,58 +187,48 @@
             }
         });
 
-        // Create Nodes Array & PRE-SORT BY VALUE
-        // Questo è il trucco: passiamo i nodi già ordinati a D3. 
-        // D3 userà questo ordine come base, ma lo modificherà per evitare incroci (grazie alla rimozione di nodeSort).
         const nodes = Array.from(nodesSet)
-            .map(name => ({ 
-                name: name,
-                totalValue: nodeValues.get(name) || 0
-            }))
-            .sort((a, b) => b.totalValue - a.totalValue); // Ordine decrescente
+            .map(name => ({ name: name, totalValue: nodeValues.get(name) || 0 }))
+            .sort((a, b) => b.totalValue - a.totalValue); 
 
         return { nodes, links, totalValue: totalImportValue };
     }
 
-    // --- DISEGNO ---
+    // --- 5. RENDERER ---
     function drawSankey(containerId, data) {
         const container = d3.select(containerId);
-        const containerRect = container.node().getBoundingClientRect();
-        const width = containerRect.width || 600;
-        const totalHeight = containerRect.height || 600; 
-
-        container.selectAll("*").remove();
-
-        const header = container.append("div")
-            .style("text-align", "center")
-            .style("margin-bottom", "10px")
-            .style("font-weight", "bold")
-            .style("color", "#6c757d")
-            .html(`Total Volume: <span style="color:#000">${formatMoney(data.totalValue)}</span>`);
-
-        const headerHeight = header.node().getBoundingClientRect().height + 10; 
-        const svgHeight = totalHeight - headerHeight; 
+        container.html("");
 
         if (!data.nodes.length) {
             container.append("div").attr("class", "alert alert-light text-center").text("No significant data available.");
             return;
         }
 
+        // Header interno al grafico
+        container.append("div")
+            .style("text-align", "center")
+            .style("margin-bottom", "10px")
+            .style("font-weight", "bold")
+            .style("color", "#6c757d")
+            .style("font-family", "'Fira Sans', sans-serif")
+            .style("font-size", "14px")
+            .html(`Total Volume: <span style="color:#000">${formatMoney(data.totalValue)}</span>`);
+
+        // SVG FLUIDO
+        // Usiamo dimensioni logiche per il calcolo, ma viewBox per la visualizzazione
         const svg = container.append("svg")
-            .attr("width", width)
-            .attr("height", svgHeight)
-            .attr("viewBox", [0, 0, width, svgHeight])
-            .style("max-width", "100%")
-            .style("height", "auto");
+            .attr("viewBox", [0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT])
+            .style("width", "100%")
+            .style("height", "auto")
+            .style("display", "block");
 
         const sankey = d3.sankey()
             .nodeId(d => d.name)
             .nodeWidth(15)
             .nodePadding(20)
-            .extent([[1, 5], [width - 1, svgHeight - 20]]) 
+            .extent([[1, 5], [LOGICAL_WIDTH - 1, LOGICAL_HEIGHT - 20]]) 
             .nodeAlign(d3.sankeyLeft)
-            .iterations(64); // PIÙ ITERAZIONI = MENO INCROCI (Relaxation Algorithm)
-            // .nodeSort(null) <-- Rimosso esplicitamente (è il default, ma per chiarezza: non lo usiamo)
+            .iterations(64); 
 
         const graph = sankey({
             nodes: data.nodes.map(d => Object.assign({}, d)),
@@ -236,22 +284,24 @@
 
         // --- LABELS ---
         svg.append("g")
-            .style("font", "11px sans-serif")
+            .style("font-family", "'Fira Sans', sans-serif")
+            .style("font-size", "11px")
             .style("font-weight", "bold")
             .style("pointer-events", "none")
             .selectAll("text")
             .data(graph.nodes)
             .join("text")
-            .attr("x", d => d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6)
+            .attr("x", d => d.x0 < LOGICAL_WIDTH / 2 ? d.x1 + 6 : d.x0 - 6)
             .attr("y", d => (d.y1 + d.y0) / 2)
             .attr("dy", "0.35em")
-            .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
+            .attr("text-anchor", d => d.x0 < LOGICAL_WIDTH / 2 ? "start" : "end")
             .text(d => d.name)
             .each(function(d) {
+                // Nascondi etichetta se il nodo è troppo piccolo
                 if (d.y1 - d.y0 < 15) this.style.display = "none";
             });
 
-        // --- INTERATTIVITÀ ---
+        // --- INTERATTIVITÀ (Highlight) ---
         const highlight = (d, type) => {
             const allPaths = svg.selectAll(".sankey-link path");
             if (type === "enter") {
@@ -272,55 +322,16 @@
             .on("mouseleave", (event, d) => highlight(d, "leave"));
     }
 
-    // --- INIT ---
-    let globalRawData = null;
-
-    async function updateCharts() {
+    // --- UPDATE HELPER ---
+    function updateCharts() {
         if (!globalRawData) return;
-
         const partner = isUkraine ? "Ukraine" : "Russia";
         
-        const labelRus = document.getElementById('label-russia');
-        const labelUkr = document.getElementById('label-ukraine');
-        if(isUkraine) {
-            labelRus.style.opacity = 0.5; labelRus.style.color = "#6c757d";
-            labelUkr.style.opacity = 1;   labelUkr.style.color = "#4575b4";
-        } else {
-            labelRus.style.opacity = 1;   labelRus.style.color = "#d73027";
-            labelUkr.style.opacity = 0.5; labelUkr.style.color = "#6c757d";
-        }
-
         const data2021 = prepareSankeyData(globalRawData, 2021, partner);
         const data2023 = prepareSankeyData(globalRawData, 2023, partner);
 
         drawSankey("#sankey-chart-2021", data2021);
         drawSankey("#sankey-chart-2023", data2023);
-    }
-
-    async function init() {
-        try {
-            globalRawData = await d3.csv(CSV_PATH);
-            
-            const toggle = document.getElementById('sankey-partner-toggle');
-            toggle.checked = false; 
-            
-            toggle.addEventListener('change', (e) => {
-                isUkraine = e.target.checked;
-                updateCharts();
-            });
-
-            updateCharts();
-            window.addEventListener("resize", updateCharts);
-
-        } catch (error) {
-            console.error("Error Sankey:", error);
-        }
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
     }
 
 })();

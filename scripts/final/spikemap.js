@@ -41,20 +41,18 @@
         return geoName;
     };
 
-    // SOSTITUISCI CON QUESTO:
+    // --- SETUP SVG ---
     const container = d3.select("#spike-container");
-    container.selectAll("*").remove(); // Pulisci eventuali vecchi SVG
+    container.selectAll("*").remove(); 
 
-    // Crea l'SVG dentro il DIV container
     const svg = container.append("svg")
-        .attr("viewBox", [0, 0, width, height]) // Mantiene la responsività
+        .attr("viewBox", [0, 0, width, height]) 
         .style("overflow", "hidden")
         .style("cursor", "grab")
         .style("display", "block")
         .style("width", "100%")
         .style("height", "100%");
 
-    // Aggiungi definizione gradiente
     const defs = svg.append("defs");
     const gradient = defs.append("linearGradient")
         .attr("id", "spikeGradient")
@@ -100,7 +98,7 @@
     d3.select("#spike-zoom-out").on("click", () => svg.transition().duration(500).call(zoom.scaleBy, 0.7));
     d3.select("#spike-zoom-reset").on("click", () => svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity));
 
-    // --- Tooltip (COMPACT STYLE) ---
+    // --- Tooltip ---
     let tooltip = d3.select("body").select(".shared-tooltip");
     if (tooltip.empty()) {
         tooltip = d3.select("body").append("div").attr("class", "shared-tooltip")
@@ -135,8 +133,10 @@
 
         let currentK = 1;
         const getGeo = (topo) => (topo && topo.type === "Topology") ? topojson.feature(topo, topo.objects[Object.keys(topo.objects)[0]]) : topo;
+        
+        // Process Region and District immediately (Fast)
         const geoDist = getGeo(topoDist);
-        const geoComuni = getGeo(geoComuniRaw);
+        // NOTE: geoComuni is processed LAZILY below to speed up initial load
 
         const clean = (d) => { d.fatalities = +d.fatalities || 0; if (d.latitude && d.longitude) { d.lat = +d.latitude; d.lon = +d.longitude; } };
         csvRegion.forEach(clean); csvDist.forEach(clean); csvComuni.forEach(clean);
@@ -144,21 +144,59 @@
         projection.fitSize([width, height], geoReg);
 
         const normalize = str => str ? String(str).toLowerCase().trim().replace(/['`'.]/g, "").replace(/\s+/g, " ") : "";
+        
+        // --- OPTIMIZED CENTROID CALCULATION ---
         const calculateCentroids = (features, data, nameFieldData, geoPropertyName) => {
             const centroidMap = new Map();
             if (!features || features.length === 0) return centroidMap;
-            const uniqueNames = [...new Set(data.map(d => d[nameFieldData]))];
+            
+            // Optimization: Create a Lookup Map for O(1) access instead of O(N) array find
+            const dataLookup = new Map();
+            const uniqueNamesSet = new Set();
+            
+            data.forEach(d => {
+                const name = d[nameFieldData];
+                if(name) {
+                    const norm = normalize(name);
+                    dataLookup.set(norm, name); // Store normalized -> original
+                    uniqueNamesSet.add(name);
+                }
+            });
+            const uniqueNames = [...uniqueNamesSet]; // Only needed for fallback
+
             features.forEach(f => {
                 let geoName = f.properties[geoPropertyName] || f.properties.shapeName || f.properties.NAME_1 || f.properties.NAME_2 || f.properties.NAME_3 || f.properties.name || "";
                 if (geoName) {
                     const normGeo = normalize(geoName);
-                    const match = uniqueNames.find(c => {
-                        const normCsv = normalize(c);
-                        if (NAME_MAPPING[normCsv]) return normGeo.includes(NAME_MAPPING[normCsv]);
-                        if (normCsv === "kyiv" && normGeo.includes("city")) return false;
-                        if (normCsv === "kyiv city" && !normGeo.includes("city")) return false;
-                        return normCsv === normGeo || normGeo.includes(normCsv) || normCsv.includes(normGeo);
-                    });
+                    
+                    // 1. Try exact match (Fastest O(1))
+                    let match = dataLookup.get(normGeo);
+
+                    // 2. Try Name Mapping (Fast O(1))
+                    if (!match) {
+                        const mappedKey = Object.keys(NAME_MAPPING).find(k => normGeo.includes(NAME_MAPPING[k]));
+                         if(mappedKey) {
+                             // Try to find the mapped key in our data lookup
+                             // Note: This logic follows the original intent but optimized
+                             // We check if any data name matches this mapped key
+                             // Since map keys are generic, we fallback to array check if simple lookup fails
+                             match = uniqueNames.find(c => {
+                                 const normCsv = normalize(c);
+                                 return NAME_MAPPING[normCsv] && normGeo.includes(NAME_MAPPING[normCsv]);
+                             });
+                         }
+                    }
+
+                    // 3. Fallback to fuzzy search (Slow - but runs less often now)
+                    if (!match) {
+                        match = uniqueNames.find(c => {
+                            const normCsv = normalize(c);
+                            if (normCsv === "kyiv" && normGeo.includes("city")) return false;
+                            if (normCsv === "kyiv city" && !normGeo.includes("city")) return false;
+                            return normCsv === normGeo || normGeo.includes(normCsv) || normCsv.includes(normGeo);
+                        });
+                    }
+
                     if (match) {
                         const c = path.centroid(f);
                         if (!isNaN(c[0])) centroidMap.set(match, c);
@@ -170,7 +208,20 @@
 
         const regionCentroids = calculateCentroids(geoReg.features, csvRegion, "admin1", "NAME_1");
         const distCentroids = calculateCentroids(geoDist ? geoDist.features : [], csvDist, "admin2", "NAME_2");
-        const comCentroids = calculateCentroids(geoComuni ? geoComuni.features : [], csvComuni, "admin3", "NAME_3");
+        
+        // LAZY LOAD VARIABLES
+        let geoComuni = null;
+        let comCentroids = null;
+
+        // Helper to process municipals only when needed
+        const ensureGeoComuni = () => {
+            if (!geoComuni && geoComuniRaw) {
+                geoComuni = getGeo(geoComuniRaw);
+            }
+            if (!comCentroids && geoComuni) {
+                comCentroids = calculateCentroids(geoComuni.features, csvComuni, "admin3", "NAME_3");
+            }
+        };
 
         // --- MAP LAYER ---
         mapLayer.selectAll("path").data(geoReg.features).join("path")
@@ -198,11 +249,10 @@
             });
         });
 
-        // Aggiungi stili ai bottoni con colori
+        /*
         function updateControlStyles() {
             const batCheck = d3.select("#check-battles");
             const expCheck = d3.select("#check-explosions");
-
             const batLabel = d3.select('label[for="check-battles"]');
             const expLabel = d3.select('label[for="check-explosions"]');
 
@@ -226,11 +276,9 @@
                 expLabel.style("font-weight", "normal");
             }
 
-            // Stili per i radio buttons dei livelli (region, district, municipals)
             d3.selectAll('input[name="mapLevel"]').each(function () {
                 const radio = d3.select(this);
                 const label = d3.select(`label[for="${this.id}"]`);
-
                 if (radio.property("checked")) {
                     label.style("font-weight", "bold");
                     label.style("color", "#000");
@@ -241,57 +289,66 @@
                     label.style("opacity", "0.6");
                 }
             });
+        }*/
+
+        function updateControlStyles() {
+            const batCheck = d3.select("#check-battles");
+            const expCheck = d3.select("#check-explosions");
+            const batLabel = d3.select('label[for="check-battles"]');
+            const expLabel = d3.select('label[for="check-explosions"]');
+
+            // --- BATTLES LOGIC ---
+            // Rimuoviamo stili inline per affidarci al CSS
+            batLabel.style("background", null).style("border-left", null);
+            
+            if (batCheck.property("checked")) {
+                batLabel.classed("active", true);
+            } else {
+                batLabel.classed("active", false);
+            }
+
+            // --- EXPLOSIONS LOGIC ---
+            expLabel.style("background", null).style("border-left", null);
+
+            if (expCheck.property("checked")) {
+                expLabel.classed("active", true);
+            } else {
+                expLabel.classed("active", false);
+            }
+
+            // --- REGION/DISTRICT LOGIC (Invariato, solo pulizia) ---
+            d3.selectAll('input[name="mapLevel"]').each(function () {
+                const radio = d3.select(this);
+                const label = d3.select(`label[for="${this.id}"]`);
+                if (radio.property("checked")) {
+                    label.style("font-weight", "bold").style("color", "#000").style("opacity", "1");
+                } else {
+                    label.style("font-weight", "normal").style("color", "#666").style("opacity", "0.6");
+                }
+            });
         }
 
         function createSharpGradient(id, battlesPerc) {
-            // Rimuovi gradiente esistente se presente
             defs.select(`#${id}`).remove();
-
-            // Crea nuovo gradiente con cambio netto
             const grad = defs.append("linearGradient")
-                .attr("id", id)
-                .attr("x1", "0%")
-                .attr("y1", "100%")
-                .attr("x2", "0%")
-                .attr("y2", "0%");
-
-            // Stop esplosioni (giallo in basso)
-            grad.append("stop")
-                .attr("offset", "0%")
-                .attr("stop-color", COLOR_EXPLOSIONS);
-
-            // Cambio netto al punto di transizione
-            grad.append("stop")
-                .attr("offset", battlesPerc + "%")
-                .attr("stop-color", COLOR_EXPLOSIONS);
-
-            grad.append("stop")
-                .attr("offset", battlesPerc + "%")
-                .attr("stop-color", COLOR_BATTLES);
-
-            // Stop battles (rosso in alto)
-            grad.append("stop")
-                .attr("offset", "100%")
-                .attr("stop-color", COLOR_BATTLES);
-
+                .attr("id", id).attr("x1", "0%").attr("y1", "100%").attr("x2", "0%").attr("y2", "0%");
+            grad.append("stop").attr("offset", "0%").attr("stop-color", COLOR_EXPLOSIONS);
+            grad.append("stop").attr("offset", battlesPerc + "%").attr("stop-color", COLOR_EXPLOSIONS);
+            grad.append("stop").attr("offset", battlesPerc + "%").attr("stop-color", COLOR_BATTLES);
+            grad.append("stop").attr("offset", "100%").attr("stop-color", COLOR_BATTLES);
             return `url(#${id})`;
         }
 
         function getSpikeColor(d, showBat, showExp) {
             const b = d.details["Battles"] || 0;
             const ex = d.details["Explosions/Remote violence"] || 0;
-
             if (showBat && showExp && b > 0 && ex > 0) {
-                // Modalità gradient con cambio netto
                 const total = b + ex;
                 const explosionsPerc = (ex / total) * 100;
                 const gradientId = `gradient-${d.name.replace(/\s+/g, '-')}`;
                 return createSharpGradient(gradientId, explosionsPerc);
-            } else if (showBat && b > 0) {
-                return COLOR_BATTLES;
-            } else if (showExp && ex > 0) {
-                return COLOR_EXPLOSIONS;
-            }
+            } else if (showBat && b > 0) return COLOR_BATTLES;
+            else if (showExp && ex > 0) return COLOR_EXPLOSIONS;
             return COLOR_BATTLES;
         }
 
@@ -303,9 +360,18 @@
             const showExp = d3.select("#check-explosions").property("checked");
 
             let currentData, currentCentroids, labelName;
-            if (level === "region") { currentData = csvRegion; currentCentroids = regionCentroids; labelName = "admin1"; }
-            else if (level === "district") { currentData = csvDist; currentCentroids = distCentroids; labelName = "admin2"; }
-            else { currentData = csvComuni; currentCentroids = comCentroids; labelName = "admin3"; if (currentData.length && !currentData[0][labelName]) labelName = "location"; }
+            
+            if (level === "region") { 
+                currentData = csvRegion; currentCentroids = regionCentroids; labelName = "admin1"; 
+            } else if (level === "district") { 
+                currentData = csvDist; currentCentroids = distCentroids; labelName = "admin2"; 
+            } else { 
+                // Lazy Load logic triggered here
+                ensureGeoComuni(); 
+                currentData = csvComuni; currentCentroids = comCentroids || new Map(); 
+                labelName = "admin3"; 
+                if (currentData.length && !currentData[0][labelName]) labelName = "location"; 
+            }
 
             const agg = new Map();
             let maxVal = 0;
@@ -327,10 +393,8 @@
 
             const data = [];
             agg.forEach((v, k) => {
-                // Verifica che ci sia almeno un evento del tipo selezionato
                 const b = v.dets["Battles"] || 0;
                 const ex = v.dets["Explosions/Remote violence"] || 0;
-
                 let shouldInclude = false;
                 if (showBat && b > 0) shouldInclude = true;
                 if (showExp && ex > 0) shouldInclude = true;
@@ -368,7 +432,6 @@
 
             all.each(function (d) {
                 const spikeColor = getSpikeColor(d, showBat, showExp);
-
                 d3.select(this).select(".spike-visual")
                     .attr("fill", spikeColor)
                     .transition().duration(1200).ease(d3.easeCubicInOut)
@@ -384,98 +447,58 @@
                 const b = d.details["Battles"] || 0;
                 const ex = d.details["Explosions/Remote violence"] || 0;
                 const total = d.value || 1;
-
                 const bPerc = ((b / total) * 100).toFixed(1);
                 const exPerc = ((ex / total) * 100).toFixed(1);
-
                 const maxVal = Math.max(b, ex, 1);
 
                 tooltip.style("visibility", "visible").html(`
-                    <div style="border-bottom: 1px solid #ddd; font-weight: 700; margin-bottom: 8px; padding-bottom: 4px; font-size: 14px; color: #222;">
-                        ${d.name}
-                    </div>
-                    
+                    <div style="border-bottom: 1px solid #ddd; font-weight: 700; margin-bottom: 8px; padding-bottom: 4px; font-size: 14px; color: #222;">${d.name}</div>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size:12px;">
-                        <span style="color: #444;">Total Victims:</span> 
-                        <strong style="color: #000;">${d.value.toLocaleString()}</strong>
+                        <span style="color: #444;">Total Victims:</span> <strong style="color: #000;">${d.value.toLocaleString()}</strong>
                     </div>
-
                     <svg width="220" height="45" style="background: #fafafa; border: 1px solid #eee; border-radius: 4px;">
                         <rect x="0" y="0" width="${(b / maxVal) * 100}%" height="18" fill="${COLOR_BATTLES}" fill-opacity="0.3"></rect>
                         <rect x="0" y="0" width="3" height="18" fill="${COLOR_BATTLES}"></rect> 
-                        <text x="6" y="13" style="font-size: 11px; font-weight: 600; fill: #222; font-family: sans-serif; pointer-events: none;">
-                            Bat: ${b.toLocaleString()} (${bPerc}%)
-                        </text>
-
+                        <text x="6" y="13" style="font-size: 11px; font-weight: 600; fill: #222; font-family: sans-serif; pointer-events: none;">Bat: ${b.toLocaleString()} (${bPerc}%)</text>
                         <rect x="0" y="22" width="${(ex / maxVal) * 100}%" height="18" fill="${COLOR_EXPLOSIONS}" fill-opacity="0.3"></rect>
                         <rect x="0" y="22" width="3" height="18" fill="${COLOR_EXPLOSIONS}"></rect>
-                        <text x="6" y="35" style="font-size: 11px; font-weight: 600; fill: #222; font-family: sans-serif; pointer-events: none;">
-                            Exp: ${ex.toLocaleString()} (${exPerc}%)
-                        </text>
+                        <text x="6" y="35" style="font-size: 11px; font-weight: 600; fill: #222; font-family: sans-serif; pointer-events: none;">Exp: ${ex.toLocaleString()} (${exPerc}%)</text>
                     </svg>
                 `);
             })
-                .on("mousemove", (e) => {
-                    tooltip.style("top", (e.pageY - 15) + "px").style("left", (e.pageX + 15) + "px");
-                })
-                .on("mouseout", (e) => {
-                    tooltip.style("visibility", "hidden");
-                });
+            .on("mousemove", (e) => tooltip.style("top", (e.pageY - 15) + "px").style("left", (e.pageX + 15) + "px"))
+            .on("mouseout", () => tooltip.style("visibility", "hidden"));
         }
 
         function drawLegend(mx, showBat, showExp) {
             legendLayer.selectAll("*").remove();
             const lx = 30, ly = height - 40;
             const g = legendLayer.append("g").attr("transform", `translate(${lx},${ly})`);
-
             const steps = [{ l: "0-100", v: 100 }, { l: "1k-5k", v: 5000 }];
             if (mx > 7500) steps.push({ l: d3.format(".1s")(mx), v: mx });
 
             let cx = 0;
             steps.forEach(s => {
                 if (s.v <= mx || (s.v === 5000 && mx >= 1000)) {
-                    // --- CORREZIONE QUI SOTTO ---
-                    // Prima era: const h = lenScale(s.v) * 0.5;
-                    // Ora togliamo il moltiplicatore per avere la scala 1:1 con la mappa
                     const h = lenScale(s.v);
-
                     let fillColor;
                     if (showBat && showExp) {
                         const legendGradId = `legend-gradient-${s.v}`;
                         fillColor = createSharpGradient(legendGradId, 50);
-                    } else if (showBat) {
-                        fillColor = COLOR_BATTLES;
-                    } else if (showExp) {
-                        fillColor = COLOR_EXPLOSIONS;
-                    } else {
-                        fillColor = COLOR_BATTLES;
-                    }
+                    } else if (showBat) fillColor = COLOR_BATTLES;
+                    else if (showExp) fillColor = COLOR_EXPLOSIONS;
+                    else fillColor = COLOR_BATTLES;
 
-                    g.append("path")
-                        .attr("d", spikePath(cx + 5, 0, h, SPIKE_WIDTH))
+                    g.append("path").attr("d", spikePath(cx + 5, 0, h, SPIKE_WIDTH))
                         .attr("fill", fillColor).attr("stroke", COLOR_STROKE).attr("stroke-width", 0.5);
 
-                    g.append("text")
-                        .attr("x", cx + 12)
-                        .attr("y", 0)
-                        .text(s.l)
-                        .attr("font-size", "11px")
-                        .attr("fill", "#555")
-                        .attr("font-family", "sans-serif")
-                        .attr("font-weight", "600");
-
+                    g.append("text").attr("x", cx + 12).attr("y", 0).text(s.l)
+                        .attr("font-size", "11px").attr("fill", "#555").attr("font-family", "sans-serif").attr("font-weight", "600");
                     cx += 60;
                 }
             });
-
-            g.append("text")
-                .attr("x", 0)
-                .attr("y", 20)
-                .text("Victims (Spike height)")
-                .attr("font-size", "11px")
-                .attr("font-weight", "bold")
-                .attr("fill", "#333")
-                .attr("font-family", "sans-serif");
+            g.append("text").attr("x", 0).attr("y", 20).text("Victims (Spike height)")
+                .attr("font-size", "11px").attr("font-weight", "bold").attr("fill", "#333").attr("font-family", "sans-serif");
         }
 
         d3.selectAll('input[name="mapLevel"]').on("change", updateSpikes);

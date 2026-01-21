@@ -1,16 +1,40 @@
+// File: food_linechart.js
+
+// --- 1. OBSERVER INTERNO ---
+document.addEventListener("DOMContentLoaded", function() {
+    // MODIFICA QUI: Aggiornato con il nuovo ID della section
+    const target = document.querySelector("#food_linechart_section");
+    
+    if (target) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    console.log("Observer: Avvio Food Chart...");
+                    initFoodChart();
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        
+        observer.observe(target);
+    } else {
+        console.warn("Attenzione: #food_linechart_section non trovato nell'HTML");
+    }
+});
+
 function initFoodChart() {
+    // ... IL RESTO DEL CODICE RIMANE IDENTICO A PRIMA ...
     const mainContainer = d3.select("#food-chart-container");
     const legendContainer = d3.select("#food-legend-container");
     const helpContainer = d3.select("#food-help-container");
 
     if (mainContainer.empty()) return;
 
-    // Pulizia totale dei contenitori
-    mainContainer.selectAll("*").remove();
-    legendContainer.selectAll("*").remove();
-    helpContainer.selectAll("*").remove();
+    mainContainer.html("");
+    legendContainer.html("");
+    helpContainer.html("");
     
-    mainContainer.style("position", "relative").style("min-height", "400px");
+    mainContainer.attr("style", "");
 
     const margin = {top: 30, right: 30, bottom: 50, left: 60}; 
     const width = 1000 - margin.left - margin.right;
@@ -18,15 +42,11 @@ function initFoodChart() {
 
     const svg = mainContainer.append("svg")
         .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
-        .style("width", "100%").style("height", "auto")
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
     d3.csv("../../data/final/data_food.csv").then(function(data) {
         
-        // Svuota ancora per sicurezza anti-duplicato
-        legendContainer.html(""); 
-
         const parseTime = d3.timeParse("%Y-%m-%d");
         const keys = data.columns.filter(k => k !== "Date");
 
@@ -35,7 +55,6 @@ function initFoodChart() {
             keys.forEach(k => d[k] = +d[k]);
         });
 
-        // SCALE
         const x = d3.scaleTime().domain(d3.extent(data, d => d.Date)).range([0, width]);
         const maxY = d3.max(data, d => Math.max(...keys.map(k => d[k])));
         const y = d3.scaleLinear().domain([0, maxY * 1.1]).range([height, 0]);
@@ -45,27 +64,14 @@ function initFoodChart() {
 
         let activeFocusKey = null;
 
-        // ASSI
-        svg.append("g")
-            .attr("transform", `translate(0,${height})`)
-            .call(d3.axisBottom(x).ticks(8).tickSizeOuter(0))
-            .style("font-family", "sans-serif").style("font-size", "14px");
-
-        svg.append("g")
-            .call(d3.axisLeft(y).ticks(6).tickSize(0).tickPadding(12))
-            .call(g => g.select(".domain").remove())
-            .style("font-family", "sans-serif").style("font-size", "13px");
-
-        // GRIGLIA
+        // 1. GRIGLIA
         svg.append("g")
             .attr("class", "grid")
             .call(d3.axisLeft(y).ticks(6).tickSize(-width).tickFormat(""))
-            .call(g => g.select(".domain").remove())
-            .selectAll("line")
-            .style("stroke", "#eee")
-            .style("stroke-dasharray", "4,4");
+            .call(g => g.select(".domain").remove());
 
-        // LINEE
+        // 2. LINEE
+        /*
         const lineGen = (key) => d3.line().curve(d3.curveMonotoneX).x(d => x(d.Date)).y(d => y(d[key]));
 
         keys.forEach(key => {
@@ -73,18 +79,58 @@ function initFoodChart() {
             svg.append("path")
                 .datum(data)
                 .attr("id", safeId)
-                .attr("class", "food-line")
+                .attr("class", "line-path food-line") 
                 .attr("fill", "none")
                 .attr("stroke", color(key))
-                .attr("stroke-width", 3)
                 .attr("d", lineGen(key))
-                .style("transition", "opacity 0.3s, stroke-width 0.3s")
                 .style("cursor", "pointer");
+        });*/
+
+        //NEW
+        // 2. LINEE
+        const lineGen = (key) => d3.line().curve(d3.curveMonotoneX).x(d => x(d.Date)).y(d => y(d[key]));
+
+        keys.forEach((key, index) => { // Aggiungi 'index' qui se vuoi un effetto a cascata (opzionale)
+            const safeId = "line-" + key.replace(/\s+/g, '-');
+            
+            const path = svg.append("path")
+                .datum(data)
+                .attr("id", safeId)
+                .attr("class", "line-path food-line") 
+                .attr("fill", "none")
+                .attr("stroke", color(key))
+                .attr("d", lineGen(key))
+                .style("cursor", "pointer");
+
+            // --- ANIMAZIONE CON RITARDO ---
+            const totalLength = path.node().getTotalLength();
+
+            path
+                .attr("stroke-dasharray", totalLength + " " + totalLength)
+                .attr("stroke-dashoffset", totalLength)
+                .transition()
+                .delay(1000)  // <--- AGGIUNTA: Aspetta 500ms (mezzo secondo) prima di partire
+                .duration(7000) // <--- CONSIGLIO: Aumentato leggermente a 2.5s per renderla più morbida
+                .ease(d3.easeCubicOut)
+                .attr("stroke-dashoffset", 0);
         });
 
-        // FUNZIONE FOCUS
+        // 3. ASSI
+        svg.append("g")
+            .attr("class", "axis axis-x") 
+            .attr("transform", `translate(0,${height})`)
+            .call(d3.axisBottom(x).ticks(8).tickSizeOuter(0))
+            .style("font-family", "sans-serif").style("font-size", "14px");
+
+        svg.append("g")
+            .attr("class", "axis axis-y")
+            .call(d3.axisLeft(y).ticks(6).tickSize(0).tickPadding(12))
+            .call(g => g.select(".domain").remove()) 
+            .style("font-family", "sans-serif").style("font-size", "13px");
+
         function updateFocus() {
             svg.selectAll(".food-line")
+                .transition().duration(200)
                 .style("opacity", function() {
                     const id = d3.select(this).attr("id");
                     const targetId = "line-" + (activeFocusKey ? activeFocusKey.replace(/\s+/g, '-') : "");
@@ -93,7 +139,7 @@ function initFoodChart() {
                 .style("stroke-width", function() {
                     const id = d3.select(this).attr("id");
                     const targetId = "line-" + (activeFocusKey ? activeFocusKey.replace(/\s+/g, '-') : "");
-                    return (!activeFocusKey || id === targetId) ? 3.5 : 2;
+                    return (!activeFocusKey || id === targetId) ? 4 : 3;
                 });
 
             legendContainer.selectAll("button")
@@ -102,11 +148,11 @@ function initFoodChart() {
                 });
         }
 
-        // LEGENDA (distanza column-gap-5 per matchare Food Chart)
         legendContainer.attr("class", "d-flex flex-wrap justify-content-center align-items-center column-gap-5 row-gap-1 mt-1");
+        
         keys.forEach(key => {
             const btn = legendContainer.append("button")
-                .attr("class", "btn-compact d-flex align-items-center gap-2 p-0 w-auto flex-grow-0 border-0 bg-transparent");
+                .attr("class", "btn-compact d-flex align-items-center gap-2 p-0 border-0 bg-transparent");
             
             btn.append("span")
                 .style("width", "10px").style("height", "10px")
@@ -123,7 +169,6 @@ function initFoodChart() {
             btn.node().__key__ = key;
         });
 
-        // HELP BUTTON
         const helpContent = {
             title: "Understanding Food Price Trends",
             steps: [
@@ -134,10 +179,9 @@ function initFoodChart() {
         };
 
         if (typeof createChartHelp === "function") {
-            createChartHelp("#food-help-container", "#food-chart-container", helpContent);
+            createChartHelp("#food-help-container", "#food-chart-wrapper", helpContent);
         }
 
-        // --- TOOLTIP ---
         const tooltip = d3.select("#food-chart-tooltip");
         const mouseLine = svg.append("line")
             .attr("y1", 0).attr("y2", height)
@@ -156,6 +200,8 @@ function initFoodChart() {
                 const d0 = data[i - 1];
                 const d1 = data[i];
                 const d = (d1 && x0 - d0.Date > d1.Date - x0) ? d1 : d0;
+
+                if (!d) return;
 
                 mouseLine.attr("x1", x(d.Date)).attr("x2", x(d.Date)).style("opacity", 1);
                 
