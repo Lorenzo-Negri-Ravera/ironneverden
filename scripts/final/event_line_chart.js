@@ -83,7 +83,7 @@ function initEventsLineChart() {
         const x = d3.scaleTime().domain(d3.extent(data, d => d.Date)).range([0, width]);
         const maxY = d3.max(data, d => Math.max(...TARGET_TYPES.map(k => d[k])));
         const y = d3.scaleLinear().domain([0, maxY * 1.15]).range([height, 0]);
-        const color = d3.scaleOrdinal().domain(TARGET_TYPES).range(["#d62728", "#ff7f0e", "#1f77b4"]);
+        const color = d3.scaleOrdinal().domain(TARGET_TYPES).range(["#ff6361", "#003f5c", "#ffa600"]);
 
         let activeFocusKey = null;
 
@@ -191,9 +191,8 @@ function initEventsLineChart() {
         const helpContent = {
             title: "How to read the chart?",
             steps: [
-                "<strong>Y-Axis:</strong> Number of weekly recorded events.",
-                "<strong>Categories:</strong> Shelling, strikes, and direct armed clashes.",
-                "<strong>Focus:</strong> Click a legend category to isolate its trend line."
+                "Hover on the line to see details.",
+                "Click legend items to isolate specific event types."
             ]
         };
 

@@ -15,13 +15,13 @@
     const radius = width / 6;
 
     const continentColors = {
-        "Europe": "#4e79a7",   
-        "Asia": "#e15759",     
-        "Africa": "#f28e2b",   
-        "North America": "#76b7b2", 
-        "South America": "#59a14f", 
-        "Oceania": "#edc948",  
-        "Unknown": "#bab0ac"   
+        "Europe": "#003f5c",   
+        "Asia": "#ffa600",     
+        "Africa": "#ff6361",   
+        "North America": "#bc5090", 
+        "South America": "#58508d", 
+        "Oceania": "#488f31",  
+        //"Unknown": "#bab0ac"   
     };
 
     const formatMoney = d3.format("$.2s"); 

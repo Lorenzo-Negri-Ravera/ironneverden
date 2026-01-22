@@ -444,9 +444,9 @@
         const mapHelpContent = {
             title: "How to read the chart?",
             steps: [
-                "<strong>Colors:</strong> Red spikes = Battles, Yellow spikes = Explosions.",
-                "<strong>Height:</strong> Represents the number of victims.",
-                "<strong>Interaction:</strong> Hover over spikes to see detailed statistics."
+                "Change the geographical view by buttons Regions, Districts and Municipals.",
+                "Change the event view by buttons Explosions and Battles",
+                "Hover on the spike to see details."
             ]
         };
 

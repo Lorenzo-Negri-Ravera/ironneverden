@@ -18,7 +18,7 @@
     // MODIFICA QUI: Aumentato margin.right a 120 per far stare le etichette
     const margin = { top: 60, right: 120, bottom: 10, left: 75 }; 
 
-    const customPalette = ["#003f5c", "#374c80", "#7a5195", "#bc5090", "#ef5675", "#ff764a", "#ffa600"];
+    const customPalette = ["#003f5c", "#374c80", "#58508d", "#bc5090", "#ff6361", "#ff764a", "#ffa600"];
     const neigh = ["Russia", "Ukraine", "Poland", "Hungary", "Romania", "Lithuania", "Slovakia"];
 
     let currentRaceId = 0;

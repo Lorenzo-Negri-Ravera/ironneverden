@@ -511,9 +511,10 @@ Promise.all([
     const mapHelpContent = {
         title: "How to read the chart?",
         steps: [
-            "<strong>Colors:</strong> Darker red indicates a higher number of conflict events.",
-            "<strong>Interaction:</strong> Hover over any country to see detailed statistics.",
-            "<strong>Zoom:</strong> Click on a country to zoom in and explore regional data."
+            "Select the interested events through the buttons.",
+            "The green line in the map represents the UKR-RUS boundary.",
+            "Hover to the regions to visualize the name region.",
+            "Start the animation of the events on the soil through the Play button."
         ]
     };
     if (typeof createChartHelp === "function") {

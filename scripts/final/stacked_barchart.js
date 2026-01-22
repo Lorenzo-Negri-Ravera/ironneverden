@@ -197,9 +197,8 @@ function initStackedBarChart() {
     const barHelpContent = {
         title: "How to read the chart?",
         steps: [
-            "<strong>Colors:</strong> Red/Yellow indicate active conflict (Battles, Explosions). Blue/Purple indicate civil unrest.",
-            "<strong>Y-axis:</strong> Percentage share of total events per year.",
-            "<strong>Interaction:</strong> Click legend items to isolate specific event types."
+            "Hover on the category to see details.",
+            "Click legend items to isolate specific event types."
         ]
     };
     if (typeof createChartHelp === "function") {

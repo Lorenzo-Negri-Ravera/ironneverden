@@ -151,7 +151,7 @@
                 .attr("height", y.bandwidth())
                 .attr("x", d => x(Math.min(0, d.value)))
                 .attr("width", d => Math.abs(x(d.value) - x(0)))
-                .attr("fill", d => d.value < 0 ? "#b2182b" : "#2166ac")
+                .attr("fill", d => d.value < 0 ? "#de425b" : "#003f5c")
                 .attr("opacity", 1);
 
             // Labels

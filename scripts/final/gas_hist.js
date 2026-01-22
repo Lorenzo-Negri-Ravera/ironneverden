@@ -4,7 +4,7 @@
 
     // --- CONFIGURAZIONE ---
     const CSV_PATH = "../../data/final/trade-data/final_datasets/gas_price.csv"; 
-    const LINE_COLOR = "#e6550d"; 
+    const LINE_COLOR = "#ff7c43"; //"#e6550d"; 
 
     document.addEventListener("DOMContentLoaded", function() {
         const target = document.querySelector("#gas-linechart-section");

@@ -1055,19 +1055,20 @@
 
         hideLoader();
 
+        /*
         if (typeof setupHelpButton === "function") {
             setupHelpButton(svg, width, height, {
                 x: 30, y: height - 30, title: "Disorders in Europe",
                 instructions: ["1. Dark intensity means more events (see Legend).", "2. Hover for a breakdown of event types.", "3. Click on a country to see details on its regions."]
             });
-        }
+        }*/
 
         const mapHelpContent = {
             title: "How to read the chart?",
             steps: [
-                "<strong>Colors:</strong> Darker red indicates a higher number of conflict events.",
-                "<strong>Interaction:</strong> Hover over any country to see detailed statistics.",
-                "<strong>Zoom:</strong> Click on a country to zoom in and explore regional data."
+                "Darker tonality indicates a higher number of conflict events.",
+                "Hover over any country to see detailed statistics.",
+                "Click over a country to explore regions statistics."
             ]
         };
 
