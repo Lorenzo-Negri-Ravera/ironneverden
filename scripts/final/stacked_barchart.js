@@ -37,28 +37,25 @@ function initStackedBarChart() {
     const color = d3.scaleOrdinal().domain(keys).range(PALETTE);
     let activeFilter = null;
 
-    // --- INTERACTIVE LEGEND ---
-    legendContainer.attr("class", "d-flex flex-wrap justify-content-start align-items-center column-gap-3 row-gap-2 mt-2");
+    // --- INTERACTIVE LEGEND (Standardized) ---
+    legendContainer.attr("class", "universal-legend"); // Classe CSS Standard
     
     keys.forEach((key) => {
         const itemColor = color(key);
         const btn = legendContainer.append("button")
-            .attr("class", "btn-compact d-flex align-items-center gap-2 p-0 border-0 bg-transparent"); 
+            .attr("class", "legend-item"); // Classe CSS Standard
 
+        // Marker (Pallino)
         btn.append("span")
-            .style("width", "10px").style("height", "10px") 
-            .style("background-color", itemColor)
-            .style("border-radius", "50%")
-            .style("display", "inline-block")
-            .style("flex-shrink", "0");
+            .attr("class", "legend-marker")
+            .style("background-color", itemColor);
 
+        // Testo
         btn.append("span")
-            .text(key)
-            .style("text-transform", "uppercase") 
-            .style("font-size", "11px")
-            .style("font-weight", "600")
-            .style("color", "#555"); 
+            .attr("class", "legend-text")
+            .text(key);
 
+        // Interazione
         btn.on("click", function() {
             activeFilter = (activeFilter === key) ? null : key;
             updateChartState();
@@ -68,12 +65,17 @@ function initStackedBarChart() {
     });
 
     function updateChartState() {
+        // Aggiorna opacità barre
         d3.selectAll(".bar-rect").transition().duration(200)
             .style("opacity", d => (!activeFilter || d.key === activeFilter) ? 1 : 0.1);
         
-        legendContainer.selectAll("button")
-            .style("opacity", function() {
-                return (!activeFilter || this.__key__ === activeFilter) ? 1 : 0.4;
+        // Aggiorna opacità legenda (usando classe 'dimmed')
+        legendContainer.selectAll(".legend-item")
+            .classed("dimmed", function() {
+                return activeFilter && this.__key__ !== activeFilter;
+            })
+            .classed("active", function() {
+                return this.__key__ === activeFilter;
             });
     }
 
@@ -102,7 +104,7 @@ function initStackedBarChart() {
         // Grid Lines
         svg.append("g")
            .attr("class", "grid")
-           .call(d3.axisLeft(y).ticks(10).tickSize(-width).tickFormat("").tickSizeOuter(0));
+           .call(d3.axisLeft(y).ticks(6).tickSize(-width).tickFormat("").tickSizeOuter(0));
 
         // BARS
         const groups = svg.append("g").selectAll("g").data(series).join("g").attr("fill", d => color(d.key));
@@ -128,7 +130,6 @@ function initStackedBarChart() {
            .call(g => g.select(".domain").remove());
 
         // --- TOOLTIP STANDARDIZZATO ---
-        // TOOLTIP E INTERAZIONE
         const tooltip = d3.select("#tooltip-bar")
             .attr("class", "shared-tooltip");
         
@@ -145,16 +146,15 @@ function initStackedBarChart() {
             const total = d3.sum(keys, k => d.data[k]);
             const percent = ((value / total) * 100).toFixed(1);
 
-            // 2. NUOVA LOGICA: Highlight Asse X
-            // Selezioniamo i tick dell'asse X, troviamo quello corrispondente all'anno e lo stilizziamo
+            // 2. Highlight Asse X (Anno)
             svg.selectAll(".axis-x .tick")
-                .filter(tickData => tickData === year) // Confronta il dato del tick con l'anno della barra
+                .filter(tickData => tickData === year)
                 .select("text")
-                .style("font-weight", "700")  // Grassetto
-                .style("fill", "#000")        // Nero pieno
-                .style("font-size", "14px");  // Leggermente più grande (opzionale)
+                .style("font-weight", "700")
+                .style("fill", "#000")
+                .style("font-size", "14px");
 
-            // 3. Tooltip HTML (Esistente)
+            // 3. Tooltip HTML
             const htmlContent = `
                 <div class="tooltip-header">${eventName}</div>
                 
@@ -178,14 +178,13 @@ function initStackedBarChart() {
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
             
-            // 1. Reset Opacità Barre (Esistente)
+            // 1. Reset Opacità Barre
             if (!activeFilter) d3.selectAll(".bar-rect").style("opacity", 1);
             else updateChartState();
 
-            // 2. NUOVA LOGICA: Reset Asse X
-            // Ripristiniamo lo stile originale per TUTTI i testi dell'asse X
+            // 2. Reset Asse X
             svg.selectAll(".axis-x .tick text")
-                .style("font-weight", null) // Rimuove lo stile inline (torna al CSS)
+                .style("font-weight", null)
                 .style("fill", null)
                 .style("font-size", null);
         });

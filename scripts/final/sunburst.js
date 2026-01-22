@@ -135,8 +135,8 @@
         container.html("");
 
         const options = [
-            { label: "Ukraine", value: "UKR" },
-            { label: "Russia", value: "RUS" }
+             { label: "Russia", value: "RUS" },
+            { label: "Ukraine", value: "UKR" }
         ];
 
         options.forEach((opt, index) => {
@@ -199,7 +199,7 @@
         const svg = d3.select(selector).append("svg")
             .attr("viewBox", [-width / 2, -width / 2, width, width]) 
             .style("font-family", "'Fira Sans', sans-serif")
-            .style("font-size", "10px");
+            .style("font-size", "15px");
         
         const path = svg.append("g")
             .selectAll("path")
@@ -262,17 +262,14 @@
             .attr("dy", "0.35em")
             .attr("fill-opacity", d => +labelVisible(d.current))
             .attr("transform", d => labelTransform(d.current))
-            .text(d => d.data.name)
-            .each(function(d) {
-                try {
-                    const self = d3.select(this);
-                    const textLength = self.node().getComputedTextLength();
-                    const availableSpace = (d.current.y1 - d.current.y0) * radius; 
-                    if (d.current && textLength > availableSpace * 1.5) {
-                        self.text(d.data.name.substring(0, 4) + "..");
-                    }
-                } catch(e) {}
+            // MODIFICA QUI: Logica di troncamento migliorata
+            .text(d => {
+                const name = d.data.name;
+                // Se il nome è più lungo di 10 caratteri, tronca e aggiungi '..'
+                // Puoi cambiare 10 con il numero che preferisci
+                return name.length > 10 ? name.substring(0, 10) + ".." : name;
             });
+
 
         const parent = svg.append("circle")
             .datum(root)

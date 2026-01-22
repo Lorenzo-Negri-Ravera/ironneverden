@@ -163,57 +163,64 @@ body {
     gap: 5px;
 }
 
-
 /* ------------------- UNIVERSAL CHART THEME ------------------- */
-/* Questa classe andrà applicata al contenitore SVG di TUTTI i grafici */
 
-/* 1. Stile ASSI e GRIGLIE (Comune a tutti: Linee, Barre, Istogrammi) */
-
-/* Nascondi di base le linee degli assi e i tick verticali */
+/* Remove axis lines and ticks (Y axis usually) */
 .chart-theme-universal .axis path,
 .chart-theme-universal .axis line {
     display: none;
 }
 
-/* Mostra la griglia (tratteggiata) */
+/* Add Grid lines */
 .chart-theme-universal .grid line {
     display: block !important;
-    stroke: #e0e0e0;
+    stroke: #a8a8a8;
     stroke-opacity: 0.7;
     stroke-dasharray: 4, 4;
 }
+
+/* Remove grid exterior border */
 .chart-theme-universal .grid path {
-    display: none; /* Nasconde il bordo esterno della griglia */
+    display: none;
 }
 
-/* Mostra la linea di base dell'asse X (il "pavimento") */
+/* --- AXIS X CUSTOMIZATION --- */
+
+/* Show the baseline of the X axis - THICKER */
 .chart-theme-universal .axis-x path.domain {
     display: block !important;
     stroke: #333;
-    stroke-width: 1px;
+    stroke-width: 2px;
+    /* Aumentato da 1px a 2px */
 }
 
-/* Mostra i TICK solo sull'asse X */
+/* Show TICKS on the X axis - THICKER */
 .chart-theme-universal .axis-x .tick line {
     display: block !important;
     stroke: #666;
-    stroke-width: 1px;
+    stroke-width: 2px;
+    /* Aumentato da 1px a 2px per visibilità */
 }
 
-/* Font standard per tutti i testi dentro il grafico */
+/* --- TEXT STYLING --- */
+
+/* Standard font for all texts inside the chart */
 .chart-theme-universal text {
     font-family: 'Fira Sans', sans-serif;
     fill: #25282A;
 }
 
+/* Axis text style - BIGGER */
 .chart-theme-universal .axis text {
-    font-size: 12px;
-    fill: #666;
+    font-size: 16px;
+    /* Aumentato da 12px a 16px per reggere lo scale-down */
+    font-weight: 500;
+    /* Leggermente più grassetto */
+    fill: #444;
+    /* Colore leggermente più scuro per contrasto */
 }
 
-
-/* 2. Stile SPECIFICO per i Line Chart (Solo se c'è la classe .line-path) */
-/* Questo blocco viene ignorato dai grafici a barre perché non hanno .line-path */
+/* Line path style */
 .chart-theme-universal .line-path {
     fill: none;
     stroke-width: 3px;
@@ -224,11 +231,21 @@ body {
 
 
 
+/* ----------------- SPECIAL GRAPHS STYLES -----------------  */
+
+/* Race bar chart year ticker */
+.year-ticker {
+    font-family: 'Roboto Slab', serif;
+    font-size: 140px;
+    font-weight: 700;
+    fill: #e0e0e0;
+    text-anchor: end;
+    opacity: 0.5;
+    pointer-events: none;
+}
 
 
-
-
-/* ------------------- CHART STYLES ------------------- */
+/* ------------------- CHART Titles TODO ------------------- */
 
 .graph-title {
     font-family: 'Fira Sans', sans-serif;
@@ -244,36 +261,11 @@ body {
     fill: #25282A;
 }
 
-/* Axes and ticks */
-.domain,
-.tick line {
-    stroke: #25282A;
-    stroke-width: 1px;
-}
-
-.tick text {
-    font-family: 'Fira Sans', sans-serif;
-    font-size: 14px;
-    fill: #25282A;
-}
-
-.legend text {
-    font-family: 'Fira Sans', sans-serif;
-    font-size: 12px;
-    fill: #25282A;
-}
-
-
-
-
-
-
-
 /* ============================================================ */
 /* ------------------- UNIVERSAL TOOLTIP THEME ---------------- */
 /* ============================================================ */
 
-/* 1. Contenitore Principale Standard (Applica questa classe a TUTTI i div dei tooltip nell'HTML) */
+/* 1. Main Container Standard (Apply this class to ALL tooltip divs in the HTML) */
 .shared-tooltip {
     position: absolute;
     visibility: hidden;
@@ -287,70 +279,54 @@ body {
     pointer-events: none;
     z-index: 3000;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    
-    /* Assicura che non vada a capo in modo strano e abbia una larghezza minima decente */
     min-width: 150px;
     white-space: normal;
 }
 
-/* 2. Header del Tooltip (Titolo / Data) */
+/* 2. Tooltip Header*/
 .tooltip-header {
     font-weight: 700;
     color: #333;
-    /* Stile aggiornato (Food Chart Style) */
     border-bottom: 1px solid #ddd;
     padding-bottom: 4px;
     margin-bottom: 8px;
     font-size: 13px;
-    display: block; /* Assicura che prenda tutta la riga */
+    display: block;
 }
 
-/* 3. STILE NUOVO (Layout a righe flessibili - Useremo questo d'ora in poi) */
+/* Tool-tip line of text */
 .tooltip-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 30px; /* Spazio standard tra nome e valore */
+    gap: 30px;
     margin-bottom: 3px;
     font-size: 13px;
 }
 
-/* Elementi interni alla riga */
+/* Elements inside the row */
 .tooltip-label {
     display: flex;
     align-items: center;
-    gap: 6px; /* Spazio tra pallino e testo */
+    gap: 6px;
 }
 
+/* Element inside the row to add symbol */
 .tooltip-bullet {
     font-size: 16px;
     line-height: 0;
-    /* Il colore verrà impostato inline via JS */
 }
 
+/*Value of the element inside the row */
 .tooltip-value {
     font-weight: 700;
     color: #25282A;
-    font-variant-numeric: tabular-nums; /* Allinea bene i numeri */
+    font-variant-numeric: tabular-nums;
 }
 
-/* Stato "dimmed" (opacità ridotta) per quando una riga non è in focus */
+/* Dimmed row (when another element is highlighted) */
 .tooltip-row.dimmed {
     opacity: 0.3;
-}
-
-/* 4. STILE VECCHIO (Legacy - DA RIMUOVERE una volta aggiornati tutti i JS) */
-/* Manteniamo questo per non rompere le mappe finché non le aggiorni */
-.tooltip-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.tooltip-list li {
-    display: flex;
-    justify-content: space-between;
-    gap: 15px;
 }
 
 
@@ -391,7 +367,9 @@ body {
 
 
 
-/* ------------------- Menu Style ------------------- */
+/* ------------------- BUTTONS STYLES ------------------- */
+
+/* Buttons array bootstrap like*/
 .compact-menu-bar {
     position: relative;
     margin: 0 auto;
@@ -405,8 +383,12 @@ body {
     justify-content: space-between;
     gap: 15px;
     width: 100%;
-    /*max-width: 500px;*/
     max-width: fit-content;
+}
+
+.compact-menu-bar.fluid-width {
+    max-width: 90%;
+    width: auto;
 }
 
 .compact-group {
@@ -446,8 +428,6 @@ body {
     margin: 0 10px;
 }
 
-
-
 /* --- Buttons --- */
 .btn-compact {
     background: none;
@@ -481,6 +461,64 @@ body {
     font-weight: 700;
 }
 
+/* FIX RESPONSIVE PER MENU E BOTTONI */
+@media (max-width: 768px) {
+
+    /* 1. IL CONTENITORE: Centrato nella pagina, ma scorrevole dentro */
+    .compact-menu-bar {
+        display: flex !important;
+        flex-wrap: nowrap !important;     /* Mai a capo */
+        overflow-x: auto !important;      /* Scroll orizzontale se serve */
+        justify-content: flex-start !important; /* Necessario per lo scroll */
+        
+        width: fit-content !important;    /* Si adatta al contenuto... */
+        max-width: 95% !important;        /* ...ma non esce dallo schermo (lascia margini) */
+        margin: 0 auto !important;        /* Centra tutto il blocco nella pagina */
+        
+        gap: 0px !important;              /* Gestiamo lo spazio col padding dei bottoni */
+        padding: 4px 6px !important;      /* Padding esterno ridotto */
+        
+        /* Nasconde scrollbar */
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    
+    .compact-menu-bar::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* 2. I BOTTONI E LE ETICHETTE: Spazio per la linea sotto */
+    .btn-compact,
+    .compact-menu-bar label { 
+        width: auto !important;
+        flex: 0 0 auto !important;
+        font-size: 11px !important;
+        white-space: nowrap !important;
+        
+        /* PADDING CRUCIALE: 
+           8px ai lati per distanziarli
+           10px SOTTO per farci stare la linea colorata senza che tocchi il testo */
+        padding: 6px 12px 10px 12px !important; 
+        margin: 0 !important;
+    }
+
+    /* 3. SISTEMAZIONE LINEA COLORATA (Battles/Explosions/Filters) */
+    /* La posizioniamo esattamente nello spazio di 10px creato dal padding-bottom */
+    #filter-container .btn-compact::after,
+    label[for="check-battles"]::after,
+    label[for="check-explosions"]::after {
+        bottom: 3px !important;           /* Staccata 3px dal fondo */
+        width: 70% !important;            /* Larga il 70% del testo (più elegante) */
+        left: 50% !important;             /* Centrata */
+        transform: translateX(-50%) !important;
+        height: 3px !important;           /* Spessore linea */
+    }
+
+    /* 4. Nascondi i divisori verticali (linee grigie) su mobile */
+    .compact-divider {
+        display: none !important;
+    }
+}
 
 /* Button Play / Replay */
 .btn-player {
@@ -492,12 +530,12 @@ body {
     letter-spacing: 0.5px;
     height: 36px;
     transition: all 0.2s ease;
-    background-color: #c5655e;
+    background-color: #8a8e92;
     border: none;
 }
 
 .btn-player:hover {
-    background-color: #ad534d !important;
+    background-color: #515357 !important;
     box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
     transform: translateY(-1px);
 }
@@ -506,10 +544,6 @@ body {
     background-color: #0a58ca;
     transform: translateY(0);
 }
-
-
-
-
 
 /* ------------------- Help Botton (How to read the chart) ------------------- */
 .chart-help-trigger {
@@ -585,10 +619,6 @@ body {
     margin-bottom: 0;
 }
 
-
-
-
-
 /* ------------------- Zoom ------------------- */
 #zoom-controls,
 #front-zoom-controls,
@@ -642,8 +672,6 @@ body {
         gap: 3px !important;
     }
 }
-
-
 
 /* ------------------- Timeline player (front_map) ------------------- */
 #controls {
@@ -708,138 +736,105 @@ body {
     transform: translateX(10px);
 }
 
-
-
-
-
 /* ------------------- Responsive adjustments (front_map) ------------------- */
 
 @media (min-width: 768px) {
-    #front-map-section #controls {
-        width: auto !important;
-    }
-
     #time-slider {
         width: 180px !important;
     }
 }
 
+/* ============================================================ */
+/* ------------------- UNIVERSAL LEGEND THEME ----------------- */
+/* ============================================================ */
 
-/* ######################### */
-/* --- RESPONSIVE STACKED BAR CHART CONTROLS (Specchio della Front Map) --- */
-/* --- COMPACT MENU BAR (Stile "Pillola" su una riga) --- */
-
-/* 1. Il Contenitore (Guscio esterno) */
-#stacked-legend-container.compact-menu-bar {
-    display: inline-flex;
+/* 1. Contenitore della Legenda */
+.universal-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    /* Centrato orizzontalmente */
     align-items: center;
-    background-color: white;
-    border: 1px solid #dee2e6;
-    border-radius: 10px;
+    gap: 15px;
+    /* Spazio tra gli elementi */
+    width: 100%;
+    padding: 0;
+    list-style: none;
+}
+
+/* 2. Singolo Elemento (Bottone) */
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    /* Spazio tra pallino e testo */
+    background: none;
+    border: none;
     padding: 4px 6px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-
-    /* MODIFICA FONDAMENTALE PER UNA RIGA */
-    flex-wrap: nowrap !important;
-    /* Forza tutto su una linea */
-    white-space: nowrap;
-    /* Impedisce al testo di andare a capo */
-
-    /* Sicurezza per schermi piccoli: permette lo scroll orizzontale se non ci sta */
-    max-width: 100%;
-    overflow-x: auto;
-
-    /* Nascondi la barra di scorrimento (estetica) */
-    scrollbar-width: none;
-    /* Firefox */
-    -ms-overflow-style: none;
-    /* IE/Edge */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
 }
 
-/* Nascondi scrollbar Webkit (Chrome/Safari) */
-#stacked-legend-container.compact-menu-bar::-webkit-scrollbar {
-    display: none;
+/* 3. Il Pallino Colorato (Marker) */
+.legend-marker {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    /* Cerchio perfetto */
+    flex-shrink: 0;
 }
 
-
-/* --- ELEMENTI FLOTTANTI --- */
-
-/* Anno di sfondo */
-.year-ticker {
-    font-family: 'Roboto Slab', serif;
-    font-size: 140px;
-    font-weight: 700;
-    fill: #e0e0e0;
-    text-anchor: end;
-    opacity: 0.5;
-    pointer-events: none;
-}
-
-
-/* Legenda (Posizionata sopra il bottone Replay) */
-.legend-box {
-    position: absolute;
-    bottom: 70px;
-    /* Appena sopra l'area dei bottoni */
-    right: 30px;
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid #dee2e6;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    min-width: 180px;
-    z-index: 50;
-    transition: opacity 0.3s ease;
-}
-
-.legend-box.hidden {
-    opacity: 0;
-    pointer-events: none;
-}
-
-.legend-box h3 {
-    margin: 0 0 8px 0;
-    font-size: 16px;
-    border-bottom: 2px solid #002677;
-    padding-bottom: 4px;
-}
-
-.legend-box p {
-    margin: 6px 0;
-    font-size: 13px;
+/* 4. Il Testo della Legenda */
+.legend-text {
+    font-family: 'Fira Sans', sans-serif;
+    font-size: 15px;
     font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
 }
 
+/* 5. Stati Interattivi */
 
+/* Hover sull'elemento attivo */
+.legend-item:not(.dimmed):hover .legend-text {
+    color: #25282A;
+    /* Diventa più scuro */
+}
 
-/* Stili SVG Testo */
-.label-name {
-    font-family: 'Fira Sans', sans-serif;
+/* Stato "Dimmed" (quando un altro elemento è selezionato) */
+.legend-item.dimmed {
+    opacity: 0.3;
+}
+
+/* Stato Attivo (opzionale, se vuoi evidenziare la selezione corrente) */
+.legend-item.active .legend-text {
+    color: #000;
     font-weight: 700;
-    font-size: 14px;
-    fill: #333;
 }
 
-.label-value {
-    font-family: 'Fira Sans', sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    fill: #555;
-    font-variant-numeric: tabular-nums;
+/* Ottimizzazione Legenda per Mobile */
+@media (max-width: 768px) {
+    .universal-legend {
+        gap: 10px;
+        /* Riduce lo spazio tra gli elementi (era 15px) */
+        row-gap: 5px;
+        /* Riduce lo spazio tra le righe quando vanno a capo */
+    }
+
+    .legend-item {
+        padding: 2px 4px;
+        /* Riduce leggermente l'area di click per risparmiare spazio */
+    }
+
+    .legend-text {
+        font-size: 11px;
+        /* Opzionale: testo leggermente più piccolo su mobile */
+    }
 }
-
-.axis--top path,
-.axis--top line {
-    stroke: #d0d0d0;
-}
-
-.axis--top text {
-    fill: #666;
-    font-size: 12px;
-}
-
-
-
 
 
 
@@ -848,12 +843,14 @@ body {
 /* 1. Configurazione base delle Label */
 label[for="check-battles"],
 label[for="check-explosions"] {
-    position: relative; /* Necessario per posizionare la linea */
+    position: relative;
+    /* Necessario per posizionare la linea */
     opacity: 0.7;
     transition: color 0.2s ease, opacity 0.2s ease;
     /* Rimuoviamo eventuali bordi precedenti se presenti */
-    border-bottom: none !important; 
-    padding-bottom: 10px; /* Un po' di spazio per la linea sotto */
+    border-bottom: none !important;
+    padding-bottom: 10px;
+    /* Un po' di spazio per la linea sotto */
 }
 
 /* 2. Creazione della "barretta" (pseudo-elemento) */
@@ -861,15 +858,22 @@ label[for="check-battles"]::after,
 label[for="check-explosions"]::after {
     content: '';
     position: absolute;
-    bottom: 5px; /* Distanza dal testo */
-    left: 50%; /* Posiziona al centro orizzontale... */
-    transform: translateX(-50%); /* ...e corregge il centraggio esatto */
-    
-    width: 24px; /* LARGHEZZA DELLA LINEA (Modifica qui se serve) */
-    height: 3px; /* Spessore della linea */
-    border-radius: 2px; /* Arrotonda leggermente gli angoli della linea */
-    
-    background-color: transparent; /* Invisibile di base */
+    bottom: 5px;
+    /* Distanza dal testo */
+    left: 50%;
+    /* Posiziona al centro orizzontale... */
+    transform: translateX(-50%);
+    /* ...e corregge il centraggio esatto */
+
+    width: 24px;
+    /* LARGHEZZA DELLA LINEA (Modifica qui se serve) */
+    height: 3px;
+    /* Spessore della linea */
+    border-radius: 2px;
+    /* Arrotonda leggermente gli angoli della linea */
+
+    background-color: transparent;
+    /* Invisibile di base */
     transition: background-color 0.2s ease;
 }
 
@@ -893,4 +897,67 @@ label[for="check-battles"].active::after {
 label[for="check-explosions"]:hover::after,
 label[for="check-explosions"].active::after {
     background-color: #ffa600;
+}
+
+
+
+
+/* --- FRONT MAP FILTER TOGGLES (Replica stile Spike Map) --- */
+
+/* 1. Configurazione base del bottone */
+#filter-container .btn-compact {
+    position: relative;
+    /* Necessario per posizionare la linea */
+    opacity: 0.7;
+    transition: color 0.2s ease, opacity 0.2s ease;
+    padding-bottom: 10px;
+    /* Spazio per la linea */
+}
+
+/* 2. Creazione della "barretta" (pseudo-elemento) */
+#filter-container .btn-compact::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    /* Distanza dal testo */
+    left: 50%;
+    /* Posiziona al centro orizzontale... */
+    transform: translateX(-50%);
+    /* ...e corregge il centraggio esatto */
+
+    width: 24px;
+    /* LARGHEZZA DELLA LINEA */
+    height: 3px;
+    /* Spessore della linea */
+    border-radius: 2px;
+
+    background-color: transparent;
+    /* Invisibile di base */
+    transition: background-color 0.2s ease;
+}
+
+/* 3. Stile Testo quando attivo/hover */
+#filter-container .btn-compact:hover,
+#filter-container .btn-compact.active {
+    color: #25282A !important;
+    font-weight: 700 !important;
+    opacity: 1;
+}
+
+/* 4. Colore linea: BATTLES (Rosso) */
+#filter-container .btn-compact[data-type="Battles"]:hover::after,
+#filter-container .btn-compact[data-type="Battles"].active::after {
+    background-color: #ff6361;
+}
+
+/* 5. Colore linea: EXPLOSIONS (Giallo) */
+#filter-container .btn-compact[data-type="Explosions/Remote violence"]:hover::after,
+#filter-container .btn-compact[data-type="Explosions/Remote violence"].active::after {
+    background-color: #ffa600;
+}
+
+/* 6. Colore linea: ALL EVENTS (Grigio Scuro) */
+#filter-container .btn-compact[data-type="all"]:hover::after,
+#filter-container .btn-compact[data-type="all"].active::after {
+    background-color: #333;
 }

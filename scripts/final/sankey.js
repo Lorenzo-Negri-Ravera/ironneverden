@@ -53,7 +53,6 @@
             const observer = new IntersectionObserver((entries, obs) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        console.log("Observer: Avvio Sankey...");
                         initSankey();
                         obs.unobserve(entry.target);
                     }
@@ -280,20 +279,28 @@
             .attr("stroke", "#000")
             .attr("stroke-opacity", 0.1)
             .style("cursor", "pointer");
-
+        
         // --- LABELS ---
         svg.append("g")
             .style("font-family", "'Fira Sans', sans-serif")
-            .style("font-size", "11px")
+            .style("font-size", "17px")
             .style("font-weight", "bold")
             .style("pointer-events", "none")
             .selectAll("text")
             .data(graph.nodes)
             .join("text")
-            .attr("x", d => d.x0 < LOGICAL_WIDTH / 2 ? d.x1 + 6 : d.x0 - 6)
+            // MODIFICA RADICALE:
+            // Se il nodo inizia nei primi 20px (quindi è la Prima Colonna: Russia/Ucraina)
+            // -> Metti testo a DESTRA (x1 + 6)
+            // Per TUTTO il resto (Prodotti intermedi e Paesi finali)
+            // -> Metti testo a SINISTRA (x0 - 6)
+            .attr("x", d => d.x0 < 20 ? d.x1 + 6 : d.x0 - 6)
             .attr("y", d => (d.y1 + d.y0) / 2)
             .attr("dy", "0.35em")
-            .attr("text-anchor", d => d.x0 < LOGICAL_WIDTH / 2 ? "start" : "end")
+            // Allineamento testo: 
+            // Prima colonna -> start (allineato a sinistra del testo, va verso destra)
+            // Altri -> end (allineato a destra del testo, va verso sinistra)
+            .attr("text-anchor", d => d.x0 < 20 ? "start" : "end")
             .text(d => d.name)
             .each(function(d) {
                 if (d.y1 - d.y0 < 15) this.style.display = "none";
@@ -385,5 +392,19 @@
         drawSankey("#sankey-chart-2021", data2021, tooltip);
         drawSankey("#sankey-chart-2023", data2023, tooltip);
     }
+
+        // Help Content
+    const sunburstHelpContent = {
+        title: "Reading the Sunburst",
+        steps: [
+            "<strong>Inner Ring:</strong> Continents.",
+            "<strong>Outer Ring:</strong> Countries.",
+            "<strong>Interaction:</strong> Click a region to zoom in. Click center to zoom out."
+        ]
+    };
+
+    if (typeof createChartHelp === "function") {
+        createChartHelp("#sankey-help-container", "#sankey-wrapper", sunburstHelpContent);
+    } 
 
 })();

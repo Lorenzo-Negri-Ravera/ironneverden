@@ -16,7 +16,7 @@
     const barSize = 50;     
     
     // MODIFICA QUI: Aumentato margin.right a 120 per far stare le etichette
-    const margin = { top: 60, right: 120, bottom: 10, left: 140 }; 
+    const margin = { top: 60, right: 120, bottom: 10, left: 75 }; 
 
     const customPalette = ["#003f5c", "#374c80", "#7a5195", "#bc5090", "#ef5675", "#ff764a", "#ffa600"];
     const neigh = ["Russia", "Ukraine", "Poland", "Hungary", "Romania", "Lithuania", "Slovakia"];
@@ -143,7 +143,7 @@
             )
             .selectAll("text")
             .style("font-family", "'Fira Sans', sans-serif")
-            .style("font-size", "12px");
+            .style("font-size", "16px");
 
         for (const keyframe of keyframes) {
             if (currentRaceId !== myRaceId) return; 
@@ -205,7 +205,7 @@
                         .attr("y", d => y(n + 1) + y.bandwidth() / 2) 
                         .attr("dy", "0.35em")
                         .style("font-family", "'Fira Sans', sans-serif")
-                        .style("font-size", "14px")
+                        .style("font-size", "15px")
                         .style("font-variant-numeric", "tabular-nums")
                         .text(d => formatNumber(d.value)),
                     update => update,

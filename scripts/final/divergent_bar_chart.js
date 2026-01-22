@@ -5,7 +5,7 @@
     // --- Configurations ---
     const CONFIG = {
         dataPath: "../../data/final/FlightsUKR/divergence_final.json", 
-        margin: { top: 40, right: 60, bottom: 20, left: 140 }, 
+        margin: { top: 40, right: 60, bottom: 20, left: 150 }, 
         barHeight: 30,
         width: 1000 
     };
@@ -117,14 +117,15 @@
                 .call(g => g.select(".domain").remove())
                 .call(g => g.selectAll(".tick line").attr("stroke-opacity", 0.2).attr("y2", height - CONFIG.margin.top))
                 .selectAll("text")
-                .style("font-family", "'Fira Sans', sans-serif");
+                .style("font-family", "'Fira Sans', sans-serif")
+                .style("font-size", "16px");
 
             const yAxis = d3.axisLeft(y).tickSize(0).tickPadding(6);
             yAxisGroup.attr("transform", `translate(${CONFIG.margin.left}, 0)`)
                 .transition().duration(750)
                 .call(yAxis)
                 .call(g => g.select(".domain").remove())
-                .style("font-size", "11px")
+                .style("font-size", "15px")
                 .style("font-weight", "600")
                 .style("font-family", "'Fira Sans', sans-serif");
 
@@ -159,7 +160,7 @@
                 .attr("class", "label-val")
                 .attr("y", d => y(d.origin_name) + y.bandwidth() / 2)
                 .attr("dy", "0.35em")
-                .attr("font-size", "10px")
+                .attr("font-size", "15px")
                 .attr("font-family", "'Fira Sans', sans-serif")
                 .attr("opacity", 0);
 

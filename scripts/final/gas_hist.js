@@ -13,7 +13,6 @@
             const observer = new IntersectionObserver((entries, obs) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        console.log("Observer: Avvio Gas Chart (Histogram)...");
                         initGasBarChart();
                         obs.unobserve(entry.target);
                     }
@@ -102,7 +101,8 @@
                 .attr("y", d => y(d.value) - 10)
                 .attr("text-anchor", "middle")
                 // Rimosso style inline, eredita font da .chart-theme-universal text
-                .style("font-weight", "bold") 
+                .style("font-weight", "bold")
+                .style("font-size", "15px") 
                 .style("fill", "#25282A")
                 .style("opacity", 0)
                 .transition()
@@ -127,6 +127,17 @@
             svg.append("g")
                 .attr("class", "axis axis-y")
                 .call(d3.axisLeft(y).ticks(6).tickSize(0).tickPadding(10));
+            
+            svg.append("text")
+                .attr("class", "y-axis-label")
+                .attr("x", -50)          // Allineato con l'inizio dell'asse Y
+                .attr("y", 0)        // Posizionato nel margine superiore
+                .style("text-anchor", "start") // Allineamento a sinistra
+                .style("font-size", "15px")
+                .style("font-weight", "bold")
+                .style("fill", "#666") // Colore grigio scuro per non distrarre troppo
+                .style("font-family", "'Fira Sans', sans-serif") // Coerente con il tema
+                .text("€/KWh");
 
         } catch (error) {
             console.error("Error loading Gas Price Data:", error);

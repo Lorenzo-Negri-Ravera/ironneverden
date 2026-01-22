@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", function() {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    console.log("Observer: Avvio Food Chart...");
                     initFoodChart();
                     observer.unobserve(entry.target);
                 }
@@ -35,7 +34,7 @@ function initFoodChart() {
     // Rimuove stili inline, lasciando fare al CSS esterno
     mainContainer.attr("style", "");
 
-    const margin = {top: 30, right: 30, bottom: 50, left: 60}; 
+    const margin = {top: 30, right: 30, bottom: 40, left: 60}; 
     const width = 1000 - margin.left - margin.right;
     const height = 500 - margin.top - margin.bottom;
 
@@ -106,8 +105,21 @@ function initFoodChart() {
         svg.append("g")
             .attr("class", "axis axis-y")
             .call(d3.axisLeft(y).ticks(6).tickSize(0).tickPadding(12));
+        
+        // --- 4. LABEL ASSE Y (NUOVA) ---
+        svg.append("text")
+            .attr("class", "y-axis-label")
+            .attr("x", -40)        // Spostato a sinistra (margin.left è 60)
+            .attr("y", 0)        // Sopra l'asse
+            .style("text-anchor", "start")
+            .style("font-size", "15px")
+            .style("font-weight", "bold")
+            .style("fill", "#666")
+            .style("font-family", "'Fira Sans', sans-serif")
+            .text("FFPI"); // O "Price Index Points"
 
         function updateFocus() {
+            // Aggiorna le Linee
             svg.selectAll(".food-line")
                 .transition().duration(200)
                 .style("opacity", function() {
@@ -121,33 +133,46 @@ function initFoodChart() {
                     return (!activeFocusKey || id === targetId) ? 4 : 3;
                 });
 
-            legendContainer.selectAll("button")
-                .style("opacity", function() {
-                    return (!activeFocusKey || this.__key__ === activeFocusKey) ? 1 : 0.4;
+            // Aggiorna la Legenda (usando le classi CSS dimmed/active)
+            legendContainer.selectAll(".legend-item")
+                .classed("dimmed", function() {
+                    // Dimmed se c'è un filtro attivo E questo bottone NON è quello attivo
+                    return activeFocusKey && this.__key__ !== activeFocusKey;
+                })
+                .classed("active", function() {
+                    // Active se questo è il bottone selezionato
+                    return this.__key__ === activeFocusKey;
                 });
         }
 
-        // LEGENDA E HELP
-        legendContainer.attr("class", "d-flex flex-wrap justify-content-center align-items-center column-gap-5 row-gap-1 mt-1");
+        // --- LEGENDA STANDARDIZZATA (CSS: .universal-legend) ---
+        legendContainer.attr("class", "universal-legend");
         
         keys.forEach(key => {
             const btn = legendContainer.append("button")
-                .attr("class", "btn-compact d-flex align-items-center gap-2 p-0 border-0 bg-transparent");
+                .attr("class", "legend-item"); // Classe CSS standard
             
+            // Marker (Pallino)
             btn.append("span")
-                .style("width", "10px").style("height", "10px")
-                .style("background-color", color(key)).style("border-radius", "50%").style("display", "inline-block");
+                .attr("class", "legend-marker")
+                .style("background-color", color(key)); // Unico stile inline necessario (colore dinamico)
             
+            // Testo
             btn.append("span")
-                .text(key).style("font-size", "12px").style("font-weight", "600").style("color", "#25282A").style("white-space", "nowrap");
+                .attr("class", "legend-text")
+                .text(key);
             
+            // Interazione
             btn.on("click", function() {
                 activeFocusKey = (activeFocusKey === key) ? null : key;
                 updateFocus();
             });
+            
+            // Salviamo la chiave nel nodo DOM per usarla in updateFocus
             btn.node().__key__ = key;
         });
 
+        // HELP CONTENT
         const helpContent = {
             title: "Understanding Food Price Trends",
             steps: [

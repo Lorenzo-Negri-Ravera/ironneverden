@@ -126,30 +126,47 @@ function initEventsLineChart() {
         svg.append("g")
             .attr("class", "axis axis-x") 
             .attr("transform", `translate(0,${height})`)
-            .call(d3.axisBottom(x).ticks(10).tickFormat(d3.timeFormat("%b %y")).tickSizeOuter(0).tickPadding(10));
+            .call(d3.axisBottom(x).ticks(10).tickFormat(d3.timeFormat("%b %y")).tickSizeOuter(0));
 
         svg.append("g")
             .attr("class", "axis axis-y") 
             .call(d3.axisLeft(y).ticks(6).tickPadding(10).tickSize(0));
+        
+                // --- 4. LABEL ASSE Y (NUOVA) ---
+        svg.append("text")
+            .attr("class", "y-axis-label")
+            .attr("x", -51)        // Spostato a sinistra (margin.left è 60)
+            .attr("y", 0)        // Sopra l'asse
+            .style("text-anchor", "start")
+            .style("font-size", "15px")
+            .style("font-weight", "bold")
+            .style("fill", "#666")
+            .style("font-family", "'Fira Sans', sans-serif")
+            .text("Number of events"); 
 
 
-        // LEGENDA
-        legendContainer.attr("class", "d-flex flex-wrap justify-content-center align-items-center column-gap-3 row-gap-2 mt-2");
+        // --- LEGENDA STANDARDIZZATA (CSS: .universal-legend) ---
+        legendContainer.attr("class", "universal-legend");
 
         TARGET_TYPES.forEach(key => {
             const btn = legendContainer.append("button")
-                .attr("class", "btn-compact d-flex align-items-center gap-2 p-0 border-0 bg-transparent");
+                .attr("class", "legend-item"); // Classe CSS Standard
             
+            // Marker (Pallino)
             btn.append("span")
-                .style("width", "10px").style("height", "10px")
-                .style("background-color", color(key)).style("border-radius", "50%").style("display", "inline-block");
+                .attr("class", "legend-marker")
+                .style("background-color", color(key));
             
+            // Testo
             btn.append("span")
-                .text(key).style("font-size", "12px").style("font-weight", "600").style("color", "#25282A").style("white-space", "nowrap");
+                .attr("class", "legend-text")
+                .text(key);
 
+            // Interazione
             btn.on("click", function() {
                 activeFocusKey = (activeFocusKey === key) ? null : key;
                 
+                // Aggiornamento grafico (trasparenza linee)
                 d3.selectAll(".line-path").transition().duration(200)
                     .style("opacity", function() {
                         const id = this.id.replace("line-sub-", "");
@@ -157,11 +174,16 @@ function initEventsLineChart() {
                         return (!activeFocusKey || id === target) ? 1 : 0.1;
                     });
                 
-                legendContainer.selectAll("button")
-                    .style("opacity", function() {
-                        return (!activeFocusKey || this.__key__ === activeFocusKey) ? 1 : 0.4;
+                // Aggiornamento Legenda (uso classi CSS)
+                legendContainer.selectAll(".legend-item")
+                    .classed("dimmed", function() {
+                        return activeFocusKey && this.__key__ !== activeFocusKey;
+                    })
+                    .classed("active", function() {
+                        return this.__key__ === activeFocusKey;
                     });
             });
+            
             btn.node().__key__ = key;
         });
 
