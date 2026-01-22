@@ -11,7 +11,7 @@
     // Configurazione Grafica
     const width = 1000;
     const height = 700;
-    const margin = { top: 60, right: 250, bottom: 50, left: 250 }; 
+    const margin = { top: 60, right: 250, bottom:10, left: 250 }; 
 
     // Colori
     const colorScale = d3.scaleOrdinal(d3.schemeTableau10);
@@ -373,7 +373,7 @@
 
     // --- HELP BUTTON ---
     const helpContent = {
-        title: "Reading the Slope Chart",
+        title: "How to read the chart?",
         steps: [
             "<strong>Y-axis:</strong> Visualizes the shift in export shares between 2021 and 2023.",
             "<strong>Lines:</strong> Slope indicates increase (up) or decrease (down) in market share.",

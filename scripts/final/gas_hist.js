@@ -147,8 +147,11 @@
 
     if (typeof createChartHelp === "function") {
         createChartHelp("#histo-help-container", "#gas-linechart-wrapper", {
-            title: "How to read the chart",
-            steps: ["<strong>Prices:</strong> Household gas price index.", "<strong>Timeline:</strong> Aggregated by semester."]
+            title: "How to read the chart?",
+            steps: [
+                "<strong>Prices:</strong> Household gas price index.", 
+                "<strong>Timeline:</strong> Aggregated by semester."
+            ]
         });
     }
 

@@ -27,7 +27,7 @@
     const formatMoney = d3.format("$.2s"); 
 
     let allData = {};
-    let currentCountry = "UKR"; 
+    let currentCountry = "RUS"; 
 
     // --- 1. OBSERVER INTERNO ---
     document.addEventListener("DOMContentLoaded", function() {
@@ -317,7 +317,7 @@
 
     // Help Content
     const sunburstHelpContent = {
-        title: "Reading the Sunburst",
+        title: "How to read the chart?",
         steps: [
             "<strong>Inner Ring:</strong> Continents.",
             "<strong>Outer Ring:</strong> Countries.",

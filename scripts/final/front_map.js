@@ -386,23 +386,32 @@ Promise.all([
             playText.text("Play");
             isPlaying = false;
         } else {
+            // Se siamo già alla fine e premiamo play, ricominciamo da capo
             if (currentIndex >= days.length - 1) {
                 currentIndex = 0;
                 slider.property("value", currentIndex);
                 updateStateAndRender();
             }
+            
             playText.text("Pause");
             isPlaying = true;
             
             timer = setInterval(() => {
-                currentIndex++;
+                // MODIFICA QUI: Controlliamo se c'è ancora spazio per andare avanti
+                if (currentIndex < days.length - 1) {
+                    currentIndex++;
 
-                // Se l'utente preme play, puliamo eventuali highlights attivi
-                if (currentIndex % 5 === 0) clearHighlight(); // Check leggero per non chiamarlo ogni ms
+                    // Se l'utente preme play, puliamo eventuali highlights attivi
+                    if (currentIndex % 5 === 0) clearHighlight(); 
 
-                slider.property("value", currentIndex);
-                updateStateAndRender();
-                // ...
+                    slider.property("value", currentIndex);
+                    updateStateAndRender();
+                } else {
+                    // SIAMO ALLA FINE: Ferma tutto
+                    clearInterval(timer);
+                    playText.text("Play");
+                    isPlaying = false;
+                }
             }, 70);
         }
     });
@@ -500,7 +509,7 @@ Promise.all([
 
     // -- How to read the chart --
     const mapHelpContent = {
-        title: "How to read the Map",
+        title: "How to read the chart?",
         steps: [
             "<strong>Colors:</strong> Darker red indicates a higher number of conflict events.",
             "<strong>Interaction:</strong> Hover over any country to see detailed statistics.",

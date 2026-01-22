@@ -1,3 +1,4 @@
+// File: spikemap.js
 (function () {
 
     // --- Configurations ---
@@ -13,11 +14,11 @@
     const height = 700;
     const SPIKE_WIDTH = 8;
 
-    // Colors
-    const COLOR_BATTLES = "#ff6361"; // Rosso
-    const COLOR_EXPLOSIONS = "#ffa600"; // Giallo
-    const COLOR_STROKE = "#8e0000";
-
+    // --- PALETTE MODERN & VIVID (Option 1) ---
+    const COLOR_BATTLES = "#ff6361";     // Corallo (Richiesto)
+    const COLOR_EXPLOSIONS = "#ffa600";  // Giallo (Richiesto)
+    const COLOR_STROKE = "#c7dfebff";      // Blu Scuro (Primary Text Color) - per contrasto moderno
+    
     // Regions name mapping
     const NAME_MAPPING = {
         "vinnytsia": "vinnytska", "volyn": "volynska", "dnipropetrovsk": "dnipropetrovska",
@@ -99,13 +100,11 @@
     d3.select("#spike-zoom-reset").on("click", () => svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity));
 
     // --- TOOLTIP SETUP ---
-    // Seleziona il tooltip esistente nell'HTML (modificato per avere id="spike-tooltip")
     const tooltip = d3.select("#spike-tooltip")
         .style("text-align", "left")
-        // MODIFICA FONDAMENTALE PER ADATTARE IL BOX ALLA LUNGHEZZA DEL TESTO
         .style("min-width", "auto")
         .style("width", "fit-content")
-        .style("white-space", "nowrap"); // Evita che vada a capo se il nome è breve ma composto
+        .style("white-space", "nowrap");
 
     const projection = d3.geoConicConformal().rotate([-31, 0]).center([31.1656, 48.3794]);
     const path = d3.geoPath().projection(projection);
@@ -128,10 +127,7 @@
 
         let currentK = 1;
         const getGeo = (topo) => (topo && topo.type === "Topology") ? topojson.feature(topo, topo.objects[Object.keys(topo.objects)[0]]) : topo;
-        
-        // Process Region and District immediately (Fast)
         const geoDist = getGeo(topoDist);
-        // NOTE: geoComuni is processed LAZILY below to speed up initial load
 
         const clean = (d) => { d.fatalities = +d.fatalities || 0; if (d.latitude && d.longitude) { d.lat = +d.latitude; d.lon = +d.longitude; } };
         csvRegion.forEach(clean); csvDist.forEach(clean); csvComuni.forEach(clean);
@@ -140,14 +136,11 @@
 
         const normalize = str => str ? String(str).toLowerCase().trim().replace(/['`'.]/g, "").replace(/\s+/g, " ") : "";
         
-        // --- OPTIMIZED CENTROID CALCULATION ---
         const calculateCentroids = (features, data, nameFieldData, geoPropertyName) => {
             const centroidMap = new Map();
             if (!features || features.length === 0) return centroidMap;
-            
             const dataLookup = new Map();
             const uniqueNamesSet = new Set();
-            
             data.forEach(d => {
                 const name = d[nameFieldData];
                 if(name) {
@@ -162,9 +155,7 @@
                 let geoName = f.properties[geoPropertyName] || f.properties.shapeName || f.properties.NAME_1 || f.properties.NAME_2 || f.properties.NAME_3 || f.properties.name || "";
                 if (geoName) {
                     const normGeo = normalize(geoName);
-                    
                     let match = dataLookup.get(normGeo);
-
                     if (!match) {
                         const mappedKey = Object.keys(NAME_MAPPING).find(k => normGeo.includes(NAME_MAPPING[k]));
                          if(mappedKey) {
@@ -174,7 +165,6 @@
                              });
                          }
                     }
-
                     if (!match) {
                         match = uniqueNames.find(c => {
                             const normCsv = normalize(c);
@@ -183,7 +173,6 @@
                             return normCsv === normGeo || normGeo.includes(normCsv) || normCsv.includes(normGeo);
                         });
                     }
-
                     if (match) {
                         const c = path.centroid(f);
                         if (!isNaN(c[0])) centroidMap.set(match, c);
@@ -210,10 +199,12 @@
 
         // --- MAP LAYER ---
         mapLayer.selectAll("path").data(geoReg.features).join("path")
-            .attr("d", path).attr("fill", "#e9ecef").attr("stroke", "#fff").attr("stroke-width", 1.5)
+            .attr("d", path)
+            .attr("fill", "#e9ecef") // Sfondo mappa Modern (grigio chiaro)
+            .attr("stroke", "#ffffff")
+            .attr("stroke-width", 1.5)
             .on("mouseover", function (e, d) {
                 d3.select(this).attr("fill", "#dee2e6");
-                // TOOLTIP STANDARDIZZATO (Solo Header)
                 tooltip.style("visibility", "visible")
                     .html(`<div class='tooltip-header' style='margin-bottom:0; border-bottom:none;'>${getCleanNameFromGeo(d.properties.NAME_1 || d.properties.name)}</div>`);
             })
@@ -234,8 +225,6 @@
                 d3.select(this).select(".spike-hitbox").attr("d", spikePath(d.x, d.y, h < 25 ? 25 : h, Math.max(scaledWidth, 5 / currentK)));
             });
         });
-
-        
 
         function updateControlStyles() {
             const batCheck = d3.select("#check-battles");
@@ -375,7 +364,7 @@
             all.select(".spike-hitbox")
                 .attr("d", d => spikePath(d.x, d.y, getHeight(d.value) < 25 ? 25 : getHeight(d.value), currentSpikeWidth));
 
-            // --- SPIKE TOOLTIP STANDARDIZZATO ---
+            // --- SPIKE TOOLTIP ---
             all.on("mouseover", (e, d) => {
                 const b = d.details["Battles"] || 0;
                 const ex = d.details["Explosions/Remote violence"] || 0;
@@ -384,9 +373,13 @@
                 const exPerc = ((ex / total) * 100).toFixed(1);
                 const maxVal = Math.max(b, ex, 1);
 
-                // Costruzione HTML usando classi standard (.tooltip-header, .tooltip-row)
+                // Use Theme Colors for Tooltip Header Border if dominant
+                let headerColor = "#444";
+                if (b > ex) headerColor = COLOR_BATTLES;
+                else if (ex > 0) headerColor = COLOR_EXPLOSIONS;
+
                 const htmlContent = `
-                    <div class="tooltip-header">${d.name}</div>
+                    <div class="tooltip-header" style="border-bottom: 2px solid ${headerColor}; color: #222;">${d.name}</div>
                     
                     <div class="tooltip-row">
                         <span class="tooltip-label">Total Victims</span>
@@ -449,18 +442,16 @@
         updateSpikes();
 
         const mapHelpContent = {
-            title: "How to read the Map",
+            title: "How to read the chart?",
             steps: [
-                "<strong>Colors:</strong> Red spikes = Battles, Yellow spikes = Explosions. When both are selected, gradient shows proportion.",
-                "<strong>Interaction:</strong> Hover over spikes to see detailed statistics.",
-                "<strong>Zoom:</strong> Use zoom controls or drag to explore the map."
+                "<strong>Colors:</strong> Red spikes = Battles, Yellow spikes = Explosions.",
+                "<strong>Height:</strong> Represents the number of victims.",
+                "<strong>Interaction:</strong> Hover over spikes to see detailed statistics."
             ]
         };
 
         if (typeof createChartHelp === "function") {
             createChartHelp("#spike-help-container", "#spike-map-wrapper", mapHelpContent);
-        } else {
-            console.warn("createChartHelp non trovata.");
         }
 
     }).catch(e => console.error("CRITICAL ERROR:", e));

@@ -19,43 +19,51 @@ function initStackedBarChart() {
     // Rimuovi stili manuali inline
     mainContainer.attr("style", "");
 
-    // --- CHART DIMENSIONS (Standardizzato) ---
+    // --- CHART DIMENSIONS ---
     const margin = {top: 40, right: 20, bottom: 40, left: 50};
     const width = 1000 - margin.left - margin.right;
     const height = 500 - margin.top - margin.bottom;
 
     // --- SVG SETUP ---
-    // Il container ha già la classe .chart-theme-universal (da HTML)
     const svg = mainContainer.append("svg")
         .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // --- DATI ---
+    // --- 1. CONFIGURAZIONE PALETTE (Option 1: Modern & Vivid) ---
     const keys = ["Battles", "Explosions/Remote violence", "Riots", "Violence against civilians", "Protests"];
-    const PALETTE = ["#ff6361","#ffa600", "#58508d", "#bc5090", "#003f5c"];
-    const color = d3.scaleOrdinal().domain(keys).range(PALETTE);
+    
+    // Mappatura manuale per garantire i vincoli richiesti
+    const COLOR_MAPPING = {
+        "Battles": "#ff6361",                    // Corallo (Richiesto)
+        "Explosions/Remote violence": "#ffa600", // Giallo (Richiesto)
+        "Violence against civilians": "#bc5090", // Rosa (Secondary)
+        "Riots": "#58508d",                      // Viola
+        "Protests": "#003f5c"                    // Blu Scuro (Primary)
+    };
+
+    const color = d3.scaleOrdinal()
+        .domain(keys)
+        .range(keys.map(k => COLOR_MAPPING[k]));
+
     let activeFilter = null;
 
-    // --- INTERACTIVE LEGEND (Standardized) ---
-    legendContainer.attr("class", "universal-legend"); // Classe CSS Standard
+    // --- INTERACTIVE LEGEND ---
+    legendContainer.attr("class", "universal-legend"); 
     
     keys.forEach((key) => {
         const itemColor = color(key);
         const btn = legendContainer.append("button")
-            .attr("class", "legend-item"); // Classe CSS Standard
+            .attr("class", "legend-item");
 
-        // Marker (Pallino)
         btn.append("span")
             .attr("class", "legend-marker")
             .style("background-color", itemColor);
 
-        // Testo
         btn.append("span")
             .attr("class", "legend-text")
             .text(key);
 
-        // Interazione
         btn.on("click", function() {
             activeFilter = (activeFilter === key) ? null : key;
             updateChartState();
@@ -69,7 +77,7 @@ function initStackedBarChart() {
         d3.selectAll(".bar-rect").transition().duration(200)
             .style("opacity", d => (!activeFilter || d.key === activeFilter) ? 1 : 0.1);
         
-        // Aggiorna opacità legenda (usando classe 'dimmed')
+        // Aggiorna opacità legenda
         legendContainer.selectAll(".legend-item")
             .classed("dimmed", function() {
                 return activeFilter && this.__key__ !== activeFilter;
@@ -100,8 +108,7 @@ function initStackedBarChart() {
         const x = d3.scaleBand().domain(wideData.map(d => d.YEAR)).range([0, width]).padding(0.1);
         const y = d3.scaleLinear().domain([0, 1]).range([height, 0]);
 
-        // AXES
-        // Grid Lines
+        // GRID
         svg.append("g")
            .attr("class", "grid")
            .call(d3.axisLeft(y).ticks(6).tickSize(-width).tickFormat("").tickSizeOuter(0));
@@ -117,24 +124,21 @@ function initStackedBarChart() {
             .attr("width", x.bandwidth())
             .style("cursor", "pointer");
 
-        // X Axis
+        // AXES
         svg.append("g")
            .attr("class", "axis axis-x")
            .attr("transform", `translate(0,${height})`)
            .call(d3.axisBottom(x).tickSizeOuter(0));
 
-        // Y Axis
         svg.append("g")
            .attr("class", "axis axis-y")
            .call(d3.axisLeft(y).ticks(10, "%"))
            .call(g => g.select(".domain").remove());
 
-        // --- TOOLTIP STANDARDIZZATO ---
-        const tooltip = d3.select("#tooltip-bar")
-            .attr("class", "shared-tooltip");
+        // --- TOOLTIP ---
+        const tooltip = d3.select("#tooltip-bar").attr("class", "shared-tooltip");
         
         rects.on("mouseover", function(event, d) {
-            // 1. Gestione Opacità Barre (Esistente)
             if (!activeFilter) {
                 d3.selectAll(".bar-rect").style("opacity", 0.4);
                 d3.select(this).style("opacity", 1);
@@ -146,17 +150,19 @@ function initStackedBarChart() {
             const total = d3.sum(keys, k => d.data[k]);
             const percent = ((value / total) * 100).toFixed(1);
 
-            // 2. Highlight Asse X (Anno)
+            // Highlight X Axis
             svg.selectAll(".axis-x .tick")
                 .filter(tickData => tickData === year)
                 .select("text")
                 .style("font-weight", "700")
                 .style("fill", "#000")
-                .style("font-size", "14px");
+                .style("font-size", "17px");
 
-            // 3. Tooltip HTML
+            // Tooltip Color Match
+            const headerColor = COLOR_MAPPING[eventName];
+
             const htmlContent = `
-                <div class="tooltip-header">${eventName}</div>
+                <div class="tooltip-header" style="border-bottom: 2px solid ${headerColor}; color:${headerColor}">${eventName}</div>
                 
                 <div class="tooltip-row">
                     <span class="tooltip-label">Events</span>
@@ -177,12 +183,9 @@ function initStackedBarChart() {
         })
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
-            
-            // 1. Reset Opacità Barre
             if (!activeFilter) d3.selectAll(".bar-rect").style("opacity", 1);
             else updateChartState();
 
-            // 2. Reset Asse X
             svg.selectAll(".axis-x .tick text")
                 .style("font-weight", null)
                 .style("fill", null)
@@ -192,11 +195,11 @@ function initStackedBarChart() {
 
     // HELP CONTENT
     const barHelpContent = {
-        title: "How to read the Chart",
+        title: "How to read the chart?",
         steps: [
-            "<strong>X-axis:</strong> Years of the conflict.",
-            "<strong>Y-axis:</strong> Percentage share of each event type.",
-            "<strong>Interaction:</strong> Click legend items to filter specific events."
+            "<strong>Colors:</strong> Red/Yellow indicate active conflict (Battles, Explosions). Blue/Purple indicate civil unrest.",
+            "<strong>Y-axis:</strong> Percentage share of total events per year.",
+            "<strong>Interaction:</strong> Click legend items to isolate specific event types."
         ]
     };
     if (typeof createChartHelp === "function") {

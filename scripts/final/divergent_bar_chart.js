@@ -115,7 +115,10 @@
             xAxisGroup.transition().duration(750)
                 .call(xAxis)
                 .call(g => g.select(".domain").remove())
-                .call(g => g.selectAll(".tick line").attr("stroke-opacity", 0.2).attr("y2", height - CONFIG.margin.top))
+                .call(g => g.selectAll(".tick line")
+                .attr("stroke-opacity", 0.7)
+                .attr("stroke-dasharray", 4,4)
+                .attr("y2", height - CONFIG.margin.top))
                 .selectAll("text")
                 .style("font-family", "'Fira Sans', sans-serif")
                 .style("font-size", "16px");
@@ -224,7 +227,7 @@
 
     // Help Content
     const divergingHelpContent = {
-        title: "Reading the Divergence Chart",
+        title: "How to read the chart?",
         steps: [
             "<strong>Positive (Blue):</strong> Increased traffic or market share.",
             "<strong>Negative (Red):</strong> Decreased traffic or market share.",

@@ -174,7 +174,7 @@ function initFoodChart() {
 
         // HELP CONTENT
         const helpContent = {
-            title: "Understanding Food Price Trends",
+            title: "How to read the chart?",
             steps: [
                 "<strong>Y-Axis:</strong> Food price index values over time.",
                 "<strong>Categories:</strong> Different food categories tracked monthly.",

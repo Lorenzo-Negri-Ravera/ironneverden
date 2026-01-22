@@ -97,11 +97,10 @@
     }
 
     // ==========================================
-    // --- 4. ANIMAZIONE ---
+    // --- 4. ANIMAZIONE (CORRETTA) ---
     // ==========================================
     async function runAnimation(svg, keyframes, n, height, globalMax, myRaceId) {
         
-        // MODIFICA QUI: Aggiunto * 1.05 per dare un po' di "respiro" alla barra più lunga
         const x = d3.scaleLinear([0, globalMax * 1.05], [margin.left, width - margin.right]);
         
         const y = d3.scaleBand()
@@ -137,18 +136,24 @@
             )
             .call(g => g.select(".domain").remove())
             .call(g => g.selectAll(".tick line")
-                .attr("stroke-opacity", 0.4)
-                .attr("stroke-dasharray", "2,2")
-                .attr("stroke", "#ccc")
+                .attr("stroke-opacity", 0.7)
+                .attr("stroke-dasharray", "4,4")
+                .attr("stroke", "#a8a8a8")
             )
             .selectAll("text")
             .style("font-family", "'Fira Sans', sans-serif")
             .style("font-size", "16px");
 
+        // --- FIX: Flag per gestire il primo frame ---
+        let isFirstFrame = true;
+
         for (const keyframe of keyframes) {
             if (currentRaceId !== myRaceId) return; 
 
-            const transition = svg.transition().duration(duration / keyframes.length).ease(d3.easeLinear);
+            // Se è il primo frame, durata 0 (istantaneo), altrimenti durata normale
+            const transitionDuration = isFirstFrame ? 0 : duration / keyframes.length;
+            const transition = svg.transition().duration(transitionDuration).ease(d3.easeLinear);
+            
             const [date, data] = keyframe;
 
             // --- BARRE ---
@@ -159,7 +164,9 @@
                         .attr("fill", d => getColor(d.name))
                         .attr("height", y.bandwidth())
                         .attr("x", x(0))
-                        .attr("y", d => y(n + 1)) 
+                        // FIX QUI: Se è il primo frame, mettili subito al loro rank (y(d.rank)).
+                        // Se entrano dopo, falli partire dal fondo (y(n+1)).
+                        .attr("y", d => isFirstFrame ? y(d.rank) : y(n + 1)) 
                         .attr("width", d => x(d.value) - x(0)),
                     update => update,
                     exit => exit.transition(transition).remove()
@@ -180,7 +187,8 @@
                         .attr("class", "label-name")
                         .attr("text-anchor", "end")
                         .attr("x", margin.left - 10) 
-                        .attr("y", d => y(n + 1) + y.bandwidth() / 2) 
+                        // FIX QUI: Stessa logica per la posizione Y del testo
+                        .attr("y", d => (isFirstFrame ? y(d.rank) : y(n + 1)) + y.bandwidth() / 2) 
                         .attr("dy", "0.35em")
                         .style("font-family", "'Fira Sans', sans-serif")
                         .style("font-weight", "bold")
@@ -202,7 +210,8 @@
                         .attr("class", "label-value")
                         .attr("text-anchor", "start")
                         .attr("x", d => x(d.value) + 8) 
-                        .attr("y", d => y(n + 1) + y.bandwidth() / 2) 
+                        // FIX QUI: Stessa logica per la posizione Y del numero
+                        .attr("y", d => (isFirstFrame ? y(d.rank) : y(n + 1)) + y.bandwidth() / 2) 
                         .attr("dy", "0.35em")
                         .style("font-family", "'Fira Sans', sans-serif")
                         .style("font-size", "15px")
@@ -223,6 +232,10 @@
                 );
 
             dateLabel.text(formatDate(date));
+            
+            // Spegniamo il flag dopo il primo ciclo
+            isFirstFrame = false; 
+
             try { await transition.end(); } catch(e) { return; }
         }
     }
@@ -272,7 +285,7 @@
 
         if (typeof createChartHelp === "function") {
             createChartHelp("#race-help-container", "#race-chart-wrapper", {
-                title: "How to read the Race Chart",
+                title: "How to read the chart?",
                 steps: [
                     "<strong>Bars:</strong> Represent flight volume per destination.",
                     "<strong>Rank:</strong> Watch countries rise and fall in rank over time.",

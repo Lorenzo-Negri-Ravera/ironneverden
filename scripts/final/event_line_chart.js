@@ -189,7 +189,7 @@ function initEventsLineChart() {
 
         // HELP BUTTON
         const helpContent = {
-            title: "Understanding Conflict Trends",
+            title: "How to read the chart?",
             steps: [
                 "<strong>Y-Axis:</strong> Number of weekly recorded events.",
                 "<strong>Categories:</strong> Shelling, strikes, and direct armed clashes.",

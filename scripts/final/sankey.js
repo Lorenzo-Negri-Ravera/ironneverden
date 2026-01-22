@@ -395,7 +395,7 @@
 
         // Help Content
     const sunburstHelpContent = {
-        title: "Reading the Sunburst",
+        title: "How to read the chart?",
         steps: [
             "<strong>Inner Ring:</strong> Continents.",
             "<strong>Outer Ring:</strong> Countries.",

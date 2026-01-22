@@ -245,21 +245,42 @@ body {
 }
 
 
-/* ------------------- CHART Titles TODO ------------------- */
+/* ------------------- CHART HEADERS (TITLES) ------------------- */
 
-.graph-title {
-    font-family: 'Fira Sans', sans-serif;
-    font-size: 16px;
+.chart-header {
+    margin-bottom: 1.5rem; /* Spazio tra il blocco del titolo e il grafico */
+    display: block;
+}
+
+.chart-title {
+    font-family: 'Roboto Slab', serif;
     font-weight: 700;
-    fill: #25282A;
+    font-size: 1.4rem;      /* Dimensione leggibile ma non invasiva */
+    color: #25282A;         /* Colore scuro principale */
+    margin-bottom: 0.25rem; /* Spaziatura minima verso il sottotitolo */
+    line-height: 1.2;
 }
 
-.graph-subtitle {
+.chart-subtitle {
     font-family: 'Fira Sans', sans-serif;
-    font-size: 15px;
-    font-style: italic;
-    fill: #25282A;
+    font-weight: 400;
+    font-style: italic;     /* Richiesto: Italic */
+    font-size: 1rem;        /* Leggermente più piccolo del titolo */
+    color: #6c757d;         /* Grigio più chiaro (muted) per contrasto */
+    margin: 0;
+    line-height: 1.4;
 }
+
+/* Adattamento per mobile */
+@media (max-width: 768px) {
+    .chart-title {
+        font-size: 1.25rem;
+    }
+    .chart-subtitle {
+        font-size: 0.9rem;
+    }
+}
+
 
 /* ============================================================ */
 /* ------------------- UNIVERSAL TOOLTIP THEME ---------------- */
@@ -960,4 +981,21 @@ label[for="check-explosions"].active::after {
 #filter-container .btn-compact[data-type="all"]:hover::after,
 #filter-container .btn-compact[data-type="all"].active::after {
     background-color: #333;
+}
+
+/* --- FIX ALLINEAMENTO SUNBURST --- */
+/* Forza i due bottoni ad avere la stessa larghezza esatta, ignorando la lunghezza del testo */
+#sunburst-controls .btn-compact {
+    flex-basis: 0;  /* Imposta la dimensione base a 0 */
+    flex-grow: 1;   /* Fai crescere entrambi con lo stesso fattore */
+    min-width: 0;   /* Impedisce al testo lungo di forzare la larghezza */
+    justify-content: center; /* Assicura che il testo rimanga centrato nel suo box */
+}
+
+/* --- FIX ALLINEAMENTO SANKEY --- */
+#sankey-controls .btn-compact {
+    flex-basis: 0;
+    flex-grow: 1;
+    min-width: 0;
+    justify-content: center;
 }
