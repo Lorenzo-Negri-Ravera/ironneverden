@@ -128,10 +128,12 @@ function initStackedBarChart() {
            .call(g => g.select(".domain").remove());
 
         // --- TOOLTIP STANDARDIZZATO ---
+        // TOOLTIP E INTERAZIONE
         const tooltip = d3.select("#tooltip-bar")
             .attr("class", "shared-tooltip");
         
         rects.on("mouseover", function(event, d) {
+            // 1. Gestione Opacità Barre (Esistente)
             if (!activeFilter) {
                 d3.selectAll(".bar-rect").style("opacity", 0.4);
                 d3.select(this).style("opacity", 1);
@@ -143,9 +145,18 @@ function initStackedBarChart() {
             const total = d3.sum(keys, k => d.data[k]);
             const percent = ((value / total) * 100).toFixed(1);
 
-            // Contenuto HTML Standard
+            // 2. NUOVA LOGICA: Highlight Asse X
+            // Selezioniamo i tick dell'asse X, troviamo quello corrispondente all'anno e lo stilizziamo
+            svg.selectAll(".axis-x .tick")
+                .filter(tickData => tickData === year) // Confronta il dato del tick con l'anno della barra
+                .select("text")
+                .style("font-weight", "700")  // Grassetto
+                .style("fill", "#000")        // Nero pieno
+                .style("font-size", "14px");  // Leggermente più grande (opzionale)
+
+            // 3. Tooltip HTML (Esistente)
             const htmlContent = `
-                <div class="tooltip-header">${eventName} (${year})</div>
+                <div class="tooltip-header">${eventName}</div>
                 
                 <div class="tooltip-row">
                     <span class="tooltip-label">Events</span>
@@ -166,8 +177,17 @@ function initStackedBarChart() {
         })
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
+            
+            // 1. Reset Opacità Barre (Esistente)
             if (!activeFilter) d3.selectAll(".bar-rect").style("opacity", 1);
             else updateChartState();
+
+            // 2. NUOVA LOGICA: Reset Asse X
+            // Ripristiniamo lo stile originale per TUTTI i testi dell'asse X
+            svg.selectAll(".axis-x .tick text")
+                .style("font-weight", null) // Rimuove lo stile inline (torna al CSS)
+                .style("fill", null)
+                .style("font-size", null);
         });
     });
 

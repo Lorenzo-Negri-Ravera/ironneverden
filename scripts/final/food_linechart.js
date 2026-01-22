@@ -197,8 +197,7 @@ function initFoodChart() {
                     html += `
                     <div class="${rowClass}">
                         <span class="tooltip-label">
-                            <span class="tooltip-bullet" style="color:${color(k)}">●</span> 
-                            ${k}
+                            <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background-color:${color(k)};"></span>${k}                            
                         </span>
                         <span class="tooltip-value">${d[k].toFixed(1)}</span>
                     </div>`;

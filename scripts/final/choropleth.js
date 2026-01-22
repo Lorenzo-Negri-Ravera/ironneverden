@@ -251,7 +251,6 @@
                 html += `
             <div class="tooltip-row">
                 <span class="tooltip-label">
-                    <span class="tooltip-bullet" style="color:#C8102E">•</span>
                     ${label}
                 </span>
                 <span class="tooltip-value">${count}</span>
