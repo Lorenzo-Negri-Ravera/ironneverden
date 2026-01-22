@@ -1,4 +1,4 @@
-// gas_linechart.js --> diventato histogram
+// gas_hist.js
 
 (function() {
 
@@ -13,7 +13,7 @@
             const observer = new IntersectionObserver((entries, obs) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        console.log("Observer: Avvio Gas Chart (Static)...");
+                        console.log("Observer: Avvio Gas Chart (Histogram)...");
                         initGasBarChart();
                         obs.unobserve(entry.target);
                     }
@@ -41,17 +41,16 @@
         container.html("");
         container.attr("style", ""); 
 
-        // Dimensioni totali SVG
-        const width = 1000;
-        const height = 500;
-        
-        // MODIFICA QUI: Riserviamo 30px in basso INTERNAMENTE per far stare le etichette dell'asse
-        const footerHeight = 30; 
-        const chartHeight = height - footerHeight; 
+        // 1. MARGINI STANDARD (Uniformità con gli altri grafici)
+        const margin = {top: 40, right: 30, bottom: 40, left: 50};
+        const width = 1000 - margin.left - margin.right;
+        const height = 500 - margin.top - margin.bottom;
 
+        // Il container ha già la classe .chart-theme-universal (da HTML)
         const svg = container.append("svg")
-            .attr("viewBox", `0 0 ${width} ${height}`)
-            .append("g");
+            .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
 
         try {
             const data = await d3.csv(CSV_PATH, d => ({
@@ -68,12 +67,17 @@
                 .range([0, width])
                 .padding(0.3);
 
-            // La scala Y usa 'chartHeight' invece di 'height'
             const y = d3.scaleLinear()
                 .domain([0, d3.max(data, d => d.value) * 1.15]) 
-                .range([chartHeight, 0]);
+                .range([height, 0]);
 
-            // --- 1. BARRE ---
+            // --- 2. GRIGLIA (Nuova aggiunta) ---
+            // Il CSS .chart-theme-universal gestirà tratteggio e nasconderà il bordo
+            svg.append("g")
+                .attr("class", "grid")
+                .call(d3.axisLeft(y).ticks(6).tickSize(-width).tickFormat(""));
+
+            // --- 3. BARRE ---
             svg.selectAll(".bar")
                 .data(data)
                 .enter().append("rect")
@@ -81,15 +85,15 @@
                 .attr("x", d => x(d.originalPeriod))
                 .attr("width", x.bandwidth())
                 .attr("fill", LINE_COLOR)
-                .attr("y", chartHeight) // Partono dal fondo del grafico (non dell'SVG)
+                .attr("y", height) // Start from bottom
                 .attr("height", 0)
                 .transition()
                 .duration(800)
                 .delay((d, i) => i * 50)
                 .attr("y", d => y(d.value))
-                .attr("height", d => chartHeight - y(d.value));
+                .attr("height", d => height - y(d.value));
 
-            // --- 2. ETICHETTE VALORI ---
+            // --- 4. ETICHETTE VALORI ---
             svg.selectAll(".label")
                 .data(data)
                 .enter().append("text")
@@ -97,9 +101,8 @@
                 .attr("x", d => x(d.originalPeriod) + x.bandwidth() / 2)
                 .attr("y", d => y(d.value) - 10)
                 .attr("text-anchor", "middle")
-                .style("font-family", "Fira Sans, sans-serif")
-                .style("font-size", "13px")
-                .style("font-weight", "bold")
+                // Rimosso style inline, eredita font da .chart-theme-universal text
+                .style("font-weight", "bold") 
                 .style("fill", "#25282A")
                 .style("opacity", 0)
                 .transition()
@@ -107,17 +110,23 @@
                 .delay((d, i) => i * 50 + 400)
                 .style("opacity", 1);
 
-            // --- 3. ASSE X ---
+            // --- 5. ASSE X ---
+            // Aggiunta classe .axis-x per attivare la linea di base nera dal CSS
             const xAxis = d3.axisBottom(x)
                 .tickFormat(d => d.includes("-S1") ? d.split("-")[0] : "");
 
             svg.append("g")
                 .attr("class", "axis axis-x")
-                // Posizioniamo l'asse a 'chartHeight' (470px) invece che 'height' (500px)
-                // Così i 30px rimanenti mostrano il testo
-                .attr("transform", `translate(0,${chartHeight})`)
-                .call(xAxis)
-                .style("font-family", "sans-serif").style("font-size", "14px");
+                .attr("transform", `translate(0,${height})`)
+                .call(xAxis);
+                // Rimossi font inline
+
+            // --- 6. ASSE Y (Opzionale ma coerente) ---
+            // Aggiungiamo l'asse Y per coerenza visiva (numeri a sinistra), 
+            // il CSS nasconderà la linea verticale ma mostrerà i numeri.
+            svg.append("g")
+                .attr("class", "axis axis-y")
+                .call(d3.axisLeft(y).ticks(6).tickSize(0).tickPadding(10));
 
         } catch (error) {
             console.error("Error loading Gas Price Data:", error);
@@ -133,3 +142,5 @@
     }
 
 })();
+
+

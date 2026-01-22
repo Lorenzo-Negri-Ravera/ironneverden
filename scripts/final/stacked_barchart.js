@@ -11,13 +11,25 @@ function initStackedBarChart() {
 
     if (mainContainer.empty() || legendContainer.empty()) return;
 
-    // PULIZIA: Rimuovi stili manuali, ora gestiti dalla classe .chart-container-responsive nel CSS
-    // mainContainer
-    //    .style("background-color", "transparent") ... 
-
+    // PULIZIA
     mainContainer.html("");
     legendContainer.html(""); 
     helpContainer.html("");
+    
+    // Rimuovi stili manuali inline
+    mainContainer.attr("style", "");
+
+    // --- CHART DIMENSIONS (Standardizzato) ---
+    const margin = {top: 40, right: 20, bottom: 40, left: 50};
+    const width = 1000 - margin.left - margin.right;
+    const height = 500 - margin.top - margin.bottom;
+
+    // --- SVG SETUP ---
+    // Il container ha già la classe .chart-theme-universal (da HTML)
+    const svg = mainContainer.append("svg")
+        .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
 
     // --- DATI ---
     const keys = ["Battles", "Explosions/Remote violence", "Riots", "Violence against civilians", "Protests"];
@@ -25,13 +37,11 @@ function initStackedBarChart() {
     const color = d3.scaleOrdinal().domain(keys).range(PALETTE);
     let activeFilter = null;
 
-    // --- INTERACTIVE LEGEND (COMPACT) ---
-    // Usa le classi Bootstrap flex per allineare
+    // --- INTERACTIVE LEGEND ---
     legendContainer.attr("class", "d-flex flex-wrap justify-content-start align-items-center column-gap-3 row-gap-2 mt-2");
     
-    keys.forEach((key, index) => {
+    keys.forEach((key) => {
         const itemColor = color(key);
-        // Usa btn-compact dal tuo CSS
         const btn = legendContainer.append("button")
             .attr("class", "btn-compact d-flex align-items-center gap-2 p-0 border-0 bg-transparent"); 
 
@@ -67,19 +77,6 @@ function initStackedBarChart() {
             });
     }
 
-    // --- CHART DIMENSIONS ---
-    const margin = {top: 40, right: 20, bottom: 40, left: 50};
-    const width = 1000 - margin.left - margin.right;
-    const height = 550 - margin.top - margin.bottom;
-
-    // --- SVG SETUP (RESPONSIVE) ---
-    const svg = mainContainer.append("svg")
-        // IL VIEWBOX È LA CHIAVE DELLA RESPONSIVITÀ
-        .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
-        // Rimuovi stili inline width/height, li gestisce .chart-container-responsive svg
-        .append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`);
-
     // --- DATA LOADING ---
     d3.json("../../data/final/stackedbarchart/Year_Events_UKR.json").then(function(data) {
         data.forEach(d => { d.YEAR = +d.YEAR; d.count = +d.count; if(d.EVENT_TYPE) d.EVENT_TYPE = d.EVENT_TYPE.trim(); });
@@ -105,21 +102,7 @@ function initStackedBarChart() {
         // Grid Lines
         svg.append("g")
            .attr("class", "grid")
-           .call(d3.axisLeft(y).ticks(10).tickSize(-width).tickFormat("").tickSizeOuter(0))
-           .call(g => g.select(".domain").remove())
-           .selectAll("line").style("stroke", "#eee").style("stroke-width", "1px").style("stroke-dasharray", "3,3");
-
-        // X Axis
-        svg.append("g")
-           .attr("transform", `translate(0,${height})`)
-           .call(d3.axisBottom(x).tickSizeOuter(0))
-           .selectAll("text").style("font-family", "'Fira Sans', sans-serif").style("font-size", "14px");
-
-        // Y Axis
-        svg.append("g")
-           .call(d3.axisLeft(y).ticks(10, "%"))
-           .call(g => g.select(".domain").remove())
-           .selectAll("text").style("font-family", "'Fira Sans', sans-serif").style("font-size", "12px");
+           .call(d3.axisLeft(y).ticks(10).tickSize(-width).tickFormat("").tickSizeOuter(0));
 
         // BARS
         const groups = svg.append("g").selectAll("g").data(series).join("g").attr("fill", d => color(d.key));
@@ -132,8 +115,21 @@ function initStackedBarChart() {
             .attr("width", x.bandwidth())
             .style("cursor", "pointer");
 
-        // TOOLTIP
-        const tooltip = d3.select("#tooltip-bar"); // Definito nell'HTML
+        // X Axis
+        svg.append("g")
+           .attr("class", "axis axis-x")
+           .attr("transform", `translate(0,${height})`)
+           .call(d3.axisBottom(x).tickSizeOuter(0));
+
+        // Y Axis
+        svg.append("g")
+           .attr("class", "axis axis-y")
+           .call(d3.axisLeft(y).ticks(10, "%"))
+           .call(g => g.select(".domain").remove());
+
+        // --- TOOLTIP STANDARDIZZATO ---
+        const tooltip = d3.select("#tooltip-bar")
+            .attr("class", "shared-tooltip");
         
         rects.on("mouseover", function(event, d) {
             if (!activeFilter) {
@@ -147,18 +143,25 @@ function initStackedBarChart() {
             const total = d3.sum(keys, k => d.data[k]);
             const percent = ((value / total) * 100).toFixed(1);
 
-            tooltip.style("visibility", "visible")
-                   .html(`
-                       <div style="font-family: 'Fira Sans', sans-serif; font-size: 13px; line-height: 1.5;">
-                           <strong>${eventName}</strong><br>
-                           <span style="color: #666;">Year:</span> ${year} <br>
-                           <span style="color: #666;">Value:</span> ${value}<br>
-                           <span style="color: #666;">Share:</span> <b>${percent}%</b>
-                       </div>
-                   `);
+            // Contenuto HTML Standard
+            const htmlContent = `
+                <div class="tooltip-header">${eventName} (${year})</div>
+                
+                <div class="tooltip-row">
+                    <span class="tooltip-label">Events</span>
+                    <span class="tooltip-value">${value}</span>
+                </div>
+                
+                <div class="tooltip-row">
+                    <span class="tooltip-label">Share</span>
+                    <span class="tooltip-value">${percent}%</span>
+                </div>
+            `;
+
+            tooltip.style("visibility", "visible").html(htmlContent);
         })
         .on("mousemove", function(event) {
-            tooltip.style("top", (event.pageY - 10) + "px")
+            tooltip.style("top", (event.pageY - 15) + "px")
                    .style("left", (event.pageX + 15) + "px");
         })
         .on("mouseout", function() {

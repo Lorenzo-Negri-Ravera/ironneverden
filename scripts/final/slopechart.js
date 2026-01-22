@@ -117,7 +117,7 @@
             .attr("x", margin.left)
             .attr("y", margin.top - 25)
             .attr("text-anchor", "middle")
-            .style("font-family", "'Roboto Slab', serif") // Uniformato al tema
+            .style("font-family", "'Roboto Slab', serif") 
             .style("font-weight", "700").style("font-size", "22px").style("fill", "#333")
             .text("2021");
 
@@ -125,7 +125,7 @@
             .attr("x", width - margin.right)
             .attr("y", margin.top - 25)
             .attr("text-anchor", "middle")
-            .style("font-family", "'Roboto Slab', serif") // Uniformato al tema
+            .style("font-family", "'Roboto Slab', serif") 
             .style("font-weight", "700").style("font-size", "22px").style("fill", "#333")
             .text("2023");
 
@@ -236,18 +236,25 @@
         d3.selectAll(".slope-dot").filter(l => l.cat === category)
             .attr("opacity", 1).attr("r", 7);
 
-        // Tooltip
-        const tooltip = d3.select("#slope-chart-tooltip");
+        // --- TOOLTIP STANDARDIZZATO ---
+        const tooltip = d3.select("#slope-chart-tooltip")
+            .attr("class", "shared-tooltip");
+
         const val21 = formatEuro(d.raw2021);
         const val23 = formatEuro(d.raw2023);
 
+        // Contenuto HTML Standard
         const htmlContent = `
-            <div style="font-family:'Fira Sans'; font-weight:bold; margin-bottom:4px; color:${colorScale(category)}">${category}</div>
-            <div style="font-family:'Fira Sans'; font-size:12px; display:flex; justify-content:space-between; gap:10px;">
-                <span>2021:</span> <span style="font-weight:bold;">${val21}</span>
+            <div class="tooltip-header" style="color:${colorScale(category)}">${category}</div>
+            
+            <div class="tooltip-row">
+                <span class="tooltip-label">2021 Value</span>
+                <span class="tooltip-value">${val21}</span>
             </div>
-            <div style="font-family:'Fira Sans'; font-size:12px; display:flex; justify-content:space-between; gap:10px;">
-                <span>2023:</span> <span style="font-weight:bold;">${val23}</span>
+            
+            <div class="tooltip-row">
+                <span class="tooltip-label">2023 Value</span>
+                <span class="tooltip-value">${val23}</span>
             </div>
         `;
 
@@ -346,22 +353,18 @@
 
         options.forEach((opt, index) => {
             const btn = container.append("button")
-                .attr("class", "btn-compact") // Classe standard
+                .attr("class", "btn-compact") 
                 .text(opt.label)
                 .on("click", function() {
-                    // Gestione classe active
                     container.selectAll(".btn-compact").classed("active", false);
                     d3.select(this).classed("active", true);
-                    
                     updateChart(opt.value);
                 });
 
-            // Imposta stato iniziale
             if (opt.value === currentCountry) {
                 btn.classed("active", true);
             }
 
-            // Aggiungi divisore se non è l'ultimo
             if (index < options.length - 1) {
                 container.append("div").attr("class", "compact-divider");
             }

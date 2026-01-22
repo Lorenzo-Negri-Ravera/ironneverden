@@ -5,16 +5,13 @@
     // --- CONFIGURAZIONE ---
     const CSV_PATH = "../../data/final/trade-data/final_datasets/output_data.csv"; 
     
-    // Configurazione Logica (Dimensioni interne per il calcolo Sankey)
-    // Il CSS scalerà tutto, ma queste proporzioni determinano l'aspect ratio.
     const LOGICAL_WIDTH = 800;
     const LOGICAL_HEIGHT = 900;
 
-    // Configurazione Soglie
     const MIN_PERCENTAGE = 0.03; 
     const TOP_N_COUNTRIES = 6;   
 
-    let isUkraine = false; // False = Russia (Default)
+    let isUkraine = false; 
     let globalRawData = null;
 
     // Colori
@@ -68,17 +65,27 @@
 
     // --- 2. INIT FUNCTION ---
     async function initSankey() {
+        // --- SETUP TOOLTIP ---
+        const tooltip = d3.select("#sankey-tooltip");
+        if (!tooltip.empty()) {
+            // Spostiamo nel body per evitare problemi di overflow/posizionamento
+            document.body.appendChild(tooltip.node());
+            tooltip.attr("class", "shared-tooltip")
+                   .style("position", "absolute")
+                   .style("z-index", "9999");
+        }
+
         try {
             globalRawData = await d3.csv(CSV_PATH);
             setupControls();
-            updateCharts();
+            updateCharts(tooltip);
         } catch (error) {
             console.error("Error Sankey:", error);
             d3.select("#sankey-controls").html(`<span style="color:red">Error loading data</span>`);
         }
     }
 
-    // --- 3. CONTROLS SETUP (Standardizzato) ---
+    // --- 3. CONTROLS SETUP ---
     function setupControls() {
         const container = d3.select("#sankey-controls");
         if(container.empty()) return;
@@ -87,7 +94,7 @@
         container.html("");
 
         const options = [
-            { label: "Russia", value: false }, // Value false -> isUkraine = false
+            { label: "Russia", value: false },
             { label: "Ukraine", value: true }
         ];
 
@@ -99,10 +106,10 @@
                     container.selectAll(".btn-compact").classed("active", false);
                     d3.select(this).classed("active", true);
                     isUkraine = opt.value;
-                    updateCharts();
+                    const tooltip = d3.select("#sankey-tooltip");
+                    updateCharts(tooltip);
                 });
 
-            // Set active state
             if (isUkraine === opt.value) btn.classed("active", true);
 
             if (index < options.length - 1) {
@@ -195,7 +202,7 @@
     }
 
     // --- 5. RENDERER ---
-    function drawSankey(containerId, data) {
+    function drawSankey(containerId, data, tooltip) {
         const container = d3.select(containerId);
         container.html("");
 
@@ -204,7 +211,6 @@
             return;
         }
 
-        // Header interno al grafico
         container.append("div")
             .style("text-align", "center")
             .style("margin-bottom", "10px")
@@ -214,8 +220,6 @@
             .style("font-size", "14px")
             .html(`Total Volume: <span style="color:#000">${formatMoney(data.totalValue)}</span>`);
 
-        // SVG FLUIDO
-        // Usiamo dimensioni logiche per il calcolo, ma viewBox per la visualizzazione
         const svg = container.append("svg")
             .attr("viewBox", [0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT])
             .style("width", "100%")
@@ -263,9 +267,6 @@
             .attr("stroke-width", d => Math.max(1, d.width))
             .style("transition", "stroke-opacity 0.3s");
 
-        path.append("title")
-            .text(d => `${d.source.name} → ${d.target.name}\n${formatMoney(d.value)}`);
-
         // --- NODES ---
         const node = svg.append("g")
             .selectAll("rect")
@@ -279,8 +280,6 @@
             .attr("stroke", "#000")
             .attr("stroke-opacity", 0.1)
             .style("cursor", "pointer");
-
-        node.append("title").text(d => `${d.name}\n${formatMoney(d.value)}`);
 
         // --- LABELS ---
         svg.append("g")
@@ -297,11 +296,10 @@
             .attr("text-anchor", d => d.x0 < LOGICAL_WIDTH / 2 ? "start" : "end")
             .text(d => d.name)
             .each(function(d) {
-                // Nascondi etichetta se il nodo è troppo piccolo
                 if (d.y1 - d.y0 < 15) this.style.display = "none";
             });
 
-        // --- INTERATTIVITÀ (Highlight) ---
+        // --- FUNZIONE HIGHLIGHT ---
         const highlight = (d, type) => {
             const allPaths = svg.selectAll(".sankey-link path");
             if (type === "enter") {
@@ -315,23 +313,77 @@
             }
         };
 
-        node.on("mouseenter", (event, d) => highlight(d, "enter"))
-            .on("mouseleave", (event, d) => highlight(d, "leave"));
+        // --- GESTIONE TOOLTIP E EVENTI MOUSE ---
+        
+        // 1. EVENTI SU NODI
+        node.on("mouseover", function(event, d) {
+            highlight(d, "enter");
             
-        path.on("mouseenter", (event, d) => highlight(d, "enter"))
-            .on("mouseleave", (event, d) => highlight(d, "leave"));
+            const htmlContent = `
+                <div class="tooltip-header" style="border-bottom: 2px solid ${getColor(d.name)}">${d.name}</div>
+                <div class="tooltip-row">
+                    <span class="tooltip-label">Total Volume</span>
+                    <span class="tooltip-value">${formatMoney(d.value)}</span>
+                </div>
+            `;
+            
+            tooltip.html(htmlContent)
+                   .style("visibility", "visible")
+                   .style("opacity", 1);
+        })
+        .on("mousemove", function(event) {
+            tooltip.style("top", (event.pageY + 15) + "px")
+                   .style("left", (event.pageX + 15) + "px");
+        })
+        .on("mouseout", function(event, d) {
+            highlight(d, "leave");
+            tooltip.style("visibility", "hidden");
+        });
+
+        // 2. EVENTI SU LINK
+        path.on("mouseover", function(event, d) {
+            highlight(d, "enter");
+
+            const htmlContent = `
+                <div class="tooltip-header" style="font-size:11px; color:#666; margin-bottom:2px; border-bottom:none;">Flow</div>
+                <div style="font-weight:bold; margin-bottom:5px; font-size:13px;">
+                    <span style="color:${getColor(d.source.name)}">${d.source.name}</span> 
+                    → 
+                    <span style="color:${getColor(d.target.name)}">${d.target.name}</span>
+                </div>
+                <div class="tooltip-row" style="margin-bottom:0;">
+                    <span class="tooltip-label">Value</span>
+                    <span class="tooltip-value">${formatMoney(d.value)}</span>
+                </div>
+            `;
+
+            tooltip.html(htmlContent)
+                   .style("visibility", "visible")
+                   .style("opacity", 1);
+        })
+        .on("mousemove", function(event) {
+            tooltip.style("top", (event.pageY + 15) + "px")
+                   .style("left", (event.pageX + 15) + "px");
+        })
+        .on("mouseout", function(event, d) {
+            highlight(d, "leave");
+            tooltip.style("visibility", "hidden");
+        });
     }
 
     // --- UPDATE HELPER ---
-    function updateCharts() {
+    function updateCharts(tooltip) {
         if (!globalRawData) return;
         const partner = isUkraine ? "Ukraine" : "Russia";
         
+        // Recupera tooltip se non passato
+        if (!tooltip) tooltip = d3.select("#sankey-tooltip");
+
         const data2021 = prepareSankeyData(globalRawData, 2021, partner);
         const data2023 = prepareSankeyData(globalRawData, 2023, partner);
 
-        drawSankey("#sankey-chart-2021", data2021);
-        drawSankey("#sankey-chart-2023", data2023);
+        drawSankey("#sankey-chart-2021", data2021, tooltip);
+        drawSankey("#sankey-chart-2023", data2023, tooltip);
     }
 
 })();

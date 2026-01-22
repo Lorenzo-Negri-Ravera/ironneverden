@@ -109,26 +109,9 @@ Promise.all([
     const days = d3.timeDays(d3.min(allBattlesData, d => d.date), d3.max(allBattlesData, d => d.date));
 
 
-    // --- SVG Setup (Responsive) ---        check with css style, could be redundant
-    // container
-    //     .style("position", "relative")
-    //     .style("width", "100%")
-    //     .style("height", "auto")
-    //     .style("aspect-ratio", "1000 / 700")
-    //     .style("background-color", "#f8f9fa")
-    //     .style("border", "1px solid #dee2e6")
-    //     .style("border-radius", "8px")
-    //     .style("margin", "0 auto")
-    //     .style("overflow", "hidden");
-
-    // SVG Element                          check with css style, could be redundant
+    // SVG Element                          
     const svg = container.append("svg")
         .attr("viewBox", [0, 0, width, height])
-        // .style("position", "absolute")
-        // .style("top", 0)
-        // .style("left", 0)
-        // .style("width", "100%")
-        // .style("height", "100%")
         .style("z-index", 1);
 
     // Clip Path for Russia Mask
@@ -141,33 +124,35 @@ Promise.all([
         .join("path")
         .attr("d", pathGenerator);
 
-    // Tooltip Setup
-    const tooltip = d3.select("body").selectAll(".tooltip-geo").data([0]).join("div")
-        .attr("class", "tooltip-geo")
-        .style("position", "absolute")
-        .style("background", "rgba(255, 255, 255, 0.95)")
-        .style("padding", "6px 10px")
-        .style("border", "1px solid #999")
-        .style("border-radius", "8px")
-        .style("pointer-events", "none")
-        .style("font-size", "12px")
-        .style("font-family", "sans-serif")
+    // --- TOOLTIP MODIFICATO (SOLO QUESTO) ---
+    // Usiamo il div esistente nell'HTML con id="tooltip" e classe "shared-tooltip"
+    const tooltip = d3.select("#tooltip")
+        .attr("class", "shared-tooltip") // Sicurezza, applico la classe standard
         .style("opacity", 0)
-        .style("z-index", 9999);
+        .style("min-width", "auto")
+        .style("width", "fit-content");
 
     // Tooltip Handlers
     const handleMouseOver = function (event, d) {
         d3.select(this).attr("fill-opacity", 0.8);
         const regionName = d.properties.COUNTRY || d.properties.name || d.properties.NAME || "Region";
-        tooltip.style("opacity", 1).text(regionName);
+        
+        // Uso struttura standard .tooltip-header
+        tooltip.style("opacity", 1)
+               .style("visibility", "visible")
+               .html(`<div class='tooltip-header' style='margin-bottom:0; border-bottom:none;'>${regionName}</div>`);
     };
+    
     const handleMouseMove = function (event) {
-        tooltip.style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 15) + "px");
+        tooltip.style("left", (event.pageX + 15) + "px")
+               .style("top", (event.pageY - 15) + "px");
     };
+    
     const handleMouseOut = function () {
         d3.select(this).attr("fill-opacity", 1);
-        tooltip.style("opacity", 0);
+        tooltip.style("opacity", 0).style("visibility", "hidden");
     };
+    // ----------------------------------------
 
     // --- Draw map ---
 
@@ -235,11 +220,6 @@ Promise.all([
     const canvas = container.append("canvas")
         .attr("width", width)
         .attr("height", height)
-        // .style("position", "absolute")
-        // .style("top", 0)
-        // .style("left", 0)
-        // .style("width", "100%")
-        // .style("height", "100%")
         .style("z-index", 2)
         .style("pointer-events", "none");
 
@@ -366,7 +346,6 @@ Promise.all([
     d3.select("#front-zoom-in").on("click", () => svg.transition().call(zoom.scaleBy, 1.3));
     d3.select("#front-zoom-out").on("click", () => svg.transition().call(zoom.scaleBy, 0.7));
     d3.select("#front-zoom-reset").on("click", () => svg.transition().call(zoom.transform, d3.zoomIdentity));
-
 
     // --- Filter Buttons Logic ---
     d3.selectAll("#filter-container .btn-compact").on("click", function () {
@@ -537,3 +516,5 @@ Promise.all([
 }).catch(err => {
     console.error("Errore Front Map:", err);
 });
+
+

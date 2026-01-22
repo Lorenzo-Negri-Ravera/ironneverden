@@ -77,26 +77,7 @@ body {
 
 /* ------------------- SVG CONTAINERS ------------------- */
 
-/* Responsive mode */
-#chart-container,
-#chart svg {
-    width: 100% !important;
-    height: auto !important;
-    display: block;
-    max-width: none;
-}
-
-/* Wrapper to handle zoom and overflow */
-.chart-wrapper-map {
-    width: 100%;
-    position: relative;
-    overflow: hidden;
-    border-radius: 8px;
-}
-
-
-/* ------------------- SVG CONTAINERS EXPERIMENTAL ------------------- */
-
+/* Universal Graphs Container */
 .chart-container-responsive {
     width: 100%;
     height: auto;
@@ -104,9 +85,7 @@ body {
     display: block;
 }
 
-
-
-/* Rende l'SVG fluido */
+/* Force SVG to fill the container */
 .chart-container-responsive svg {
     width: 100%;
     height: auto;
@@ -114,28 +93,24 @@ body {
     max-width: 100%;
 }
 
-/* NUOVO: Griglia per grafici affiancati (Sunburst, Sankey, ecc.) */
+
 .chart-grid-2 {
     display: grid;
     grid-template-columns: 1fr;
-    /* Default Mobile: 1 colonna (uno sotto l'altro) */
     gap: 2rem;
-    /* Spazio tra i grafici */
     width: 100%;
     align-items: start;
 }
 
-/* Separatore visuale opzionale */
+/* Grid separator for PC */
 .chart-grid-separator {
     display: none;
-    /* Nascosto su mobile */
 }
 
-/* Desktop (Large screens): Diventa 2 colonne */
+/* Grid graph device handling */
 @media (min-width: 992px) {
     .chart-grid-2 {
         grid-template-columns: 1fr 1px 1fr;
-        /* Grafico - Linea - Grafico */
         gap: 0;
     }
 
@@ -154,11 +129,10 @@ body {
     }
 }
 
-/* --- Classe Universale per Mappe (Layered) --- */
+/* --------- Maps containers --------- */
 .map-container-responsive {
     position: relative;
     width: 100%;
-    /* Mantiene sempre la proporzione 1000:700 (la stessa del viewBox di D3) */
     aspect-ratio: 1000 / 700;
     overflow: hidden;
     background-color: #f8f9fa;
@@ -166,7 +140,7 @@ body {
     border-radius: 8px;
 }
 
-/* Forza SVG e Canvas a riempire esattamente il contenitore */
+/* Force SVG and Canvas to fill the map container */
 .map-container-responsive svg,
 .map-container-responsive canvas {
     position: absolute !important;
@@ -178,7 +152,7 @@ body {
     display: block;
 }
 
-/* Gestione dei controlli zoom dentro la mappa */
+/* Zoom Controls Overlay */
 .map-container-responsive .zoom-controls-overlay {
     position: absolute;
     top: 10px;
@@ -187,6 +161,65 @@ body {
     display: flex;
     flex-direction: column;
     gap: 5px;
+}
+
+
+/* ------------------- UNIVERSAL CHART THEME ------------------- */
+/* Questa classe andrà applicata al contenitore SVG di TUTTI i grafici */
+
+/* 1. Stile ASSI e GRIGLIE (Comune a tutti: Linee, Barre, Istogrammi) */
+
+/* Nascondi di base le linee degli assi e i tick verticali */
+.chart-theme-universal .axis path,
+.chart-theme-universal .axis line {
+    display: none;
+}
+
+/* Mostra la griglia (tratteggiata) */
+.chart-theme-universal .grid line {
+    display: block !important;
+    stroke: #e0e0e0;
+    stroke-opacity: 0.7;
+    stroke-dasharray: 4, 4;
+}
+.chart-theme-universal .grid path {
+    display: none; /* Nasconde il bordo esterno della griglia */
+}
+
+/* Mostra la linea di base dell'asse X (il "pavimento") */
+.chart-theme-universal .axis-x path.domain {
+    display: block !important;
+    stroke: #333;
+    stroke-width: 1px;
+}
+
+/* Mostra i TICK solo sull'asse X */
+.chart-theme-universal .axis-x .tick line {
+    display: block !important;
+    stroke: #666;
+    stroke-width: 1px;
+}
+
+/* Font standard per tutti i testi dentro il grafico */
+.chart-theme-universal text {
+    font-family: 'Fira Sans', sans-serif;
+    fill: #25282A;
+}
+
+.chart-theme-universal .axis text {
+    font-size: 12px;
+    fill: #666;
+}
+
+
+/* 2. Stile SPECIFICO per i Line Chart (Solo se c'è la classe .line-path) */
+/* Questo blocco viene ignorato dai grafici a barre perché non hanno .line-path */
+.chart-theme-universal .line-path {
+    fill: none;
+    stroke-width: 3px;
+    stroke-linecap: round;
+    filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.1));
+    transition: opacity 0.3s ease;
 }
 
 
@@ -236,14 +269,14 @@ body {
 
 
 
-/* ------------------- TOOLTIPS & UI CONTROLS (Menu, Buttons, Help Button, Reloader..)  ------------------- */
+/* ============================================================ */
+/* ------------------- UNIVERSAL TOOLTIP THEME ---------------- */
+/* ============================================================ */
 
-/* Da capire e gestire perchè sono usati in diversi chart, definiti nei js */
-/* ------------------- General tooltip style ------------------- */
-.tooltip-map,
-#tooltip,
-#tooltip-bar,
-#chart-tooltip {
+/* 1. Contenitore Principale Standard (Applica questa classe a TUTTI i div dei tooltip nell'HTML) */
+.shared-tooltip {
+    position: absolute;
+    visibility: hidden;
     font-family: 'Fira Sans', sans-serif;
     font-size: 13px;
     line-height: 1.4;
@@ -254,15 +287,60 @@ body {
     pointer-events: none;
     z-index: 3000;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    
+    /* Assicura che non vada a capo in modo strano e abbia una larghezza minima decente */
+    min-width: 150px;
+    white-space: normal;
 }
 
+/* 2. Header del Tooltip (Titolo / Data) */
 .tooltip-header {
     font-weight: 700;
-    margin-bottom: 5px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 3px;
+    color: #333;
+    /* Stile aggiornato (Food Chart Style) */
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    display: block; /* Assicura che prenda tutta la riga */
 }
 
+/* 3. STILE NUOVO (Layout a righe flessibili - Useremo questo d'ora in poi) */
+.tooltip-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px; /* Spazio standard tra nome e valore */
+    margin-bottom: 3px;
+    font-size: 13px;
+}
+
+/* Elementi interni alla riga */
+.tooltip-label {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Spazio tra pallino e testo */
+}
+
+.tooltip-bullet {
+    font-size: 16px;
+    line-height: 0;
+    /* Il colore verrà impostato inline via JS */
+}
+
+.tooltip-value {
+    font-weight: 700;
+    color: #25282A;
+    font-variant-numeric: tabular-nums; /* Allinea bene i numeri */
+}
+
+/* Stato "dimmed" (opacità ridotta) per quando una riga non è in focus */
+.tooltip-row.dimmed {
+    opacity: 0.3;
+}
+
+/* 4. STILE VECCHIO (Legacy - DA RIMUOVERE una volta aggiornati tutti i JS) */
+/* Manteniamo questo per non rompere le mappe finché non le aggiorni */
 .tooltip-list {
     list-style: none;
     margin: 0;
@@ -369,6 +447,7 @@ body {
 }
 
 
+
 /* --- Buttons --- */
 .btn-compact {
     background: none;
@@ -402,34 +481,30 @@ body {
     font-weight: 700;
 }
 
-/* NUOVO: Stile Bottone Replay (Race Chart) */
-.btn-replay {
-    background-color: #343a40;
-    color: white;
-    border: none;
-    border-radius: 20px;
-    padding: 6px 20px;
-    text-transform: uppercase;
+
+/* Button Play / Replay */
+.btn-player {
+    border-radius: 6px !important;
+    font-family: 'Fira Sans', sans-serif;
     font-weight: 700;
-    font-size: 12px;
+    font-size: 13px;
+    text-transform: uppercase;
     letter-spacing: 0.5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    height: 36px;
     transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+    background-color: #c5655e;
+    border: none;
 }
 
-.btn-replay:hover {
-    background-color: #23272b;
+.btn-player:hover {
+    background-color: #ad534d !important;
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
     transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
-    color: white;
 }
 
-.btn-replay:active {
+.btn-player:active {
+    background-color: #0a58ca;
     transform: translateY(0);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 
@@ -581,30 +656,6 @@ body {
     width: 100%;
 }
 
-/* Button Play */
-.btn-player {
-    border-radius: 6px !important;
-    font-family: 'Fira Sans', sans-serif;
-    font-weight: 700;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    height: 36px;
-    transition: all 0.2s ease;
-    background-color: #c5655e;
-    border: none;
-}
-
-.btn-player:hover {
-    background-color: #ad534d !important;
-    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
-    transform: translateY(-1px);
-}
-
-.btn-player:active {
-    background-color: #0a58ca;
-    transform: translateY(0);
-}
 
 /* Slider */
 .custom-range-slider {
@@ -672,54 +723,6 @@ body {
         width: 180px !important;
     }
 }
-
-
-/* ------------------- UNIVERSAL LINE CHART THEME ------------------- */
-
-/* 1. Nascondi di base tutti i bordi e i tick */
-.chart-theme-line .axis path,
-.chart-theme-line .axis line {
-    display: none;
-}
-
-.chart-theme-line .grid line {
-    stroke: #e0e0e0;
-    stroke-opacity: 0.7;
-    stroke-dasharray: 4, 4;
-}
-
-/* 2. ECCEZIONE: Mostra la linea dell'asse X (Domain) */
-.chart-theme-line .axis-x path.domain {
-    display: block !important;
-    stroke: #333;
-    stroke-width: 1px;
-    /* Opzionale: se vuoi che l'asse sembri "sopra" alle linee del grafico, usa z-index via JS o ordine di disegno */
-}
-
-/* 3. ECCEZIONE: Mostra i TICK solo sull'asse X */
-.chart-theme-line .axis-x .tick line {
-    display: block !important;
-    stroke: #666;
-    /* Colore del tick */
-    stroke-width: 1px;
-}
-
-/* 4. Stile Linee Grafico */
-.chart-theme-line .line-path {
-    fill: none;
-    stroke-width: 3px;
-    stroke-linecap: round;
-    filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.1));
-    transition: opacity 0.3s ease;
-}
-
-.chart-theme-line .axis text {
-    font-family: 'Fira Sans', sans-serif;
-    font-size: 12px;
-    fill: #666;
-}
-
-
 
 
 /* ######################### */

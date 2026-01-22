@@ -24,6 +24,11 @@
     // Pulizia
     container.html("");
 
+    // Setup Tooltip
+    const tooltip = d3.select("#divergence-tooltip")
+        .attr("class", "shared-tooltip")
+        .style("text-align", "left"); // Reset allineamento (visto che il padre è centered)
+
     // Creazione SVG
     const svg = container.append("svg")
         .style("width", "100%")
@@ -34,20 +39,6 @@
     
     const xAxisGroup = g.append("g").attr("class", "x-axis");
     const yAxisGroup = g.append("g").attr("class", "y-axis");
-
-    // --- Tooltip ---
-    let tooltip = d3.select("body").select(".shared-tooltip");
-    if (tooltip.empty()) {
-        tooltip = d3.select("body").append("div").attr("class", "shared-tooltip")
-            .style("position", "absolute").style("visibility", "hidden")
-            .style("background", "rgba(255, 255, 255, 0.96)")
-            .style("border", "1px solid #ccc") 
-            .style("padding", "8px 10px") 
-            .style("border-radius", "4px") 
-            .style("font-family", "'Fira Sans', sans-serif").style("font-size", "12px")
-            .style("pointer-events", "none").style("z-index", "10000")
-            .style("box-shadow", "0 2px 8px rgba(0,0,0,0.15)");
-    }
 
     // --- Data Loading ---
     d3.json(CONFIG.dataPath).then(raw_data => {
@@ -104,12 +95,7 @@
             g.attr("transform", `translate(0,${CONFIG.margin.top})`);
 
             // --- SCALES (FIXED OVERLAP) ---
-            
-            // 1. Calcola l'estensione dei dati (min e max)
             const extent = d3.extent(data, d => d.value);
-            
-            // 2. Aggiungi "respiro" (padding) del 15% al dominio
-            // Questo assicura che la barra più lunga non tocchi il bordo, lasciando spazio all'etichetta
             const rangePadding = Math.abs(extent[1] - extent[0]) * 0.15;
             
             const x = d3.scaleLinear()
@@ -123,7 +109,7 @@
 
             // Axes
             const xAxis = d3.axisTop(x)
-                .ticks(CONFIG.width / 100) // Meno ticks per pulizia
+                .ticks(CONFIG.width / 100) 
                 .tickFormat(currentFormat);
 
             xAxisGroup.transition().duration(750)
@@ -180,7 +166,6 @@
             labelsEnter.merge(labels)
                 .transition().duration(750)
                 .text(d => currentFormat(d.value))
-                // MODIFICA: Aumentato il margine da 4 a 10px
                 .attr("x", d => x(d.value) + (d.value < 0 ? -10 : 10))
                 .attr("text-anchor", d => d.value < 0 ? "end" : "start")
                 .attr("y", d => y(d.origin_name) + y.bandwidth() / 2)
@@ -196,29 +181,31 @@
                     const icon = isNeg ? "↘" : "↗";
                     const shareChange = d.Share_diff > 0 ? "+" + formatPerc(d.Share_diff) : formatPerc(d.Share_diff);
                     
-                    const hlShare = metric === "share" ? "background:#fff3cd;" : "";
-                    const hlFlights = metric !== "share" ? "background:#fff3cd;" : "";
-
-                    tooltip.style("visibility", "visible").html(`
-                        <div style="border-bottom: 2px solid ${color}; font-weight: 700; margin-bottom: 6px; padding-bottom: 4px; font-size: 13px;">
-                            ${d.origin_name}
+                    // Contenuto Standardizzato
+                    const htmlContent = `
+                        <div class="tooltip-header" style="color:${color}; border-color:${color};">${d.origin_name}</div>
+                        
+                        <div class="tooltip-row">
+                            <span class="tooltip-label">Flights 2021</span>
+                            <span class="tooltip-value">${d.flights_2021}</span>
                         </div>
-                        <div style="display: grid; grid-template-columns: auto auto; gap: 4px 15px; font-size: 12px; align-items: center;">
-                            <span style="color:#666;">Flights 2021:</span>
-                            <span style="font-weight:600; text-align:right;">${d.flights_2021}</span>
-                            
-                            <span style="color:#666;">Flights 2022:</span>
-                            <span style="font-weight:600; text-align:right;">${d.flights_2022}</span>
-
-                            <span style="color:#666; ${hlFlights}">Change (Abs):</span>
-                            <span style="font-weight:bold; color:${color}; text-align:right; ${hlFlights}">${formatAbs(d.Divergence)} ${icon}</span>
-                            
-                            <div style="grid-column: span 2; border-top: 1px solid #eee; margin-top:4px; padding-top:4px; font-style:italic; color:#555; ${hlShare}">
-                                Market Share: ${formatPerc(d.Freq_2021)}% &rarr; <b>${formatPerc(d.Freq_2022)}%</b> 
-                                <span style="font-size:11px; margin-left:4px;">(${shareChange}pp)</span>
-                            </div>
+                        
+                        <div class="tooltip-row">
+                            <span class="tooltip-label">Flights 2022</span>
+                            <span class="tooltip-value">${d.flights_2022}</span>
                         </div>
-                    `);
+
+                        <div class="tooltip-row">
+                            <span class="tooltip-label">Change (Abs)</span>
+                            <span class="tooltip-value" style="color:${color}">${formatAbs(d.Divergence)} ${icon}</span>
+                        </div>
+
+                        <div style="border-top:1px dashed #eee; padding-top:4px; margin-top:6px; font-size:11px; color:#666;">
+                            Market Share: <b>${formatPerc(d.Freq_2022)}%</b> (${shareChange}pp)
+                        </div>
+                    `;
+
+                    tooltip.style("visibility", "visible").html(htmlContent);
                 })
                 .on("mousemove", (e) => {
                     tooltip.style("top", (e.pageY - 15) + "px").style("left", (e.pageX + 15) + "px");

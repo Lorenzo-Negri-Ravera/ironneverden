@@ -2,7 +2,6 @@
 
 // --- 1. OBSERVER INTERNO ---
 document.addEventListener("DOMContentLoaded", function() {
-    // MODIFICA QUI: Aggiornato con il nuovo ID della section
     const target = document.querySelector("#food_linechart_section");
     
     if (target) {
@@ -23,7 +22,6 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function initFoodChart() {
-    // ... IL RESTO DEL CODICE RIMANE IDENTICO A PRIMA ...
     const mainContainer = d3.select("#food-chart-container");
     const legendContainer = d3.select("#food-legend-container");
     const helpContainer = d3.select("#food-help-container");
@@ -34,12 +32,14 @@ function initFoodChart() {
     legendContainer.html("");
     helpContainer.html("");
     
+    // Rimuove stili inline, lasciando fare al CSS esterno
     mainContainer.attr("style", "");
 
     const margin = {top: 30, right: 30, bottom: 50, left: 60}; 
     const width = 1000 - margin.left - margin.right;
     const height = 500 - margin.top - margin.bottom;
 
+    // Il container ha già la classe .chart-theme-universal nel HTML padre (#food-chart-wrapper)
     const svg = mainContainer.append("svg")
         .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
         .append("g")
@@ -66,31 +66,14 @@ function initFoodChart() {
 
         // 1. GRIGLIA
         svg.append("g")
-            .attr("class", "grid")
-            .call(d3.axisLeft(y).ticks(6).tickSize(-width).tickFormat(""))
-            .call(g => g.select(".domain").remove());
+            .attr("class", "grid") 
+            .call(d3.axisLeft(y).ticks(6).tickSize(-width).tickFormat(""));
 
-        // 2. LINEE
-        /*
-        const lineGen = (key) => d3.line().curve(d3.curveMonotoneX).x(d => x(d.Date)).y(d => y(d[key]));
 
-        keys.forEach(key => {
-            const safeId = "line-" + key.replace(/\s+/g, '-');
-            svg.append("path")
-                .datum(data)
-                .attr("id", safeId)
-                .attr("class", "line-path food-line") 
-                .attr("fill", "none")
-                .attr("stroke", color(key))
-                .attr("d", lineGen(key))
-                .style("cursor", "pointer");
-        });*/
-
-        //NEW
         // 2. LINEE
         const lineGen = (key) => d3.line().curve(d3.curveMonotoneX).x(d => x(d.Date)).y(d => y(d[key]));
 
-        keys.forEach((key, index) => { // Aggiungi 'index' qui se vuoi un effetto a cascata (opzionale)
+        keys.forEach((key) => {
             const safeId = "line-" + key.replace(/\s+/g, '-');
             
             const path = svg.append("path")
@@ -102,15 +85,14 @@ function initFoodChart() {
                 .attr("d", lineGen(key))
                 .style("cursor", "pointer");
 
-            // --- ANIMAZIONE CON RITARDO ---
+            // --- ANIMAZIONE ---
             const totalLength = path.node().getTotalLength();
-
             path
                 .attr("stroke-dasharray", totalLength + " " + totalLength)
                 .attr("stroke-dashoffset", totalLength)
                 .transition()
-                .delay(1000)  // <--- AGGIUNTA: Aspetta 500ms (mezzo secondo) prima di partire
-                .duration(7000) // <--- CONSIGLIO: Aumentato leggermente a 2.5s per renderla più morbida
+                .delay(1000)
+                .duration(7000)
                 .ease(d3.easeCubicOut)
                 .attr("stroke-dashoffset", 0);
         });
@@ -119,14 +101,11 @@ function initFoodChart() {
         svg.append("g")
             .attr("class", "axis axis-x") 
             .attr("transform", `translate(0,${height})`)
-            .call(d3.axisBottom(x).ticks(8).tickSizeOuter(0))
-            .style("font-family", "sans-serif").style("font-size", "14px");
+            .call(d3.axisBottom(x).ticks(8).tickSizeOuter(0));
 
         svg.append("g")
             .attr("class", "axis axis-y")
-            .call(d3.axisLeft(y).ticks(6).tickSize(0).tickPadding(12))
-            .call(g => g.select(".domain").remove()) 
-            .style("font-family", "sans-serif").style("font-size", "13px");
+            .call(d3.axisLeft(y).ticks(6).tickSize(0).tickPadding(12));
 
         function updateFocus() {
             svg.selectAll(".food-line")
@@ -148,6 +127,7 @@ function initFoodChart() {
                 });
         }
 
+        // LEGENDA E HELP
         legendContainer.attr("class", "d-flex flex-wrap justify-content-center align-items-center column-gap-5 row-gap-1 mt-1");
         
         keys.forEach(key => {
@@ -165,7 +145,6 @@ function initFoodChart() {
                 activeFocusKey = (activeFocusKey === key) ? null : key;
                 updateFocus();
             });
-            
             btn.node().__key__ = key;
         });
 
@@ -182,7 +161,10 @@ function initFoodChart() {
             createChartHelp("#food-help-container", "#food-chart-wrapper", helpContent);
         }
 
-        const tooltip = d3.select("#food-chart-tooltip");
+        // --- TOOLTIP STANDARDIZZATO ---
+        const tooltip = d3.select("#food-chart-tooltip")
+            .attr("class", "shared-tooltip");
+
         const mouseLine = svg.append("line")
             .attr("y1", 0).attr("y2", height)
             .style("stroke", "#ccc").style("stroke-width", "1px").style("stroke-dasharray", "4,4")
@@ -205,13 +187,21 @@ function initFoodChart() {
 
                 mouseLine.attr("x1", x(d.Date)).attr("x2", x(d.Date)).style("opacity", 1);
                 
-                let html = `<div style="font-weight:bold; color:#333; border-bottom:1px solid #ddd; padding-bottom:4px; margin-bottom:8px;">${d3.timeFormat("%B %Y")(d.Date)}</div>`;
+                // Creazione HTML Standardizzato
+                let html = `<div class="tooltip-header">${d3.timeFormat("%B %Y")(d.Date)}</div>`;
+                
                 keys.forEach(k => {
                     const isFocus = !activeFocusKey || activeFocusKey === k;
-                    html += `<div style="display:flex; justify-content:space-between; gap:30px; font-size:13px; margin-bottom:3px; opacity:${isFocus ? 1 : 0.3}">
-                                <span><b style="color:${color(k)}; font-size:16px; line-height:0;">•</b> ${k}</span>
-                                <span style="font-weight:700;">${d[k].toFixed(1)}</span>
-                             </div>`;
+                    const rowClass = isFocus ? "tooltip-row" : "tooltip-row dimmed";
+
+                    html += `
+                    <div class="${rowClass}">
+                        <span class="tooltip-label">
+                            <span class="tooltip-bullet" style="color:${color(k)}">●</span> 
+                            ${k}
+                        </span>
+                        <span class="tooltip-value">${d[k].toFixed(1)}</span>
+                    </div>`;
                 });
 
                 tooltip.html(html)

@@ -27,7 +27,6 @@
 
             <section id="choropleth-section" class="mb-5 position-relative">
                 <div class="container-fluid p-0">
-
                     <div class="row justify-content-center mb-4">
                         <div class="col-lg-10">
                             <div class="compact-menu-bar">
@@ -57,14 +56,15 @@
 
                     <div class="row justify-content-center">
                         <div class="col-lg-10">
-
                             <div id="choropleth-wrapper" class="map-container-responsive mb-2">
                                 <svg id="choropleth-container"></svg>
-
                                 <div id="zoom-controls" class="zoom-controls-overlay">
-                                    <button class="btn btn-sm btn-primary zoom-btn" id="zoom-in">+</button>
-                                    <button class="btn btn-sm btn-primary zoom-btn" id="zoom-out">−</button>
-                                    <button class="btn btn-sm btn-primary zoom-btn" id="zoom-reset">R</button>
+                                    <button class="btn btn-sm btn-primary zoom-btn" id="zoom-in"
+                                        aria-label="Zoom in">+</button>
+                                    <button class="btn btn-sm btn-primary zoom-btn" id="zoom-out"
+                                        aria-label="Zoom out">−</button>
+                                    <button class="btn btn-sm btn-primary zoom-btn" id="zoom-reset"
+                                        aria-label="Reset zoom">R</button>
                                 </div>
                             </div>
 
@@ -89,13 +89,15 @@
                 </div>
             </section>
 
-
             <section id="front-map-section" class="mt-5">
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
+                        <!--
                         <div id="tooltip"
                             style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 4px; pointer-events: none; font-family: Arial; font-size: 12px; z-index: 3000;">
-                        </div>
+                        </div>-->
+
+                        <div id="tooltip" class="shared-tooltip"></div>
 
                         <div class="d-flex justify-content-center mb-3">
                             <div id="filter-container" class="compact-menu-bar d-inline-flex justify-content-center"
@@ -112,10 +114,13 @@
                             <div class="col-12 p-0">
                                 <div id="front-map-wrapper" class="map-container-responsive mb-2">
                                     <div id="front-map-container"></div>
-                                    <div id="front-zoom-controls" class="zoom-controls-overlay">
-                                        <button class="btn btn-sm btn-primary zoom-btn" id="front-zoom-in">+</button>
-                                        <button class="btn btn-sm btn-primary zoom-btn" id="front-zoom-out">−</button>
-                                        <button class="btn btn-sm btn-primary zoom-btn" id="front-zoom-reset">R</button>
+                                    <div id="zoom-controls" class="zoom-controls-overlay">
+                                        <button class="btn btn-sm btn-primary zoom-btn" id="front-zoom-in"
+                                            aria-label="Zoom in">+</button>
+                                        <button class="btn btn-sm btn-primary zoom-btn" id="front-zoom-out"
+                                            aria-label="Zoom out">−</button>
+                                        <button class="btn btn-sm btn-primary zoom-btn" id="front-zoom-reset"
+                                            aria-label="Reset zoom">R</button>
                                     </div>
                                 </div>
                             </div>
@@ -165,7 +170,9 @@
                     <p>
                         As is widely known, the conflict on Ukrainian soil has been ongoing for nearly a decade,
                         with violence historically concentrated along the eastern border in the Donetsk and Luhansk
-                        regions. <br>
+                        regions.
+                    </p>
+                    <p>
                         However, starting from February 24 2022, the distribution of events changed drastically.
                         Explosions were no longer confined to the south-east but spread simultaneously across all
                         borders
@@ -201,7 +208,7 @@
             <section id="spike-map-section" class="mt-5">
                 <div class="row justify-content-center">
                     <div class="col-lg-10 text-center">
-
+                        <div id="spike-tooltip" class="shared-tooltip" style="text-align: left;"></div>
                         <div id="static-spike-controls" class="d-flex justify-content-center flex-wrap gap-3 mb-4">
                             <div class="compact-menu-bar d-inline-flex align-items-center" role="group">
                                 <input type="radio" class="btn-check" name="mapLevel" id="lvl-region" value="region"
@@ -230,10 +237,13 @@
 
                             <div id="spike-container"></div>
 
-                            <div id="spike-zoom-controls" class="zoom-controls-overlay">
-                                <button class="btn btn-sm btn-primary zoom-btn" id="spike-zoom-in">+</button>
-                                <button class="btn btn-sm btn-primary zoom-btn" id="spike-zoom-out">−</button>
-                                <button class="btn btn-sm btn-primary zoom-btn" id="spike-zoom-reset">R</button>
+                            <div id="zoom-controls" class="zoom-controls-overlay">
+                                <button class="btn btn-sm btn-primary zoom-btn" id="spike-zoom-in"
+                                    aria-label="Zoom in">+</button>
+                                <button class="btn btn-sm btn-primary zoom-btn" id="spike-zoom-out"
+                                    aria-label="Zoom out">−</button>
+                                <button class="btn btn-sm btn-primary zoom-btn" id="spike-zoom-reset"
+                                    aria-label="Reset zoom">R</button>
                             </div>
                         </div>
 
@@ -258,11 +268,14 @@
             <section id="stacked-bar-section" class="mt-5">
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
+                        <!--
                         <div id="tooltip-bar"
                             style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 4px; pointer-events: none; font-family: 'Fira Sans', sans-serif; font-size: 12px; z-index: 3000;">
-                        </div>
+                        </div>-->
 
-                        <div id="stacked-bar-wrapper" class="chart-container-responsive mb-0">
+                        <div id="tooltip-bar" class="shared-tooltip"></div>
+
+                        <div id="stacked-bar-wrapper" class="chart-container-responsive chart-theme-universal mb-0">
                             <div id="stacked-bar-chart-container"></div>
                         </div>
 
@@ -314,11 +327,14 @@
             <section id="events-line-section" class="mt-5">
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
+                        <!--
                         <div id="events-line-tooltip"
                             style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 4px; pointer-events: none; font-family: 'Fira Sans', sans-serif; font-size: 12px; z-index: 3000;">
-                        </div>
+                        </div>-->
 
-                        <div id="events-line-wrapper" class="chart-container-responsive chart-theme-line mb-0">
+                        <div id="events-line-tooltip" class="shared-tooltip"></div>
+
+                        <div id="events-line-wrapper" class="chart-container-responsive chart-theme-universal mb-0">
                             <div id="events-line-chart-container"></div>
                         </div>
 
@@ -380,9 +396,12 @@
             <section id="slope-chart-section" class="mt-5">
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
+                        <!--
                         <div id="slope-chart-tooltip"
                             style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 4px; pointer-events: none; font-family: 'Fira Sans', sans-serif; font-size: 12px; z-index: 3000;">
-                        </div>
+                        </div>-->
+
+                        <div id="slope-chart-tooltip" class="shared-tooltip"></div>
 
                         <div class="d-flex justify-content-center align-items-center mb-3">
                             <div id="slope-controls"></div>
@@ -425,10 +444,12 @@
             <section id="sunburst-section" class="mb-5 position-relative">
                 <div class="container-fluid p-0">
 
-                    <div class="row justify-content-center mb-4">
+                    <div class="row justify-content-center mb-0">
                         <div class="col-lg-10 text-center">
 
-                            <div class="d-flex justify-content-center align-items-center mb-3">
+                            <div id="sunburst-tooltip" class="shared-tooltip"></div>
+
+                            <div class="d-flex justify-content-center align-items-center mb-0">
                                 <div id="sunburst-controls"></div>
                             </div>
                         </div>
@@ -457,9 +478,7 @@
 
                                         <div id="chart-2023" class="chart-container-responsive"></div>
                                     </div>
-
                                 </div>
-
                             </div>
 
                             <div class="row mt-3">
@@ -469,37 +488,29 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </section>
 
             <section id="sankey-section" class="mb-5 position-relative">
                 <div class="container-fluid p-0">
-
-                    <div class="row justify-content-center mb-4">
+                    <div class="row justify-content-center mb-0">
                         <div class="col-lg-10">
-
-                            <div class="d-flex justify-content-center align-items-center mb-3">
+                            <div id="sankey-tooltip" class="shared-tooltip"></div>
+                            <div class="d-flex justify-content-center align-items-center mb-0">
                                 <div id="sankey-controls"></div>
                             </div>
-
                         </div>
                     </div>
 
                     <div class="row justify-content-center">
                         <div class="col-lg-10">
-
                             <div id="sankey-wrapper" class="py-4">
-
                                 <div class="chart-grid-2">
-
                                     <div class="chart-grid-item text-center">
                                         <h5 class="fw-bold mb-3">2021 (Pre-War)</h5>
                                         <div id="sankey-chart-2021" class="chart-container-responsive"></div>
                                     </div>
-
                                     <div class="chart-grid-separator" style="min-height: 550px;"></div>
-
                                     <div class="chart-grid-item text-center">
                                         <h5 class="fw-bold mb-3">2023 (War Time)</h5>
                                         <div id="sankey-chart-2023" class="chart-container-responsive"></div>
@@ -517,7 +528,8 @@
                         To better illustrate the war's impact on the global economy,
                         we analyzed the FAO Food Price Index (FFPI),
                         provided by the Food and Agriculture Organization of the United Nations
-                        (<a href="https://www.fao.org/worldfoodsituation/FoodPricesIndex/en" target="_blank">FAO</a>).
+                        (<a href="https://www.fao.org/worldfoodsituation/FoodPricesIndex/en" target="_blank"
+                            rel="noopener noreferrer">FAO</a>).
                         <br>
                         This index, which monitors monthly fluctuations in the international
                         prices of a basket of food commodities, allows for a comprehensive overview
@@ -529,20 +541,21 @@
             <section id="food_linechart_section" class="mt-5">
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
+                        <!--
                         <div id="food-chart-tooltip"
                             style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 4px; pointer-events: none; font-family: 'Fira Sans', sans-serif; font-size: 12px; z-index: 3000;">
-                        </div>
+                        </div>-->
 
-                        <div id="food-chart-wrapper" class="chart-container-responsive chart-theme-line mb-0">
+                        <div id="food-chart-tooltip" class="shared-tooltip"></div>
+
+                        <div id="food-chart-wrapper" class="chart-container-responsive chart-theme-universal mb-0">
                             <div id="food-chart-container"></div>
                         </div>
-
                         <div class="row mt-1">
                             <div class="col-12">
                                 <div id="food-legend-container" class="w-100"></div>
                             </div>
                         </div>
-
                         <div class="row mt-3">
                             <div class="col-12">
                                 <div id="food-help-container"></div>
@@ -603,11 +616,9 @@
                 <div class="container-fluid p-0">
                     <div class="row justify-content-center">
                         <div class="col-lg-10">
-                            <div id="gas-linechart-tooltip"
-                                style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 4px; pointer-events: none; font-family: 'Fira Sans', sans-serif; font-size: 12px; z-index: 3000; box-shadow: 2px 2px 6px rgba(0,0,0,0.1);">
-                            </div>
 
-                            <div id="gas-linechart-wrapper" clathess="chart-container-responsive mb-0">
+                            <div id="gas-linechart-wrapper"
+                                class="chart-container-responsive chart-theme-universal mb-0">
                                 <div id="gas-linechart-container"></div>
                             </div>
 
@@ -656,10 +667,6 @@
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
 
-                        <div id="race-chart-tooltip"
-                            style="position: absolute; visibility: hidden; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 4px; pointer-events: none; font-family: 'Fira Sans', sans-serif; font-size: 12px; z-index: 3000;">
-                        </div>
-
                         <div id="race-chart-wrapper" class="chart-container-responsive mb-0">
                             <div id="race-chart-container"></div>
                         </div>
@@ -668,8 +675,10 @@
 
                             <div id="race-help-container"></div>
 
-                            <button id="replay-btn" class="btn-replay" onclick="replay()">
-                                <span style="font-size: 16px;">⟳</span> REPLAY
+                            <button id="replay-btn"
+                                class="btn btn-primary btn-sm btn-player d-flex align-items-center gap-2 px-3"
+                                onclick="replay()">
+                                <span class="fw-bold">REPLAY</span>
                             </button>
                         </div>
                     </div>
@@ -701,6 +710,8 @@
             <section id="divergence-chart-section" class="mt-5">
                 <div class="row justify-content-center">
                     <div class="col-lg-10 text-center">
+
+                        <div id="divergence-tooltip" class="shared-tooltip"></div>
 
                         <div id="divergence-controls" class="d-flex justify-content-center flex-wrap gap-3 mb-4">
                             <div class="compact-menu-bar d-inline-flex align-items-center" role="group">
@@ -764,7 +775,7 @@
     <script src="../../scripts/final/sunburst.js"></script>
     <script src="../../scripts/final/sankey.js"></script>
     <script src="../../scripts/final/food_linechart.js"></script>
-    <script src="../../scripts/final/gas_linechart.js"></script>
+    <script src="../../scripts/final/gas_hist.js"></script>
     <script src="../../scripts/final/race_bar_chart.js"></script>
     <script src="../../scripts/final/divergent_bar_chart.js"></script>
 

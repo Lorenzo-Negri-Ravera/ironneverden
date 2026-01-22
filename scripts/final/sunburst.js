@@ -11,8 +11,6 @@
     };
 
     // --- CONFIGURAZIONE VISIVA ---
-    // Usiamo una dimensione logica interna quadrata. 
-    // Il CSS lo scalerà, quindi 600 è solo per la risoluzione del viewBox.
     const width = 600; 
     const radius = width / 6;
 
@@ -52,7 +50,18 @@
         const wrapper = d3.select("#sunburst-wrapper");
         wrapper.selectAll(".chart-loader-overlay").remove();
         
-        // Loader posizionato relativo al wrapper
+        // --- SETUP TOOLTIP ---
+        const tooltip = d3.select("#sunburst-tooltip");
+        
+        // FIX CRUCIALE: Spostiamo il tooltip nel body per far funzionare correttamente
+        // le coordinate pageX/pageY indipendentemente dal contenitore relativo.
+        if (!tooltip.empty()) {
+            document.body.appendChild(tooltip.node());
+            tooltip.attr("class", "shared-tooltip")
+                   .style("position", "absolute")
+                   .style("z-index", "9999");
+        }
+
         const loader = wrapper.append("div")
             .attr("class", "chart-loader-overlay")
             .style("display", "flex");
@@ -82,36 +91,13 @@
         });
     }
 
-    /*
     function processHierarchy(flatData) {
         const grouped = d3.group(flatData, d => d.Continent);
-        const children = Array.from(grouped, ([key, values]) => {
-            return {
-                name: key,
-                children: values.map(d => ({
-                    name: d.Country,
-                    value: d["Trade Value"]
-                }))
-            };
-        });
-        return { name: "World", children: children };
-    }*/
-
-    function processHierarchy(flatData) {
-        // 1. Raggruppa per Continente
-        const grouped = d3.group(flatData, d => d.Continent);
-        
-        // SOGLIA DI VISIBILITÀ CUMULATIVA (0.90 = 90%)
-        // Mostriamo i paesi che costituiscono il 90% del business.
-        // Il restante 10% (la coda degli "ultimissimi") finisce in Other.
-        // Puoi alzare a 0.95 se vuoi accorpare ancora meno roba (solo l'ultimo 5%).
         const CUMULATIVE_CUTOFF = 0.90; 
 
         const children = Array.from(grouped, ([continentName, values]) => {
             
             const continentTotal = d3.sum(values, d => d["Trade Value"]);
-            
-            // IMPORTANTE: Ordiniamo decrescente per calcolare la cumulata
             values.sort((a, b) => b["Trade Value"] - a["Trade Value"]);
 
             let bigCountries = [];
@@ -122,32 +108,19 @@
                 const val = d["Trade Value"];
                 const ratio = val / continentTotal;
                 
-                // Se non abbiamo ancora coperto il 90% del totale del continente...
                 if (accumulatedPercent < CUMULATIVE_CUTOFF) {
-                    // ...aggiungiamo il paese al grafico
-                    bigCountries.push({
-                        name: d.Country,
-                        value: val
-                    });
+                    bigCountries.push({ name: d.Country, value: val });
                     accumulatedPercent += ratio;
                 } else {
-                    // Siamo oltre il 90%, questi sono gli "ultimissimi": accorpa!
                     otherValue += val;
                 }
             });
 
-            // Aggiungi il blocco "Other" solo se esiste
             if (otherValue > 0) {
-                bigCountries.push({
-                    name: "Other", 
-                    value: otherValue
-                });
+                bigCountries.push({ name: "Other", value: otherValue });
             }
 
-            return {
-                name: continentName,
-                children: bigCountries
-            };
+            return { name: continentName, children: bigCountries };
         });
 
         return { name: "World", children: children };
@@ -193,21 +166,20 @@
 
     // --- 5. CHART RENDERER ---
     function createZoomableSunburst(data, selector, labelSelector) {
+        // Selezioniamo il tooltip globalmente per questa funzione
+        const tooltip = d3.select("#sunburst-tooltip");
+
         const root = d3.hierarchy(data)
             .sum(d => d.value)
             .sort((a, b) => {
-                // REGOLA SPECIALE: "Other" deve sempre andare in fondo (dopo tutti gli altri)
-                if (a.data.name === "Other") return 1; // Sposta 'a' (Other) verso la fine dell'ordinamento visivo
-                if (b.data.name === "Other") return -1;  // Sposta 'b' (Other) verso la fine
-                
-                // Per tutti gli altri paesi, usa il normale ordinamento per valore decrescente
+                if (a.data.name === "Other") return 1; 
+                if (b.data.name === "Other") return -1;  
                 return b.value - a.value;
             });
 
         d3.partition().size([2 * Math.PI, root.height + 1])(root);
         root.each(d => d.current = d);
 
-        // Update Label
         const totalValue = root.value;
         const formattedTotal = totalValue ? formatMoney(totalValue).replace("G", "B") : "$0";
         d3.select(labelSelector).text(`Total Export: ${formattedTotal}`);
@@ -224,17 +196,11 @@
             .innerRadius(d => d.y0 * radius)
             .outerRadius(d => Math.max(d.y0 * radius, d.y1 * radius - 1));
 
-        // SVG CREATION:
-        // Qui sta il trucco: NESSUN width/height in px. Solo viewBox.
-        // Il CSS .chart-container-responsive farà width: 100%.
         const svg = d3.select(selector).append("svg")
             .attr("viewBox", [-width / 2, -width / 2, width, width]) 
             .style("font-family", "'Fira Sans', sans-serif")
             .style("font-size", "10px");
         
-        // Rimuoviamo stili inline che bloccano la responsività (tipo max-width, display block manuali)
-        // Il contenitore HTML padre gestisce la larghezza.
-
         const path = svg.append("g")
             .selectAll("path")
             .data(root.descendants().slice(1))
@@ -248,12 +214,43 @@
             .attr("pointer-events", d => arcVisible(d.current) ? "auto" : "none")
             .attr("d", d => arc(d.current));
 
+        // --- INTERAZIONI AGGIORNATE (Click + Tooltip) ---
         path.filter(d => d.children)
             .style("cursor", "pointer")
             .on("click", clicked);
 
-        path.append("title")
-            .text(d => `${d.ancestors().map(d => d.data.name).reverse().join("/")}\n${formatMoney(d.value)}`);
+        // NUOVA LOGICA TOOLTIP
+        path.on("mouseover", function(event, d) {
+            d3.select(this).attr("fill-opacity", 1); // Evidenzia spicchio
+
+            const breadcrumb = d.ancestors().map(d => d.data.name).reverse().join(" / ");
+            const val = formatMoney(d.value).replace("G", "B");
+
+            // HTML Standardizzato
+            const htmlContent = `
+                <div class="tooltip-header" style="font-size:11px; color:#666; margin-bottom:2px; border-bottom:none;">${breadcrumb}</div>
+                <div class="tooltip-row" style="margin-bottom:0;">
+                    <span class="tooltip-label" style="font-size:14px; color:#000;">${d.data.name}</span>
+                    <span class="tooltip-value" style="font-size:14px;">${val}</span>
+                </div>
+            `;
+
+            tooltip.html(htmlContent)
+                   .style("visibility", "visible")
+                   .style("opacity", 1); 
+        })
+        .on("mousemove", function(event) {
+            tooltip.style("top", (event.pageY - 15) + "px")
+                   .style("left", (event.pageX + 15) + "px");
+        })
+        .on("mouseout", function(event, d) {
+            // Ripristina opacità originale
+            const originalOpacity = arcVisible(d.current) ? (d.children ? 0.8 : 0.6) : 0;
+            d3.select(this).attr("fill-opacity", originalOpacity);
+            
+            tooltip.style("visibility", "hidden")
+                   .style("opacity", 0);
+        });
 
         const label = svg.append("g")
             .attr("pointer-events", "none")
