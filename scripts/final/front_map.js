@@ -1,18 +1,18 @@
-const UKR_PATH = "../../data/final/geojson/countries/UKR.geojson";
-const RUS_PATH = "../../data/final/geojson/countries/RUS.geojson";
-const MDA_PATH = "../../data/final/geojson/countries/MDA.geojson";
-const ROU_PATH = "../../data/final/geojson/countries/ROU.geojson";
-const HUN_PATH = "../../data/final/geojson/countries/HUN.geojson";
-const SVK_PATH = "../../data/final/geojson/countries/SVK.geojson";
-const POL_PATH = "../../data/final/geojson/countries/POL.geojson";
-const BLR_PATH = "../../data/final/geojson/countries/BLR.geojson";
-const BGR_PATH = "../../data/final/geojson/countries/BGR.geojson";
-const MKD_PATH = "../../data/final/geojson/countries/MKD.geojson";
-const SRB_PATH = "../../data/final/geojson/countries/SRB.geojson";
-const XKO_PATH = "../../data/final/geojson/countries/XKO.geojson";
+const UKR_PATH = "../../data/final/geojson/countries_front_map/UKR.geojson";
+const RUS_PATH = "../../data/final/geojson/countries_front_map/RUS.geojson";
+const MDA_PATH = "../../data/final/geojson/countries_front_map/MDA.geojson";
+const ROU_PATH = "../../data/final/geojson/countries_front_map/ROU.geojson";
+const HUN_PATH = "../../data/final/geojson/countries_front_map/HUN.geojson";
+const SVK_PATH = "../../data/final/geojson/countries_front_map/SVK.geojson";
+const POL_PATH = "../../data/final/geojson/countries_front_map/POL.geojson";
+const BLR_PATH = "../../data/final/geojson/countries_front_map/BLR.geojson";
+const BGR_PATH = "../../data/final/geojson/countries_front_map/BGR.geojson";
+const MKD_PATH = "../../data/final/geojson/countries_front_map/MKD.geojson";
+const SRB_PATH = "../../data/final/geojson/countries_front_map/SRB.geojson";
+const XKO_PATH = "../../data/final/geojson/countries_front_map/XKO.geojson";
 
-const FRONT_UKR_PATH = "../../data/final/front_UKR.csv";
-const FRONT_RU_PATH = "../../data/final/front_RU.csv";
+const FRONT_UKR_PATH = "../../data/final/front_map/front_UKR.csv";
+const FRONT_RU_PATH = "../../data/final/front_map/front_RU.csv";
 
 const parseDate = d3.timeParse("%Y-%m-%d");
 

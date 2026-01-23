@@ -1,6 +1,6 @@
 (function() {
     
-    const path = "../../data/final/FlightsUKR/fly/race_bar.csv"; 
+    const path = "../../data/final/air_traffic/race_bar.csv"; 
     
     const codeToName = {
         "UA": "Ukraine", "RU": "Russia", "PL": "Poland", "RO": "Romania", 

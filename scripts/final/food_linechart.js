@@ -39,7 +39,7 @@ function initFoodChart() {
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    d3.csv("../../data/final/data_food.csv").then(function(data) {
+    d3.csv("../../data/final/trade-data/final_datasets/data_food.csv").then(function(data) {
         
         const parseTime = d3.timeParse("%Y-%m-%d");
         const keys = data.columns.filter(k => k !== "Date");

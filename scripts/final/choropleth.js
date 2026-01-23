@@ -1,7 +1,7 @@
 (function () {
     const GENERAL_GEOJSON_PATH = "../../data/final/geojson/europe_final_simplest_v2.geojson";
-    const COUNTRIES_EVENTS_PATH = "../../data/final/df_country_summary_v4.json";
-    const ADMIN_EVENTS_PATH = "../../data/final/df_admin_summary_v4.json";
+    const COUNTRIES_EVENTS_PATH = "../../data/final/choropleth/df_country_summary_v4.json";
+    const ADMIN_EVENTS_PATH = "../../data/final/choropleth/df_admin_summary_v4.json";
 
     const NEUTRAL_COLOR = "#6b3e10b1";
 
@@ -322,7 +322,7 @@
             showLoader();
 
             const upperISO = iso.toUpperCase();
-            const path = `../../data/final/geojson/countriesv2/${upperISO}.geojson`;
+            const path = `../../data/final/geojson/countries_choropleth/${upperISO}.geojson`;
 
             if (geoCache.has(upperISO)) {
                 renderCountryDetail(geoCache.get(upperISO), countryName, upperISO);

@@ -1,0 +1,142 @@
+/* File: style.css (Aggiornato) */
+
+body {
+    /* Fira Sans for the main text (Regular - 400) */
+    font-family: 'Fira Sans', sans-serif;
+    font-weight: 400;
+    background-color: #f8f9fa;
+    color: #25282A;
+}
+
+/* roboto-slab-regular - latin */
+@font-face {
+  font-display: swap; 
+  font-family: 'Roboto Slab';
+  font-style: normal;
+  font-weight: 400;
+  src: url('fonts/roboto-slab-v36-latin-regular.woff2') format('woff2'); 
+}
+
+/* roboto-slab-700 - latin */
+@font-face {
+  font-display: swap; 
+  font-family: 'Roboto Slab';
+  font-style: normal;
+  font-weight: 700;
+  src: url('fonts/roboto-slab-v36-latin-700.woff2') format('woff2'); 
+}
+
+/* fira-sans-regular - latin */
+@font-face {
+  font-display: swap; 
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: url('fonts/fira-sans-v18-latin-regular.woff2') format('woff2'); 
+}
+
+/* fira-sans-italic - latin */
+@font-face {
+  font-display: swap; 
+  font-family: 'Fira Sans';
+  font-style: italic;
+  font-weight: 400;
+  src: url('fonts/fira-sans-v18-latin-italic.woff2') format('woff2');
+}
+
+/* fira-sans-700 - latin */
+@font-face {
+  font-display: swap; 
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: url('fonts/fira-sans-v18-latin-700.woff2') format('woff2'); 
+}
+
+/* h1: Roboto Slab Bold */
+h1.display-4{
+    font-family: 'Roboto Slab', serif;
+    font-weight: 700;
+    color: #25282A;
+}
+
+
+h1 {
+    font-family: 'Roboto Slab', serif;
+    font-weight: 700;
+    font-size: 3rem;
+    color: #25282A;
+}
+
+/* h2: Roboto Slab Regular */
+h2 {
+    font-family: 'Roboto Slab', serif;
+    font-weight: 400;
+    color: #25282A;
+}
+
+/* h3, h4, h5, h6: Fira Sans Bold */
+h3 {
+    font-family: 'Fira Sans', sans-serif;
+    font-weight: 700; /* Bold */
+    color: #25282A;
+    font-size: 2.2rem;
+}
+
+h4, h5, h6 {
+    font-family: 'Fira Sans', sans-serif;
+    font-weight: 700; /* Bold */
+    color: #25282A;
+}
+
+/* Class to define a readable website, 45-75ch rule */
+.text-container {
+    max-width: 70ch;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+}
+
+
+/* Global Styles d3 graph */
+.graph-title {
+  font-family: 'Fira Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  fill: #25282A;
+}
+
+.graph-subtitle {
+  font-family: 'Fira Sans', sans-serif;
+  font-size: 15px;
+  font-style: italic;
+  fill: #25282A;
+}
+
+.domain {
+  stroke: #25282A;
+  stroke-width: 1px;
+}
+
+.tick line {
+  stroke: #25282A;
+  stroke-width: 1px;
+}
+
+.tick text {
+  font-family: 'Fira Sans', sans-serif;
+  font-size: 15px;
+  fill: #25282A;
+}
+
+.legend text {
+  font-family: 'Fira Sans', sans-serif;
+  font-size: 20px;
+  fill: #25282A;
+}
+
+.bar-value {
+  font-family: 'Fira Sans', sans-serif;
+  font-size: 15px;
+  fill: #25282A; 
+}

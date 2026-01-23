@@ -1,7 +1,7 @@
 (function() {
     
     const CONFIG = {
-        dataPath: "../../data/final/FlightsUKR/divergence_final.json", 
+        dataPath: "../../data/final/air_traffic/divergence_final.json", 
         margin: { top: 40, right: 60, bottom: 20, left: 150 }, 
         barHeight: 30,
         width: 1000 
