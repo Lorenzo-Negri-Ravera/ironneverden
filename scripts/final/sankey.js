@@ -285,24 +285,28 @@
             .style("font-family", "'Fira Sans', sans-serif")
             .style("font-size", "17px")
             .style("font-weight", "bold")
-            .style("pointer-events", "none")
+            .style("pointer-events", "none") // Importante: permette al mouse di passare attraverso il testo per attivare i link sotto
             .selectAll("text")
             .data(graph.nodes)
             .join("text")
-            // MODIFICA RADICALE:
-            // Se il nodo inizia nei primi 20px (quindi è la Prima Colonna: Russia/Ucraina)
-            // -> Metti testo a DESTRA (x1 + 6)
-            // Per TUTTO il resto (Prodotti intermedi e Paesi finali)
-            // -> Metti testo a SINISTRA (x0 - 6)
+            
+            // --- INIZIO EFFETTO HALO ---
+            .style("fill", "#25282A")        // Colore del testo (Grigio scuro quasi nero)
+            .style("stroke", "#ffffff")      // Colore dell'alone (Bianco)
+            .style("stroke-width", "2px")    // Spessore dell'alone (sufficiente per coprire i link sotto)
+            .style("stroke-opacity", "0.9")
+            .style("stroke-linejoin", "round") // Arrotonda gli angoli dell'alone
+            .style("paint-order", "stroke")  // Disegna PRIMA il bordo (dietro) e POI il testo (sopra)
+            // --- FINE EFFETTO HALO ---
+
+            // Logica di posizionamento originale
             .attr("x", d => d.x0 < 20 ? d.x1 + 6 : d.x0 - 6)
             .attr("y", d => (d.y1 + d.y0) / 2)
             .attr("dy", "0.35em")
-            // Allineamento testo: 
-            // Prima colonna -> start (allineato a sinistra del testo, va verso destra)
-            // Altri -> end (allineato a destra del testo, va verso sinistra)
             .attr("text-anchor", d => d.x0 < 20 ? "start" : "end")
             .text(d => d.name)
             .each(function(d) {
+                // Nasconde label se il nodo è troppo piccolo (< 15px)
                 if (d.y1 - d.y0 < 15) this.style.display = "none";
             });
 
