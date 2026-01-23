@@ -153,7 +153,7 @@
                 .attr("width", d => Math.abs(x(d.value) - x(0)))
                 .attr("fill", d => d.value < 0 ? "#de425b" : "#003f5c")
                 .attr("opacity", 1);
-
+            
             // Labels
             const labels = g.selectAll(".label-val").data(data, d => d.origin_name);
 
@@ -165,7 +165,15 @@
                 .attr("dy", "0.35em")
                 .attr("font-size", "15px")
                 .attr("font-family", "'Fira Sans', sans-serif")
-                .attr("opacity", 0);
+                .attr("opacity", 0)
+                // --- INIZIO EFFETTO HALO ---
+                .style("fill", "#25282A")        // Colore del testo (scuro)
+                .style("stroke", "#ffffff")      // Colore dell'alone (sfondo del grafico)
+                .style("stroke-width", "4px")    // Spessore dell'alone
+                .style("stroke-linejoin", "round") // Angoli arrotondati
+                .style("paint-order", "stroke")  // FONDAMENTALE: disegna il bordo DIETRO il testo
+                // --- FINE EFFETTO HALO ---
+                ;
 
             labelsEnter.merge(labels)
                 .transition().duration(750)
