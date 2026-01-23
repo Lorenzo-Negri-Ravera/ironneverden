@@ -1,8 +1,8 @@
-// File: front_map.js (Fixed Responsive Version + Filters Working)
+// File: front_map.js (Updated with GeoMercator)
 
 // --- RUS and UKR ---
-const UKR_PATH = "../../data/final/geojson/countries/UKR.json";
-const RUS_PATH = "../../data/final/geojson/countries/RUS.json";
+const UKR_PATH = "../../data/final/geojson/countries/UKR.geojson";
+const RUS_PATH = "../../data/final/geojson/countries/RUS.geojson";
 // Borders countries
 const MDA_PATH = "../../data/final/geojson/countries/MDA.geojson";
 const ROU_PATH = "../../data/final/geojson/countries/ROU.geojson";
@@ -67,28 +67,19 @@ Promise.all([
     const visibleRusFeatures = rusGeo.features.filter(d => westernRussiaIds.includes(d.properties.id));
     const restOfRusFeatures = rusGeo.features.filter(d => !westernRussiaIds.includes(d.properties.id));
 
-    const projection = d3.geoIdentity()
-        .reflectY(true); // Fondamentale per non avere la mappa capovolta con dati Lat/Lon
+    // --- MODIFICA PROIEZIONE ---
+    // Usiamo geoMercator al posto di geoIdentity
+    const projection = d3.geoMercator();
 
-    // --- MODIFICA QUI ---
-    // Invece di [...ukrGeo.features, ...visibleRusFeatures], usiamo solo ukrGeo.features
-    // Questo farà sì che lo zoom iniziale riempia lo schermo con l'Ucraina.
+    // Definiamo su cosa focalizzare lo zoom: Solo l'Ucraina
     const extentFeatures = { type: "FeatureCollection", features: ukrGeo.features };
 
-    // Apply a zoom level to have some margin
-    // Puoi lasciare 1.1 o ridurlo a 1.0 se la vuoi ancora più grande
-    const ZOOM_LEVEL = 1.1;
-    const expandedWidth = (width * 0.9) * ZOOM_LEVEL;
-    const expandedHeight = (height - 30) * ZOOM_LEVEL;
-    const dx = (width - expandedWidth) / 2;
-    const dy = (height - expandedHeight) / 2;
-
-    // Fit with margins
+    // Adattiamo la proiezione all'Ucraina lasciando un margine di 50px
+    // Questo calcolerà automaticamente scala e centro
     projection.fitExtent(
-        [[dx, dy], [dx + expandedWidth, dy + expandedHeight]],
+        [[50, 50], [width - 50, height - 50]],
         extentFeatures
     );
-
 
     // Path generator
     const pathGenerator = d3.geoPath().projection(projection);
@@ -98,6 +89,7 @@ Promise.all([
         data.forEach(d => {
             d.date = parseDate(d.event_date);
             d.datasetType = type;
+            // La proiezione ora accetta [lon, lat] standard
             const coords = projection([+d.longitude, +d.latitude]);
             if (coords) { d.x = coords[0]; d.y = coords[1]; }
         });
@@ -124,10 +116,9 @@ Promise.all([
         .join("path")
         .attr("d", pathGenerator);
 
-    // --- TOOLTIP MODIFICATO (SOLO QUESTO) ---
-    // Usiamo il div esistente nell'HTML con id="tooltip" e classe "shared-tooltip"
+    // --- TOOLTIP ---
     const tooltip = d3.select("#tooltip")
-        .attr("class", "shared-tooltip") // Sicurezza, applico la classe standard
+        .attr("class", "shared-tooltip") 
         .style("opacity", 0)
         .style("min-width", "auto")
         .style("width", "fit-content");
@@ -137,7 +128,6 @@ Promise.all([
         d3.select(this).attr("fill-opacity", 0.8);
         const regionName = d.properties.COUNTRY || d.properties.name || d.properties.NAME || "Region";
         
-        // Uso struttura standard .tooltip-header
         tooltip.style("opacity", 1)
                .style("visibility", "visible")
                .html(`<div class='tooltip-header' style='margin-bottom:0; border-bottom:none;'>${regionName}</div>`);
@@ -194,10 +184,9 @@ Promise.all([
         .on("mouseover", handleMouseOver).on("mousemove", handleMouseMove).on("mouseout", handleMouseOut);
 
     // 5. Russia-Ukraine Border Highlight (PRIMO PIANO)
-    // Usiamo .raise() per assicurarci che sia l'ultimo elemento SVG disegnato
     const borderGroup = mapGroup.append("g")
         .attr("clip-path", "url(#clip-russia-full-mask)")
-        .style("pointer-events", "none"); // Click passano attraverso
+        .style("pointer-events", "none"); 
 
     borderGroup.selectAll("path")
         .data(ukrGeo.features)
@@ -210,7 +199,6 @@ Promise.all([
         .attr("stroke-linecap", "round")
         .attr("vector-effect", "non-scaling-stroke");
 
-    // FORZA IN PRIMO PIANO:
     borderGroup.raise();
 
     // Gruppo dedicato agli Highlights degli eventi
@@ -278,30 +266,26 @@ Promise.all([
 
     // Funzione per disegnare l'highlight
     function drawEventHighlight(event) {
-        // Pulisci precedenti
         clearHighlight();
 
         if (!event.coords) return;
 
-        // Proietta le coordinate
+        // Proietta le coordinate usando la nuova proiezione Mercator
         const [x, y] = projection(event.coords);
 
-        // Aggiungi il cerchio
         const circle = highlightGroup.append("circle")
             .attr("cx", x)
             .attr("cy", y)
-            .attr("r", 0) // Parte da 0 per l'animazione
-            .attr("fill", "#ff0000") // Rosso
-            .attr("fill-opacity", 0.3) // Semitrasparente
+            .attr("r", 0) 
+            .attr("fill", "#ff0000") 
+            .attr("fill-opacity", 0.3) 
             .attr("stroke", "#ff0000")
             .attr("stroke-width", 2)
-            .attr("pointer-events", "none"); // Importante: lascia passare il mouse sotto
+            .attr("pointer-events", "none"); 
 
-        // Animazione di apparizione (pop)
         circle.transition().duration(600).ease(d3.easeElasticOut)
             .attr("r", event.radius || 25);
 
-        // Opzionale: Aggiungi un anello che pulsa per attirare l'attenzione
         const pulse = highlightGroup.append("circle")
             .attr("cx", x)
             .attr("cy", y)
@@ -311,7 +295,6 @@ Promise.all([
             .attr("stroke-width", 2)
             .style("opacity", 1);
 
-        // Loop infinito di pulsazione
         function repeatPulse() {
             pulse.transition().duration(1500)
                 .attr("r", (event.radius || 25) * 1.5)
@@ -326,9 +309,7 @@ Promise.all([
 
 
     const zoom = d3.zoom()
-        .scaleExtent([1, 12]) // Limita lo zoom in/out (min 1x, max 12x)
-        // Definisce il recinto: [[minX, minY], [maxX, maxY]]
-        // Aggiungiamo un margine di 100px per dare un po' di respiro ai bordi
+        .scaleExtent([1, 12]) 
         .translateExtent([
             [-100, -100],
             [width + 100, height + 100]
@@ -342,7 +323,6 @@ Promise.all([
 
     svg.call(zoom).on("dblclick.zoom", null);
 
-    // Zoom Buttons
     d3.select("#front-zoom-in").on("click", () => svg.transition().call(zoom.scaleBy, 1.3));
     d3.select("#front-zoom-out").on("click", () => svg.transition().call(zoom.scaleBy, 0.7));
     d3.select("#front-zoom-reset").on("click", () => svg.transition().call(zoom.transform, d3.zoomIdentity));
@@ -361,32 +341,27 @@ Promise.all([
     const playButton = d3.select("#play-button");
     const playText = d3.select("#play-text");
 
-    // Function to update state and render: overlap effect
     function updateStateAndRender() {
         updateVisibleData();
         d3.selectAll('.timeline-tick').style('opacity', 1);
         d3.select(`#tick-${currentIndex}`).style('opacity', 0);
     }
 
-
-
     slider.on("input", function () {
         currentIndex = +this.value;
-        clearHighlight(); // <--- AGGIUNGI QUESTO: Rimuovi highlights se l'utente muove il tempo
+        clearHighlight(); 
         updateStateAndRender();
     });
 
     let timer;
     let isPlaying = false;
 
-    // Play/Pause Logic
     playButton.on("click", function () {
         if (isPlaying) {
             clearInterval(timer);
             playText.text("Play");
             isPlaying = false;
         } else {
-            // Se siamo già alla fine e premiamo play, ricominciamo da capo
             if (currentIndex >= days.length - 1) {
                 currentIndex = 0;
                 slider.property("value", currentIndex);
@@ -397,17 +372,13 @@ Promise.all([
             isPlaying = true;
             
             timer = setInterval(() => {
-                // MODIFICA QUI: Controlliamo se c'è ancora spazio per andare avanti
                 if (currentIndex < days.length - 1) {
                     currentIndex++;
-
-                    // Se l'utente preme play, puliamo eventuali highlights attivi
                     if (currentIndex % 5 === 0) clearHighlight(); 
 
                     slider.property("value", currentIndex);
                     updateStateAndRender();
                 } else {
-                    // SIAMO ALLA FINE: Ferma tutto
                     clearInterval(timer);
                     playText.text("Play");
                     isPlaying = false;
@@ -416,40 +387,36 @@ Promise.all([
         }
     });
 
-
-
-
-    // Aggiungi coords: [lon, lat] e radius (opzionale, default a 20)
     const significantEvents = [
         {
             date: "2022-02-24",
             title: "Invasione su larga scala",
-            coords: [30.5234, 50.4501], // Kyiv come centro simbolico
-            radius: 50 // Più grande per l'intero paese/invasione
+            coords: [30.5234, 50.4501], // Kyiv
+            radius: 50 
         },
         {
             date: "2022-04-01",
             title: "Ritiro dal nord (Kyiv)",
-            coords: [30.5234, 50.4501], // Kyiv
+            coords: [30.5234, 50.4501], 
             radius: 30
         },
         {
             date: "2022-09-06",
             title: "Controffensiva Kharkiv",
-            coords: [36.2304, 49.9935], // Kharkiv
+            coords: [36.2304, 49.9935], 
             radius: 30
         },
         {
             date: "2022-11-11",
             title: "Liberazione Kherson",
-            coords: [32.6169, 46.6354], // Kherson
+            coords: [32.6169, 46.6354], 
             radius: 25
         },
         {
             date: "2023-05-20",
             title: "Presa di Bakhmut",
-            coords: [38.0025, 48.5947], // Bakhmut
-            radius: 15 // Più piccola, battaglia localizzata
+            coords: [38.0025, 48.5947], 
+            radius: 15 
         }
     ];
 
@@ -464,38 +431,27 @@ Promise.all([
         const eventDate = parseDate(event.date);
         if (eventDate < mapStartDate || eventDate > mapEndDate) return;
 
-        // Compute position on timeline
         const exactIndex = d3.timeDay.count(mapStartDate, eventDate);
         const percent = ((eventDate - mapStartDate) / totalTime) * 100;
 
-        // Tooltip content
         const readableDate = d3.timeFormat("%d %b %Y")(eventDate);
         const fullLabel = `${readableDate}: ${event.title}`;
 
-        // Create tick element
         const tick = document.createElement('div');
         tick.className = 'timeline-tick';
-
-        // Set ID for reference (important to manage visibility on update)
         tick.id = `tick-${exactIndex}`;
-
         tick.style.left = percent + '%';
 
-        // Bootstrap Tooltip attributes
         tick.setAttribute('data-bs-toggle', 'tooltip');
         tick.setAttribute('data-bs-placement', 'top');
         tick.setAttribute('title', fullLabel);
 
 
-        // Click event to jump to date
         tick.addEventListener('click', function (e) {
             e.stopPropagation();
             currentIndex = exactIndex;
             slider.property("value", currentIndex);
-
             updateStateAndRender();
-
-            // --- NUOVA RIGA: Disegna l'highlight specifico per questo evento ---
             drawEventHighlight(event);
         });
 
@@ -503,11 +459,8 @@ Promise.all([
         new bootstrap.Tooltip(tick);
     });
 
-    // Render 
     updateStateAndRender();
 
-
-    // -- How to read the chart --
     const mapHelpContent = {
         title: "How to read the chart?",
         steps: [
@@ -526,5 +479,3 @@ Promise.all([
 }).catch(err => {
     console.error("Errore Front Map:", err);
 });
-
-

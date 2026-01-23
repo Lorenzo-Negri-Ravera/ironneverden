@@ -1,21 +1,21 @@
 // File: choropleth.js 
 (function () {
-    const GENERAL_GEOJSON_PATH = "../../data/final/geojson/europe_final_simplest.geojson";
+    const GENERAL_GEOJSON_PATH = "../../data/final/geojson/europe_final_simplest_v2.geojson";
     const COUNTRIES_EVENTS_PATH = "../../data/final/df_country_summary_v4.json";
     const ADMIN_EVENTS_PATH = "../../data/final/df_admin_summary_v4.json";
 
     // --- 1. CONFIGURAZIONE COLORI (NUOVA SEZIONE) ---
     // Definiamo un colore specifico per ogni tipologia di evento.
     // "All" userà il NEUTRAL_COLOR (il rosso originale o simile).
-    const NEUTRAL_COLOR = "#6b3e10b1"; 
-    
+    const NEUTRAL_COLOR = "#6b3e10b1";
+
     const EVENT_COLORS = {
-        "Battles": "#ff6361",                  
-        "Explosions/Remote violence": "#ffa600", 
-        "Protests": "#1e88e5",                 
-        "Riots": "#58508d",                     
-        "Violence against civilians": "#bc5090", 
-        "Strategic developments": "#003f5c"      
+        "Battles": "#ff6361",
+        "Explosions/Remote violence": "#ffa600",
+        "Protests": "#1e88e5",
+        "Riots": "#58508d",
+        "Violence against civilians": "#bc5090",
+        "Strategic developments": "#003f5c"
     };
 
     // --- 1. IMMEDIATE UI SETUP (Without waiting for data) ---
@@ -97,26 +97,21 @@
         d3.json(ADMIN_EVENTS_PATH)
     ]).then(function ([geojson, country_data, admin_data]) {
 
-        const projection = d3.geoIdentity().reflectY(true);
+        // --- MODIFICA: Configurazione manuale per zoomare sull'Europa ---
+        const projection = d3.geoMercator()
+            .center([27, 55])                // Coordinate [Long, Lat] per centrare su Germania/Polonia
+            .scale(500)                      // Livello di zoom (aumenta per ingrandire, diminuisci per rimpicciolire)
+            .translate([width / 2, height / 2]); // Centra la mappa nell'SVG
+
         const pathGenerator = d3.geoPath().projection(projection);
 
-        const europeFocus = {
-            type: "FeatureCollection",
-            features: [{
-                type: "Feature",
-                geometry: {
-                    type: "Polygon",
-                    coordinates: [[[-25, 30], [70, 30], [70, 75], [-25, 75], [-25, 30]]]
-                }
-            }]
-        };
-        projection.fitExtent([[0, 80], [width - 20, height - 20]], europeFocus);
+        // (Nota: Ho rimosso europeFocus e projection.fitExtent perché usiamo center/scale manuali)
 
 
         // --- Zoom Logic ---
         const zoom = d3.zoom()
             .scaleExtent([1, 12])
-            .translateExtent([[-200, -50], [width + 1200, height]])
+            .translateExtent([[-200, -100], [width + 1200, height]])
             .on("zoom", (event) => {
                 mapGroup.attr("transform", event.transform);
                 detailMapGroup.attr("transform", event.transform);
@@ -130,7 +125,7 @@
         d3.select("#zoom-reset").on("click", () => svg.transition().call(zoom.transform, d3.zoomIdentity));
 
         // Inizializzazione della scala (il range verrà sovrascritto dinamicamente)
-        const colorScale = d3.scaleSqrt(); 
+        const colorScale = d3.scaleSqrt();
 
         // Data Helper functions
         const getYear = (d) => d.YEAR;
@@ -286,20 +281,15 @@
 
             const selYear = yearSelect.property("value");
             const selEvent = eventSelect.property("value");
-            
-            // --- 2. MODIFICA: Logica di aggiornamento Colori ---
+
+            // --- Logica Colori ---
             let targetColor = NEUTRAL_COLOR;
             if (selEvent !== "All") {
                 targetColor = EVENT_COLORS[selEvent] || NEUTRAL_COLOR;
             }
 
-            // Creiamo un colore molto chiaro (tint) partendo dal colore target
-            // Usiamo l'interpolazione per trovare un punto vicino al bianco (0.9 = 90% bianco)
             const lightTint = d3.interpolate(targetColor, "#ffffff")(0.85);
-            
-            // Aggiorniamo il range della scala
             colorScale.range([lightTint, targetColor]);
-            // ---------------------------------------------------
 
             const filtered = country_data.filter(d => {
                 const y = getYear(d);
@@ -322,7 +312,6 @@
                 .attr("fill", d => {
                     const name = getGeoName(d);
                     const stats = statsCache.get(name);
-                    // Uso un grigio chiaro neutro (#eee) se non ci sono dati, altrimenti la scala colorata
                     return (stats && stats.total > 0) ? colorScale(stats.total) : "#eee";
                 });
 
@@ -330,8 +319,7 @@
                 d3.select(this).raise();
                 const name = getGeoName(d);
                 const stats = statsCache.get(name);
-                
-                // Highlight: uso un colore complementare o arancione brillante per contrasto
+
                 d3.select(this).attr("fill", "#FFD700").attr("stroke", "#000").attr("stroke-width", 1.5);
 
                 tooltip.style("opacity", 1)
@@ -348,7 +336,7 @@
                     const name = getGeoName(d);
                     const stats = statsCache.get(name);
                     d3.select(this).attr("stroke", "#fff").attr("stroke-width", 0.5)
-                      .attr("fill", (stats && stats.total > 0) ? colorScale(stats.total) : "#eee");
+                        .attr("fill", (stats && stats.total > 0) ? colorScale(stats.total) : "#eee");
                     tooltip.style("opacity", 0).style("visibility", "hidden");
                 })
                 .on("click", (event, d) => {
@@ -399,15 +387,14 @@
 
             const selYear = yearSelect.property("value");
             const selEvent = eventSelect.property("value");
-            
-            // --- 2.1 MODIFICA: Aggiornamento colore anche per Detail View ---
+
+            // --- Colori per Detail View ---
             let targetColor = NEUTRAL_COLOR;
             if (selEvent !== "All") {
                 targetColor = EVENT_COLORS[selEvent] || NEUTRAL_COLOR;
             }
             const lightTint = d3.interpolate(targetColor, "#ffffff")(0.85);
             colorScale.range([lightTint, targetColor]);
-            // ----------------------------------------------------------------
 
             const filteredAdmin = admin_data.filter(d => d.COUNTRY === name && d.GID_1 != null && (selYear === "All" || (getYear(d) && getYear(d).toString() === selYear)) && (selEvent === "All" || d.EVENT_TYPE === selEvent));
 
@@ -474,8 +461,9 @@
                 if (insetFeats.length > 0 && mainlandFeats.length > 0) useSplitLayout = true;
             }
 
+            // --- MODIFICA 2: Sostituiti tutti i geoIdentity().reflectY(true) con geoMercator() ---
             if (useSplitLayout) {
-                const mainProj = d3.geoIdentity().reflectY(true);
+                const mainProj = d3.geoMercator();
                 mainProj.fitExtent([[50, 50], [width - 50, height - 50]], { type: "FeatureCollection", features: mainlandFeats });
                 const mainGroup = detailMapGroup.append("g"); drawFeatures(mainGroup, mainlandFeats, mainProj);
 
@@ -501,46 +489,38 @@
                     .style("font-weight", "bold")
                     .style("fill", "black");
 
-                const insetProj = d3.geoIdentity().reflectY(true);
+                const insetProj = d3.geoMercator();
                 insetProj.fitExtent([[cfg.x + 10, cfg.y + 30], [cfg.x + cfg.w - 10, cfg.y + cfg.h - 10]], { type: "FeatureCollection", features: insetFeats });
                 const insetMapGroup = insetGroup.append("g"); drawFeatures(insetMapGroup, insetFeats, insetProj);
             } else {
-                const stdProj = d3.geoIdentity().reflectY(true);
+                const stdProj = d3.geoMercator();
                 stdProj.fitExtent([[50, 80], [width - 50, height - 50]], { type: "FeatureCollection", features: geo.features });
                 const stdGroup = detailMapGroup.append("g"); drawFeatures(stdGroup, geo.features, stdProj);
             }
-            /*
-            detailUiGroup.append("text").attr("x", width / 2).attr("y", 40).attr("text-anchor", "middle").attr("fill", "black").style("font-size", "24px").style("font-weight", "bold").text(name);
-
-            const close = detailUiGroup.append("g").attr("transform", `translate(${width - 40}, 40)`).style("cursor", "pointer").on("click", closeDetail);
-            close.append("circle").attr("r", 15).attr("fill", "#333").attr("stroke", "#fff");
-            close.append("text").attr("text-anchor", "middle").attr("dy", "0.35em").attr("fill", "white").text("X");*/
 
             detailUiGroup.append("text").attr("x", width / 2).attr("y", 40).attr("text-anchor", "middle").attr("fill", "black").style("font-size", "24px").style("font-weight", "bold").text(name);
 
-            // --- MODIFICA QUI ---
+            // --- UX Button X ---
             const close = detailUiGroup.append("g")
                 .attr("transform", `translate(${width - 40}, 40)`)
                 .style("cursor", "pointer")
                 .on("click", closeDetail);
 
-            // 1. Aggiungo un rettangolo trasparente per allargare l'area cliccabile (UX)
             close.append("rect")
                 .attr("width", 40)
                 .attr("height", 40)
-                .attr("x", -20)     // Centrato rispetto al gruppo
+                .attr("x", -20)
                 .attr("y", -20)
                 .attr("fill", "transparent");
 
-            // 2. La X nera stilizzata
             close.append("text")
                 .attr("text-anchor", "middle")
-                .attr("dy", "0.35em")       // Allineamento verticale preciso
-                .attr("fill", "#25282A")    // Il tuo colore brand scuro (o usa "black")
+                .attr("dy", "0.35em")
+                .attr("fill", "#25282A")
                 .style("font-family", "sans-serif")
-                .style("font-weight", "bold") // Grassetto
-                .style("font-size", "24px")   // Dimensione leggibile
-                .text("✕"); // Uso il simbolo 'Moltiplicazione' che è più bello della lettera 'X'
+                .style("font-weight", "bold")
+                .style("font-size", "24px")
+                .text("✕");
         }
 
         function closeDetail() {

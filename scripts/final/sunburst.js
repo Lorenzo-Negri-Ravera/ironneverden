@@ -53,8 +53,6 @@
         // --- SETUP TOOLTIP ---
         const tooltip = d3.select("#sunburst-tooltip");
         
-        // FIX CRUCIALE: Spostiamo il tooltip nel body per far funzionare correttamente
-        // le coordinate pageX/pageY indipendentemente dal contenitore relativo.
         if (!tooltip.empty()) {
             document.body.appendChild(tooltip.node());
             tooltip.attr("class", "shared-tooltip")
@@ -262,11 +260,8 @@
             .attr("dy", "0.35em")
             .attr("fill-opacity", d => +labelVisible(d.current))
             .attr("transform", d => labelTransform(d.current))
-            // MODIFICA QUI: Logica di troncamento migliorata
             .text(d => {
                 const name = d.data.name;
-                // Se il nome è più lungo di 10 caratteri, tronca e aggiungi '..'
-                // Puoi cambiare 10 con il numero che preferisci
                 return name.length > 10 ? name.substring(0, 10) + ".." : name;
             });
 
@@ -278,7 +273,58 @@
             .attr("pointer-events", "all")
             .on("click", clicked);
 
+        // ==========================================
+        // --- NUOVO: BOTTONE CHIUSURA (X) ---
+        // ==========================================
+        // Posizionato in alto a destra rispetto alla ViewBox quadrata.
+        // ViewBox: -width/2 ... width/2. 
+        // Angolo in alto a destra: x = width/2, y = -width/2
+        
+        const closeGroup = svg.append("g")
+            .attr("class", "close-btn-group")
+            .attr("transform", `translate(${width/2 - 40}, ${-width/2 + 40})`) 
+            .style("cursor", "pointer")
+            .style("opacity", 0) // Nascosto di default
+            .style("pointer-events", "none")
+            .on("click", (e) => {
+                e.stopPropagation(); // Evita conflitti
+                clicked(null, root); // Torna alla radice
+            });
+
+        // 1. Rettangolo trasparente per hit area
+        closeGroup.append("rect")
+            .attr("width", 46).attr("height", 46)
+            .attr("x", -23).attr("y", -23)
+            .attr("fill", "transparent");
+
+        // Stile font condiviso
+        const fontAttr = {
+            "text-anchor": "middle",
+            "dy": "0.35em",
+            "font-family": "sans-serif",
+            "font-weight": "900",
+            "font-size": "26px"
+        };
+        const symbol = "✕";
+        const brandDark = "#25282A";
+
+        // 2. Livello Sotto (Bordo Bianco)
+        const outline = closeGroup.append("text").text(symbol);
+        Object.entries(fontAttr).forEach(([key, val]) => outline.attr(key, val));
+        outline.attr("fill", "none").attr("stroke", "white").attr("stroke-width", 3.5);
+
+        // 3. Livello Sopra (Riempimento Scuro)
+        const fill = closeGroup.append("text").text(symbol);
+        Object.entries(fontAttr).forEach(([key, val]) => fill.attr(key, val));
+        fill.attr("fill", brandDark).attr("stroke", brandDark).attr("stroke-width", 0.5);
+
+        // --- FINE NUOVO CODICE BOTTONE ---
+
+
         function clicked(event, p) {
+            // Se p è null, significa che è stato chiamato dal bottone X per tornare alla root
+            if (!p) p = root;
+
             parent.datum(p.parent || root);
 
             root.each(d => d.target = {
@@ -289,6 +335,12 @@
             });
 
             const t = svg.transition().duration(750);
+
+            // GESTIONE VISIBILITÀ BOTTONE X
+            const isRoot = (p === root);
+            closeGroup.transition(t)
+                .style("opacity", isRoot ? 0 : 1)
+                .style("pointer-events", isRoot ? "none" : "all");
 
             path.transition(t)
                 .tween("data", d => {
