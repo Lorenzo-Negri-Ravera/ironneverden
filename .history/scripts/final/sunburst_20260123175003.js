@@ -2,6 +2,7 @@
 
 (function() {
 
+    // --- CONFIGURAZIONE PATH ---
     const DATA_PATHS = {
         UKR_2021: "../../data/final/trade-data/final_datasets/UKR_export_2021_destinations.json",
         UKR_2023: "../../data/final/trade-data/final_datasets/UKR_export_2023_destinations.json",
@@ -9,6 +10,7 @@
         RUS_2023: "../../data/final/trade-data/final_datasets/RUS_export_2023_destinations.json"
     };
 
+    // --- CONFIGURAZIONE VISIVA ---
     const width = 600; 
     const radius = width / 6;
 
@@ -27,6 +29,7 @@
     let allData = {};
     let currentCountry = "RUS"; 
 
+    // --- 1. OBSERVER INTERNO ---
     document.addEventListener("DOMContentLoaded", function() {
         const target = document.querySelector("#sunburst-section");
         if(target) {
@@ -42,10 +45,12 @@
         }
     });
 
+    // --- 2. INIT FUNCTION ---
     function initSunburst() {
         const wrapper = d3.select("#sunburst-wrapper");
         wrapper.selectAll(".chart-loader-overlay").remove();
         
+        // --- SETUP TOOLTIP ---
         const tooltip = d3.select("#sunburst-tooltip");
         
         if (!tooltip.empty()) {
@@ -119,6 +124,7 @@
         return { name: "World", children: children };
     }
 
+    // --- 3. CONTROLS SETUP ---
     function setupControls() {
         const container = d3.select("#sunburst-controls");
         if(container.empty()) return;
@@ -147,6 +153,7 @@
         });
     }
 
+    // --- 4. DASHBOARD UPDATE ---
     function updateDashboard() {
         d3.select("#chart-2021").selectAll("*").remove();
         d3.select("#chart-2023").selectAll("*").remove();
@@ -155,7 +162,9 @@
         createZoomableSunburst(allData[currentCountry][2023], "#chart-2023", "#total-label-2023");
     }
 
+    // --- 5. CHART RENDERER ---
     function createZoomableSunburst(data, selector, labelSelector) {
+        // Selezioniamo il tooltip globalmente per questa funzione
         const tooltip = d3.select("#sunburst-tooltip");
 
         const root = d3.hierarchy(data)
@@ -203,16 +212,19 @@
             .attr("pointer-events", d => arcVisible(d.current) ? "auto" : "none")
             .attr("d", d => arc(d.current));
 
+        // --- INTERAZIONI AGGIORNATE (Click + Tooltip) ---
         path.filter(d => d.children)
             .style("cursor", "pointer")
             .on("click", clicked);
 
+        // NUOVA LOGICA TOOLTIP
         path.on("mouseover", function(event, d) {
-            d3.select(this).attr("fill-opacity", 1);
+            d3.select(this).attr("fill-opacity", 1); // Evidenzia spicchio
 
             const breadcrumb = d.ancestors().map(d => d.data.name).reverse().join(" / ");
             const val = formatMoney(d.value).replace("G", "B");
 
+            // HTML Standardizzato
             const htmlContent = `
                 <div class="tooltip-header" style="font-size:11px; color:#666; margin-bottom:2px; border-bottom:none;">${breadcrumb}</div>
                 <div class="tooltip-row" style="margin-bottom:0;">
@@ -230,6 +242,7 @@
                    .style("left", (event.pageX + 15) + "px");
         })
         .on("mouseout", function(event, d) {
+            // Ripristina opacità originale
             const originalOpacity = arcVisible(d.current) ? (d.children ? 0.8 : 0.6) : 0;
             d3.select(this).attr("fill-opacity", originalOpacity);
             
@@ -259,23 +272,32 @@
             .attr("fill", "none")
             .attr("pointer-events", "all")
             .on("click", clicked);
+
+        // ==========================================
+        // --- NUOVO: BOTTONE CHIUSURA (X) ---
+        // ==========================================
+        // Posizionato in alto a destra rispetto alla ViewBox quadrata.
+        // ViewBox: -width/2 ... width/2. 
+        // Angolo in alto a destra: x = width/2, y = -width/2
         
         const closeGroup = svg.append("g")
             .attr("class", "close-btn-group")
             .attr("transform", `translate(${width/2 - 40}, ${-width/2 + 40})`) 
             .style("cursor", "pointer")
-            .style("opacity", 0) 
+            .style("opacity", 0) // Nascosto di default
             .style("pointer-events", "none")
             .on("click", (e) => {
-                e.stopPropagation(); 
-                clicked(null, root);
+                e.stopPropagation(); // Evita conflitti
+                clicked(null, root); // Torna alla radice
             });
 
+        // 1. Rettangolo trasparente per hit area
         closeGroup.append("rect")
             .attr("width", 46).attr("height", 46)
             .attr("x", -23).attr("y", -23)
             .attr("fill", "transparent");
 
+        // Stile font condiviso
         const fontAttr = {
             "text-anchor": "middle",
             "dy": "0.35em",
@@ -286,15 +308,21 @@
         const symbol = "✕";
         const brandDark = "#25282A";
 
+        // 2. Livello Sotto (Bordo Bianco)
         const outline = closeGroup.append("text").text(symbol);
         Object.entries(fontAttr).forEach(([key, val]) => outline.attr(key, val));
         outline.attr("fill", "none").attr("stroke", "white").attr("stroke-width", 3.5);
 
+        // 3. Livello Sopra (Riempimento Scuro)
         const fill = closeGroup.append("text").text(symbol);
         Object.entries(fontAttr).forEach(([key, val]) => fill.attr(key, val));
         fill.attr("fill", brandDark).attr("stroke", brandDark).attr("stroke-width", 0.5);
 
+        // --- FINE NUOVO CODICE BOTTONE ---
+
+
         function clicked(event, p) {
+            // Se p è null, significa che è stato chiamato dal bottone X per tornare alla root
             if (!p) p = root;
 
             parent.datum(p.parent || root);
@@ -308,6 +336,7 @@
 
             const t = svg.transition().duration(750);
 
+            // GESTIONE VISIBILITÀ BOTTONE X
             const isRoot = (p === root);
             closeGroup.transition(t)
                 .style("opacity", isRoot ? 0 : 1)
@@ -338,6 +367,7 @@
         }
     }
 
+    // Help Content
     const sunburstHelpContent = {
         title: "How to read the chart?",
         steps: [

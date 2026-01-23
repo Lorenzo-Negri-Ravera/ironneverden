@@ -1,5 +1,8 @@
+// File: divergent_bar_chart.js
+
 (function() {
     
+    // --- Configurations ---
     const CONFIG = {
         dataPath: "../../data/final/FlightsUKR/divergence_final.json", 
         margin: { top: 40, right: 60, bottom: 20, left: 150 }, 
@@ -7,21 +10,26 @@
         width: 1000 
     };
 
+    // Formatter
     const formatAbs = d3.format("+,d");     
     const formatRel = d3.format("+.0%");    
     const formatPerc = d3.format(".1f");    
     const formatShare = d => d3.format("+.1f")(d) + "%"; 
 
+    // --- Setup Container ---
     const container = d3.select("#divergence-container");
     
     if (container.empty()) return;
 
+    // Pulizia
     container.html("");
 
+    // Setup Tooltip
     const tooltip = d3.select("#divergence-tooltip")
         .attr("class", "shared-tooltip")
-        .style("text-align", "left");
+        .style("text-align", "left"); // Reset allineamento (visto che il padre è centered)
 
+    // Creazione SVG
     const svg = container.append("svg")
         .style("width", "100%")
         .style("height", "auto")
@@ -32,8 +40,10 @@
     const xAxisGroup = g.append("g").attr("class", "x-axis");
     const yAxisGroup = g.append("g").attr("class", "y-axis");
 
+    // --- Data Loading ---
     d3.json(CONFIG.dataPath).then(raw_data => {
         
+        // Data Cleaning
         const data = raw_data
             .filter(d => d.origin_name !== "World")
             .map(d => ({
@@ -45,15 +55,19 @@
                 Share_diff: (+d.Freq_2022) - (+d.Freq_2021)
             }));
 
+        // Funzione di Update Principale
         function updateChart() {
+            // Get Control State
             const radioNode = d3.select('input[name="metricMode"]:checked').node();
             const metric = radioNode ? radioNode.value : "absolute";
             
+            // Update UI Styles
             d3.selectAll('#divergence-controls input').each(function() {
                 const isChecked = d3.select(this).property("checked");
                 d3.select(`label[for="${this.id}"]`).classed("active", isChecked);
             });
 
+            // Prepare Data & Formatter
             let currentFormat;
 
             data.forEach(d => {
@@ -69,8 +83,10 @@
                 }
             });
 
+            // Sorting
             data.sort((a, b) => d3.ascending(a.value, b.value));
 
+            // --- Dynamic Dimensions ---
             const height = Math.ceil((data.length + 0.1) * CONFIG.barHeight) + CONFIG.margin.top + CONFIG.margin.bottom;
             
             svg.transition().duration(750)
@@ -78,6 +94,7 @@
             
             g.attr("transform", `translate(0,${CONFIG.margin.top})`);
 
+            // --- SCALES (FIXED OVERLAP) ---
             const extent = d3.extent(data, d => d.value);
             const rangePadding = Math.abs(extent[1] - extent[0]) * 0.15;
             
@@ -90,6 +107,7 @@
                 .rangeRound([0, data.length * CONFIG.barHeight])
                 .padding(0.1);
 
+            // Axes
             const xAxis = d3.axisTop(x)
                 .ticks(CONFIG.width / 100) 
                 .tickFormat(currentFormat);
@@ -114,6 +132,7 @@
                 .style("font-weight", "600")
                 .style("font-family", "'Fira Sans', sans-serif");
 
+            // Bars
             const bars = g.selectAll(".bar").data(data, d => d.origin_name);
 
             bars.exit().transition().duration(500).attr("opacity", 0).remove();
@@ -135,6 +154,7 @@
                 .attr("fill", d => d.value < 0 ? "#de425b" : "#003f5c")
                 .attr("opacity", 1);
             
+            // Labels
             const labels = g.selectAll(".label-val").data(data, d => d.origin_name);
 
             labels.exit().remove();
@@ -146,11 +166,14 @@
                 .attr("font-size", "15px")
                 .attr("font-family", "'Fira Sans', sans-serif")
                 .attr("opacity", 0)
-                .style("fill", "#25282A")        
-                .style("stroke", "#ffffff")      
-                .style("stroke-width", "4px")    
-                .style("stroke-linejoin", "round") 
-                .style("paint-order", "stroke");
+                // --- INIZIO EFFETTO HALO ---
+                .style("fill", "#25282A")        // Colore del testo (scuro)
+                .style("stroke", "#ffffff")      // Colore dell'alone (sfondo del grafico)
+                .style("stroke-width", "4px")    // Spessore dell'alone
+                .style("stroke-linejoin", "round") // Angoli arrotondati
+                .style("paint-order", "stroke")  // FONDAMENTALE: disegna il bordo DIETRO il testo
+                // --- FINE EFFETTO HALO ---
+                ;
 
             labelsEnter.merge(labels)
                 .transition().duration(750)
@@ -160,6 +183,7 @@
                 .attr("y", d => y(d.origin_name) + y.bandwidth() / 2)
                 .attr("opacity", 1);
 
+            // Tooltip Events
             g.selectAll(".bar")
                 .on("mouseover", function(e, d) {
                     d3.select(this).attr("fill-opacity", 0.7);
@@ -169,6 +193,7 @@
                     const icon = isNeg ? "↘" : "↗";
                     const shareChange = d.Share_diff > 0 ? "+" + formatPerc(d.Share_diff) : formatPerc(d.Share_diff);
                     
+                    // Contenuto Standardizzato
                     const htmlContent = `
                         <div class="tooltip-header" style="color:${color}; border-color:${color};">${d.origin_name}</div>
                         
@@ -208,6 +233,7 @@
 
     }).catch(e => console.error("Error loading divergence data:", e));
 
+    // Help Content
     const divergingHelpContent = {
         title: "How to read the chart?",
         steps: [

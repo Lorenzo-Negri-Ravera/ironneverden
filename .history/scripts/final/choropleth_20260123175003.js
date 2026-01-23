@@ -1,8 +1,12 @@
+// File: choropleth.js 
 (function () {
     const GENERAL_GEOJSON_PATH = "../../data/final/geojson/europe_final_simplest_v2.geojson";
     const COUNTRIES_EVENTS_PATH = "../../data/final/df_country_summary_v4.json";
     const ADMIN_EVENTS_PATH = "../../data/final/df_admin_summary_v4.json";
 
+    // --- 1. CONFIGURAZIONE COLORI (NUOVA SEZIONE) ---
+    // Definiamo un colore specifico per ogni tipologia di evento.
+    // "All" userà il NEUTRAL_COLOR (il rosso originale o simile).
     const NEUTRAL_COLOR = "#6b3e10b1";
 
     const EVENT_COLORS = {
@@ -14,24 +18,34 @@
         "Strategic developments": "#003f5c"
     };
 
+    // --- 1. IMMEDIATE UI SETUP (Without waiting for data) ---
+
+    // Dimensions
     const width = 1000;
     const height = 700;
 
+    // Create SVG Container
     const svg = d3.select("#choropleth-container")
         .attr("viewBox", [0, 0, width, height]);
 
+    // Parent for buttons and loader
     const svgParent = d3.select(svg.node().parentNode);
 
+    // --- LOADER CREATION AND ACTIVATION ---
     const loader = svgParent.append("div")
         .attr("class", "chart-loader-overlay");
 
     loader.append("div").attr("class", "loader-spinner");
 
+    // Helper Functions
     const showLoader = () => loader.style("display", "flex");
     const hideLoader = () => loader.style("display", "none");
 
+
+    // --- SVG GROUPS ---
     const mapGroup = svg.append("g");
 
+    // White overlay for detail view
     const overlay = svg.append("rect")
         .attr("width", width)
         .attr("height", height)
@@ -42,10 +56,12 @@
     const detailMapGroup = svg.append("g").style("display", "none");
     const detailUiGroup = svg.append("g").style("display", "none");
 
+    // Legend
     const legendGroup = svg.append("g")
         .attr("class", "legend")
         .attr("transform", `translate(${width - 290}, ${height - 50})`);
 
+    // --- STANDARDIZED TOOLTIP ---
     const tooltip = d3.select("body")
         .selectAll(".shared-tooltip.choropleth-tooltip")
         .data([0])
@@ -53,10 +69,12 @@
         .attr("class", "shared-tooltip choropleth-tooltip")
         .style("opacity", 0);
 
+    // State variables
     let isDetailMode = false;
     let currentDetailContext = null;
     const geoCache = new Map();
 
+    // Islands Layout
     const SPECIAL_COUNTRY_LAYOUTS = {
         "PRT": {
             check: (props) => ["Azores", "Madeira"].includes(props.NAME_1),
@@ -72,19 +90,25 @@
         }
     };
 
+    // --- 2. DATA LOADING ---
     Promise.all([
         d3.json(GENERAL_GEOJSON_PATH),
         d3.json(COUNTRIES_EVENTS_PATH),
         d3.json(ADMIN_EVENTS_PATH)
     ]).then(function ([geojson, country_data, admin_data]) {
 
+        // --- MODIFICA: Configurazione manuale per zoomare sull'Europa ---
         const projection = d3.geoMercator()
-            .center([27, 55])
-            .scale(500)
-            .translate([width / 2, height / 2]);
+            .center([27, 55])                // Coordinate [Long, Lat] per centrare su Germania/Polonia
+            .scale(500)                      // Livello di zoom (aumenta per ingrandire, diminuisci per rimpicciolire)
+            .translate([width / 2, height / 2]); // Centra la mappa nell'SVG
 
         const pathGenerator = d3.geoPath().projection(projection);
 
+        // (Nota: Ho rimosso europeFocus e projection.fitExtent perché usiamo center/scale manuali)
+
+
+        // --- Zoom Logic ---
         const zoom = d3.zoom()
             .scaleExtent([1, 12])
             .translateExtent([[-200, -100], [width + 1200, height]])
@@ -100,14 +124,17 @@
         d3.select("#zoom-out").on("click", () => svg.transition().call(zoom.scaleBy, 0.7));
         d3.select("#zoom-reset").on("click", () => svg.transition().call(zoom.transform, d3.zoomIdentity));
 
+        // Inizializzazione della scala (il range verrà sovrascritto dinamicamente)
         const colorScale = d3.scaleSqrt();
 
+        // Data Helper functions
         const getYear = (d) => d.YEAR;
         const getEvents = (d) => d.EVENTS;
         const getSubEvents = (d) => d.SUB_EVENT_TYPE || d.sub_event_type;
         const getGeoName = (d) => d.properties.NAME;
         const getGeoISO = (d) => d.properties.ISO || d.properties.ISO3;
 
+        // Populate Selects
         const uniqueYears = [...new Set(country_data.map(d => getYear(d)))].filter(d => d).sort(d3.descending);
         const uniqueEvents = [...new Set(country_data.map(d => d.EVENT_TYPE))].filter(d => d).sort();
         const uniqueCountries = geojson.features.map(d => d.properties.NAME).sort((a, b) => a.localeCompare(b));
@@ -121,6 +148,7 @@
         const countrySelect = d3.select("#select-country");
         countrySelect.selectAll("option.dyn-country").data(uniqueCountries).join("option").attr("class", "dyn-country").attr("value", d => d).text(d => d);
 
+        // --- HYBRID LOGIC for Country Select ---
         countrySelect.on("change", function () {
             const selectedCountry = this.value;
 
@@ -209,11 +237,13 @@
             return { total: total, breakdown: sortedBreakdown, isEventSpecific: isEventSpecific, selectedType: selectedEventType };
         }
 
+        // --- STANDARDIZED TOOLTIP RENDERING FUNCTION ---
         function renderTooltipHtml(title, stats) {
             if (!stats) return `<div class='tooltip-header'>${title}</div><div style="padding:0 5px;">No events</div>`;
 
             let html = `<div class='tooltip-header'>${title}</div>`;
 
+            // Total Row
             html += `
         <div class="tooltip-row" style="margin-bottom:8px; border-bottom:1px dashed #eee; padding-bottom:5px;">
             <span class="tooltip-label" style="font-weight:700;">Total Events</span>
@@ -224,6 +254,7 @@
                 html += `<div style='font-size:11px; color:#888; margin-bottom:4px; font-style:italic;'>Breakdown of ${stats.selectedType}:</div>`;
             }
 
+            // Breakdown Rows
             stats.breakdown.forEach(([type, count]) => {
                 const label = type || "Unspecified";
                 html += `
@@ -251,6 +282,7 @@
             const selYear = yearSelect.property("value");
             const selEvent = eventSelect.property("value");
 
+            // --- Logica Colori ---
             let targetColor = NEUTRAL_COLOR;
             if (selEvent !== "All") {
                 targetColor = EVENT_COLORS[selEvent] || NEUTRAL_COLOR;
@@ -356,6 +388,7 @@
             const selYear = yearSelect.property("value");
             const selEvent = eventSelect.property("value");
 
+            // --- Colori per Detail View ---
             let targetColor = NEUTRAL_COLOR;
             if (selEvent !== "All") {
                 targetColor = EVENT_COLORS[selEvent] || NEUTRAL_COLOR;
@@ -428,6 +461,7 @@
                 if (insetFeats.length > 0 && mainlandFeats.length > 0) useSplitLayout = true;
             }
 
+            // --- MODIFICA 2: Sostituiti tutti i geoIdentity().reflectY(true) con geoMercator() ---
             if (useSplitLayout) {
                 const mainProj = d3.geoMercator();
                 mainProj.fitExtent([[50, 50], [width - 50, height - 50]], { type: "FeatureCollection", features: mainlandFeats });
@@ -466,6 +500,7 @@
 
             detailUiGroup.append("text").attr("x", width / 2).attr("y", 40).attr("text-anchor", "middle").attr("fill", "black").style("font-size", "24px").style("font-weight", "bold").text(name);
 
+            // --- UX Button X ---
             const close = detailUiGroup.append("g")
                 .attr("transform", `translate(${width - 40}, 40)`)
                 .style("cursor", "pointer")

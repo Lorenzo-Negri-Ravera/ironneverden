@@ -1,5 +1,9 @@
+// File: front_map.js (Updated with GeoMercator)
+
+// --- RUS and UKR ---
 const UKR_PATH = "../../data/final/geojson/countries/UKR.geojson";
 const RUS_PATH = "../../data/final/geojson/countries/RUS.geojson";
+// Borders countries
 const MDA_PATH = "../../data/final/geojson/countries/MDA.geojson";
 const ROU_PATH = "../../data/final/geojson/countries/ROU.geojson";
 const HUN_PATH = "../../data/final/geojson/countries/HUN.geojson";
@@ -11,6 +15,7 @@ const MKD_PATH = "../../data/final/geojson/countries/MKD.geojson";
 const SRB_PATH = "../../data/final/geojson/countries/SRB.geojson";
 const XKO_PATH = "../../data/final/geojson/countries/XKO.geojson";
 
+// Data
 const FRONT_UKR_PATH = "../../data/final/front_UKR.csv";
 const FRONT_RU_PATH = "../../data/final/front_RU.csv";
 
@@ -37,18 +42,22 @@ Promise.all([
     ukrBattlesData, ruBattlesData
 ]) {
 
+    // Setup container
     const container = d3.select("#front-map-container");
     container.html("");
 
+    // Dimensions
     const width = 1000;
     const height = 700;
 
+    // Geo Features    
     const neighborsFeatures = [
         ...mdaGeo.features, ...rouGeo.features, ...hunGeo.features,
         ...svkGeo.features, ...polGeo.features, ...blrGeo.features,
         ...bgrGeo.features, ...mkdGeo.features, ...srbGeo.features, ...xkoGeo.features
     ];
 
+    // Western Russia IDs to show
     const westernRussiaIds = [
         "RUORL", "RUBEL", "RUKRS", "RUBRY", "RUVOR", "RUROS", "RUVGG", "RUTAM",
         "RULIP", "RUMOS", "RUMOW", "RUKLU", "RUTUL", "RURYA", "RUAST", "RUKL",
@@ -58,21 +67,29 @@ Promise.all([
     const visibleRusFeatures = rusGeo.features.filter(d => westernRussiaIds.includes(d.properties.id));
     const restOfRusFeatures = rusGeo.features.filter(d => !westernRussiaIds.includes(d.properties.id));
 
+    // --- MODIFICA PROIEZIONE ---
+    // Usiamo geoMercator al posto di geoIdentity
     const projection = d3.geoMercator();
 
+    // Definiamo su cosa focalizzare lo zoom: Solo l'Ucraina
     const extentFeatures = { type: "FeatureCollection", features: ukrGeo.features };
 
+    // Adattiamo la proiezione all'Ucraina lasciando un margine di 50px
+    // Questo calcolerà automaticamente scala e centro
     projection.fitExtent(
         [[50, 50], [width - 50, height - 50]],
         extentFeatures
     );
 
+    // Path generator
     const pathGenerator = d3.geoPath().projection(projection);
 
+    // Data Processing
     const processData = (data, type) => {
         data.forEach(d => {
             d.date = parseDate(d.event_date);
             d.datasetType = type;
+            // La proiezione ora accetta [lon, lat] standard
             const coords = projection([+d.longitude, +d.latitude]);
             if (coords) { d.x = coords[0]; d.y = coords[1]; }
         });
@@ -84,10 +101,12 @@ Promise.all([
     const days = d3.timeDays(d3.min(allBattlesData, d => d.date), d3.max(allBattlesData, d => d.date));
 
 
+    // SVG Element                          
     const svg = container.append("svg")
         .attr("viewBox", [0, 0, width, height])
         .style("z-index", 1);
 
+    // Clip Path for Russia Mask
     const mapGroup = svg.append("g");
     const defs = mapGroup.append("defs");
     defs.append("clipPath")
@@ -97,12 +116,14 @@ Promise.all([
         .join("path")
         .attr("d", pathGenerator);
 
+    // --- TOOLTIP ---
     const tooltip = d3.select("#tooltip")
         .attr("class", "shared-tooltip") 
         .style("opacity", 0)
         .style("min-width", "auto")
         .style("width", "fit-content");
 
+    // Tooltip Handlers
     const handleMouseOver = function (event, d) {
         d3.select(this).attr("fill-opacity", 0.8);
         const regionName = d.properties.COUNTRY || d.properties.name || d.properties.NAME || "Region";
@@ -121,7 +142,11 @@ Promise.all([
         d3.select(this).attr("fill-opacity", 1);
         tooltip.style("opacity", 0).style("visibility", "hidden");
     };
+    // ----------------------------------------
 
+    // --- Draw map ---
+
+    // 1. Neighbor Countries (Sfondo)
     mapGroup.append("g").selectAll("path").data(neighborsFeatures).join("path")
         .attr("d", pathGenerator)
         .attr("fill", "#e9ecef")
@@ -130,6 +155,7 @@ Promise.all([
         .attr("vector-effect", "non-scaling-stroke")
         .on("mouseover", handleMouseOver).on("mousemove", handleMouseMove).on("mouseout", handleMouseOut);
 
+    // 2. Rest of Russia (Sfondo)
     mapGroup.append("g").selectAll("path").data(restOfRusFeatures).join("path")
         .attr("d", pathGenerator)
         .attr("fill", "#cfd2d6")
@@ -139,6 +165,7 @@ Promise.all([
         .attr("vector-effect", "non-scaling-stroke")
         .on("mouseover", handleMouseOver).on("mousemove", handleMouseMove).on("mouseout", handleMouseOut);
 
+    // 3. Ukraine (Livello medio)
     mapGroup.append("g").selectAll("path").data(ukrGeo.features).join("path")
         .attr("d", pathGenerator)
         .attr("fill", "#cfd2d6")
@@ -147,6 +174,7 @@ Promise.all([
         .attr("vector-effect", "non-scaling-stroke")
         .on("mouseover", handleMouseOver).on("mousemove", handleMouseMove).on("mouseout", handleMouseOut);
 
+    // 4. Western Russia (Livello medio)
     mapGroup.append("g").selectAll("path").data(visibleRusFeatures).join("path")
         .attr("d", pathGenerator)
         .attr("fill", "#cfd2d6")
@@ -155,6 +183,7 @@ Promise.all([
         .attr("vector-effect", "non-scaling-stroke")
         .on("mouseover", handleMouseOver).on("mousemove", handleMouseMove).on("mouseout", handleMouseOut);
 
+    // 5. Russia-Ukraine Border Highlight (PRIMO PIANO)
     const borderGroup = mapGroup.append("g")
         .attr("clip-path", "url(#clip-russia-full-mask)")
         .style("pointer-events", "none"); 
@@ -172,8 +201,10 @@ Promise.all([
 
     borderGroup.raise();
 
+    // Gruppo dedicato agli Highlights degli eventi
     const highlightGroup = mapGroup.append("g").attr("class", "event-highlights");
 
+    // --- Canvas Setup for Points (Responsive)---
     const canvas = container.append("canvas")
         .attr("width", width)
         .attr("height", height)
@@ -182,12 +213,14 @@ Promise.all([
 
     const ctx = canvas.node().getContext("2d");
 
+    // --- Canvas Drawing Logic ---
     let currentTransform = d3.zoomIdentity;
     let activeFilter = "all";
     let currentIndex = 0;
     let visiblePoints = [];
     const opacityScale = d3.scaleLinear().domain([0, 5]).range([1, 0.15]);
 
+    // Render function
     function render() {
         ctx.clearRect(0, 0, width, height);
         ctx.save();
@@ -213,6 +246,7 @@ Promise.all([
         ctx.restore();
     }
 
+    // Update visible data based on current index and filter
     function updateVisibleData() {
         const currentDate = days[currentIndex];
         const startDate = d3.timeDay.offset(currentDate, -5);
@@ -225,15 +259,18 @@ Promise.all([
         render();
     }
 
+    // Funzione per pulire l'highlight (usata quando si sposta lo slider manualmente o play)
     function clearHighlight() {
         highlightGroup.selectAll("*").transition().duration(300).style("opacity", 0).remove();
     }
 
+    // Funzione per disegnare l'highlight
     function drawEventHighlight(event) {
         clearHighlight();
 
         if (!event.coords) return;
 
+        // Proietta le coordinate usando la nuova proiezione Mercator
         const [x, y] = projection(event.coords);
 
         const circle = highlightGroup.append("circle")
@@ -290,6 +327,7 @@ Promise.all([
     d3.select("#front-zoom-out").on("click", () => svg.transition().call(zoom.scaleBy, 0.7));
     d3.select("#front-zoom-reset").on("click", () => svg.transition().call(zoom.transform, d3.zoomIdentity));
 
+    // --- Filter Buttons Logic ---
     d3.selectAll("#filter-container .btn-compact").on("click", function () {
         d3.selectAll("#filter-container .btn-compact").classed("active", false);
         d3.select(this).classed("active", true);
@@ -297,6 +335,8 @@ Promise.all([
         updateVisibleData();
     });
 
+
+    // --- Timeline Slider and Play/Pause Logic ---
     const slider = d3.select("#time-slider").attr("max", days.length - 1);
     const playButton = d3.select("#play-button");
     const playText = d3.select("#play-text");
@@ -351,7 +391,7 @@ Promise.all([
         {
             date: "2022-02-24",
             title: "Invasione su larga scala",
-            coords: [30.5234, 50.4501], 
+            coords: [30.5234, 50.4501], // Kyiv
             radius: 50 
         },
         {

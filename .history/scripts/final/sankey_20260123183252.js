@@ -1,5 +1,8 @@
+// File: sankey.js
+
 (function() {
 
+    // --- CONFIGURAZIONE ---
     const CSV_PATH = "../../data/final/trade-data/final_datasets/output_data.csv"; 
     
     const LOGICAL_WIDTH = 800;
@@ -11,6 +14,7 @@
     let isUkraine = false; 
     let globalRawData = null;
 
+    // Colori
     const NODE_COLORS = {
         "Russia": "#d73027",      
         "Ukraine": "#4575b4",     
@@ -42,6 +46,7 @@
         return "€" + value.toLocaleString();
     };
 
+    // --- 1. OBSERVER INTERNO ---
     document.addEventListener("DOMContentLoaded", function() {
         const target = document.querySelector("#sankey-section");
         if(target) {
@@ -57,9 +62,12 @@
         }
     });
 
+    // --- 2. INIT FUNCTION ---
     async function initSankey() {
+        // --- SETUP TOOLTIP ---
         const tooltip = d3.select("#sankey-tooltip");
         if (!tooltip.empty()) {
+            // Spostiamo nel body per evitare problemi di overflow/posizionamento
             document.body.appendChild(tooltip.node());
             tooltip.attr("class", "shared-tooltip")
                    .style("position", "absolute")
@@ -76,6 +84,7 @@
         }
     }
 
+    // --- 3. CONTROLS SETUP ---
     function setupControls() {
         const container = d3.select("#sankey-controls");
         if(container.empty()) return;
@@ -108,6 +117,7 @@
         });
     }
 
+    // --- 4. DATA PROCESSING ---
     function prepareSankeyData(rawCsv, year, targetPartner) {
         
         const yearData = rawCsv.filter(d => 
@@ -119,6 +129,7 @@
         const totalImportValue = d3.sum(yearData, d => +d.INDICATOR_VALUE);
         const dynamicThreshold = totalImportValue * MIN_PERCENTAGE;
 
+        // Reporters Logic
         const reporterTotals = d3.rollup(yearData, 
             v => d3.sum(v, d => +d.INDICATOR_VALUE), 
             d => d.REPORTER_LAB
@@ -129,6 +140,7 @@
             .slice(0, TOP_N_COUNTRIES) 
             .map(d => d[0]);
 
+        // Products Logic
         const sectionTotals = d3.rollup(yearData,
             v => d3.sum(v, d => +d.INDICATOR_VALUE),
             d => d.Section
@@ -143,6 +155,7 @@
             }
         });
 
+        // Build Links
         const linksMap = new Map();
         const nodeValues = new Map();
 
@@ -154,12 +167,15 @@
             const section = productRenamingMap.get(row.Section) || "Other Products";
             const reporter = topReporters.includes(row.REPORTER_LAB) ? row.REPORTER_LAB : "Rest of EU";
 
+            // Update Link 1
             const key1 = `${partner}|${section}`;
             linksMap.set(key1, (linksMap.get(key1) || 0) + val);
 
+            // Update Link 2
             const key2 = `${section}|${reporter}`;
             linksMap.set(key2, (linksMap.get(key2) || 0) + val);
 
+            // Accumulate Node Values for Sorting
             nodeValues.set(partner, (nodeValues.get(partner) || 0) + val);
             nodeValues.set(section, (nodeValues.get(section) || 0) + val);
             nodeValues.set(reporter, (nodeValues.get(reporter) || 0) + val);
@@ -184,6 +200,7 @@
         return { nodes, links, totalValue: totalImportValue };
     }
 
+    // --- 5. RENDERER ---
     function drawSankey(containerId, data, tooltip) {
         const container = d3.select(containerId);
         container.html("");
@@ -221,6 +238,7 @@
             links: data.links.map(d => Object.assign({}, d))
         });
 
+        // --- LINKS ---
         const link = svg.append("g")
             .attr("fill", "none")
             .attr("stroke-opacity", 0.4)
@@ -248,6 +266,7 @@
             .attr("stroke-width", d => Math.max(1, d.width))
             .style("transition", "stroke-opacity 0.3s");
 
+        // --- NODES ---
         const node = svg.append("g")
             .selectAll("rect")
             .data(graph.nodes)
@@ -261,29 +280,37 @@
             .attr("stroke-opacity", 0.1)
             .style("cursor", "pointer");
         
+        // --- LABELS ---
         svg.append("g")
             .style("font-family", "'Fira Sans', sans-serif")
             .style("font-size", "17px")
             .style("font-weight", "bold")
-            .style("pointer-events", "none")
+            .style("pointer-events", "none") // Importante: permette al mouse di passare attraverso il testo per attivare i link sotto
             .selectAll("text")
             .data(graph.nodes)
             .join("text")
-            .style("fill", "#25282A")
-            .style("stroke", "#ffffff")
-            .style("stroke-width", "2px")
+            
+            // --- INIZIO EFFETTO HALO ---
+            .style("fill", "#25282A")        // Colore del testo (Grigio scuro quasi nero)
+            .style("stroke", "#ffffff")      // Colore dell'alone (Bianco)
+            .style("stroke-width", "2px")    // Spessore dell'alone (sufficiente per coprire i link sotto)
             .style("stroke-opacity", "0.9")
-            .style("stroke-linejoin", "round")
-            .style("paint-order", "stroke")
+            .style("stroke-linejoin", "round") // Arrotonda gli angoli dell'alone
+            .style("paint-order", "stroke")  // Disegna PRIMA il bordo (dietro) e POI il testo (sopra)
+            // --- FINE EFFETTO HALO ---
+
+            // Logica di posizionamento originale
             .attr("x", d => d.x0 < 20 ? d.x1 + 6 : d.x0 - 6)
             .attr("y", d => (d.y1 + d.y0) / 2)
             .attr("dy", "0.35em")
             .attr("text-anchor", d => d.x0 < 20 ? "start" : "end")
             .text(d => d.name)
             .each(function(d) {
+                // Nasconde label se il nodo è troppo piccolo (< 15px)
                 if (d.y1 - d.y0 < 15) this.style.display = "none";
             });
 
+        // --- FUNZIONE HIGHLIGHT ---
         const highlight = (d, type) => {
             const allPaths = svg.selectAll(".sankey-link path");
             if (type === "enter") {
@@ -297,6 +324,9 @@
             }
         };
 
+        // --- GESTIONE TOOLTIP E EVENTI MOUSE ---
+        
+        // 1. EVENTI SU NODI
         node.on("mouseover", function(event, d) {
             highlight(d, "enter");
             
@@ -321,6 +351,7 @@
             tooltip.style("visibility", "hidden");
         });
 
+        // 2. EVENTI SU LINK
         path.on("mouseover", function(event, d) {
             highlight(d, "enter");
 
@@ -351,10 +382,12 @@
         });
     }
 
+    // --- UPDATE HELPER ---
     function updateCharts(tooltip) {
         if (!globalRawData) return;
         const partner = isUkraine ? "Ukraine" : "Russia";
         
+        // Recupera tooltip se non passato
         if (!tooltip) tooltip = d3.select("#sankey-tooltip");
 
         const data2021 = prepareSankeyData(globalRawData, 2021, partner);
@@ -364,9 +397,11 @@
         drawSankey("#sankey-chart-2023", data2023, tooltip);
     }
 
+        // Help Content
     const sunburstHelpContent = {
         title: "How to read the chart?",
         steps: [
+
             "Interaction: Move the pointer on the chart for getting statistics informations.",
             "N.B. Read the chart from left toward right following the fork flow of the infromation."
         ]
