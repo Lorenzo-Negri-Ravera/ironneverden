@@ -58,7 +58,7 @@ function initFoodChart() {
         const maxY = d3.max(data, d => Math.max(...keys.map(k => d[k])));
         const y = d3.scaleLinear().domain([0, maxY * 1.1]).range([height, 0]);
         
-        const PALETTE = ["#4E79A7", "#FF9DA7", "#EDC948", "#8CD17D", "#F28E2B"];
+        const PALETTE = ["#76B7B2", "#FF9DA7", "#EDC948", "#8CD17D", "#B07AA1"];
         const color = d3.scaleOrdinal().domain(keys).range(PALETTE); 
 
         let activeFocusKey = null;
