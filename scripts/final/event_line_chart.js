@@ -83,7 +83,7 @@ function initEventsLineChart() {
         const x = d3.scaleTime().domain(d3.extent(data, d => d.Date)).range([0, width]);
         const maxY = d3.max(data, d => Math.max(...TARGET_TYPES.map(k => d[k])));
         const y = d3.scaleLinear().domain([0, maxY * 1.15]).range([height, 0]);
-        const color = d3.scaleOrdinal().domain(TARGET_TYPES).range(["#ff6361", "#003f5c", "#ffa600"]);
+        const color = d3.scaleOrdinal().domain(TARGET_TYPES).range(["#ffa600", "#003f5c", "#ff6361"]);
 
         let activeFocusKey = null;
 
@@ -126,7 +126,13 @@ function initEventsLineChart() {
         svg.append("g")
             .attr("class", "axis axis-x") 
             .attr("transform", `translate(0,${height})`)
-            .call(d3.axisBottom(x).ticks(10).tickFormat(d3.timeFormat("%b %y")).tickSizeOuter(0));
+            .call(
+                d3.axisBottom(x)
+                // MODIFICA QUI: Filtra i mesi per mostrare solo Gennaio (0) e Luglio (6)
+                .ticks(d3.timeMonth.filter(d => d.getMonth() === 0 || d.getMonth() === 6))
+                .tickFormat(d3.timeFormat("%b %y"))
+                .tickSizeOuter(0)
+            );
 
         svg.append("g")
             .attr("class", "axis axis-y") 
