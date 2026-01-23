@@ -11,7 +11,7 @@
     // Configurazione Grafica
     const width = 1000;
     const height = 700;
-    const margin = { top: 60, right: 250, bottom:10, left: 250 }; 
+    const margin = { top: 60, right: 280, bottom:10, left: 280 }; 
 
     // Colori
     const colorScale = d3.scaleOrdinal(d3.schemeTableau10);
@@ -24,10 +24,17 @@
     // --- FORMATTERS ---
     const formatPercentage = (val) => val.toFixed(1) + "%";
     
+    /*
     const formatEuro = (val) => {
         if (val >= 1e9) return "€" + (val / 1e9).toFixed(1) + "B";
         if (val >= 1e6) return "€" + (val / 1e6).toFixed(1) + "M";
         return "€" + val.toFixed(0);
+    };*/
+
+    const formatDollar = (val) => {
+        if (val >= 1e9) return "$" + (val / 1e9).toFixed(1) + "B";
+        if (val >= 1e6) return "$" + (val / 1e6).toFixed(1) + "M";
+        return "$" + val.toFixed(0);
     };
 
     // ==========================================
@@ -231,7 +238,7 @@
             .attr("opacity", 1).attr("stroke-width", 5);
 
         d3.selectAll(".slope-label").filter(l => l.category === category)
-            .attr("opacity", 1).style("font-size", "14px");
+            .attr("opacity", 1).style("font-size", "15px");
         
         d3.selectAll(".slope-dot").filter(l => l.cat === category)
             .attr("opacity", 1).attr("r", 7);
@@ -240,8 +247,8 @@
         const tooltip = d3.select("#slope-chart-tooltip")
             .attr("class", "shared-tooltip");
 
-        const val21 = formatEuro(d.raw2021);
-        const val23 = formatEuro(d.raw2023);
+        const val21 = formatDollar(d.raw2021);
+        const val23 = formatDollar(d.raw2023);
 
         // Contenuto HTML Standard
         const htmlContent = `
@@ -270,7 +277,7 @@
 
     function handleMouseOut(event, d) {
         d3.selectAll(".slope-line").attr("opacity", 0.7).attr("stroke-width", 3);
-        d3.selectAll(".slope-label").attr("opacity", 1).style("font-size", "12px");
+        d3.selectAll(".slope-label").attr("opacity", 1).style("font-size", "15px");
         d3.selectAll(".slope-dot").attr("opacity", 1).attr("r", 5);
         d3.select("#slope-chart-tooltip").style("visibility", "hidden");
     }
@@ -288,7 +295,7 @@
                     .attr("class", `label-${data[0].side} slope-label`)
                     .attr("dy", "0.35em")
                     .style("font-family", "'Fira Sans', sans-serif")
-                    .style("font-size", "12px")
+                    .style("font-size", "15px")
                     .style("font-weight", "bold")
                     .style("cursor", "pointer")
                     .style("fill", d => colorScale(d.category)) 
@@ -375,9 +382,9 @@
     const helpContent = {
         title: "How to read the chart?",
         steps: [
-            "<strong>Y-axis:</strong> Visualizes the shift in export shares between 2021 and 2023.",
-            "<strong>Lines:</strong> Slope indicates increase (up) or decrease (down) in market share.",
-            "<strong>Interaction:</strong> Hover over lines/dots to see raw trade values in Euro."
+            "Visualizes the shift in export shares Pre-War and Post-War for the two countries.",
+            "Slope indicates increase or decrease in market share.",
+            "Hover over lines/dots to see raw trade values in Dollars."
         ]
     };
 

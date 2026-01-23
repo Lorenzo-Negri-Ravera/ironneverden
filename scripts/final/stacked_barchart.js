@@ -197,6 +197,7 @@ function initStackedBarChart() {
     const barHelpContent = {
         title: "How to read the chart?",
         steps: [
+            "Observe how the proportionality of events changes over time",
             "Hover on the category to see details.",
             "Click legend items to isolate specific event types."
         ]

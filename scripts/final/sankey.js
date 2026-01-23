@@ -397,9 +397,9 @@
     const sunburstHelpContent = {
         title: "How to read the chart?",
         steps: [
-            "<strong>Inner Ring:</strong> Continents.",
-            "<strong>Outer Ring:</strong> Countries.",
-            "<strong>Interaction:</strong> Click a region to zoom in. Click center to zoom out."
+
+            "Interaction: Move the pointer on the chart for getting statistics informations.",
+            "N.B. Read the chart from left toward right following the fork flow of the infromation."
         ]
     };
 

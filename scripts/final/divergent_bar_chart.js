@@ -229,9 +229,10 @@
     const divergingHelpContent = {
         title: "How to read the chart?",
         steps: [
-            "<strong>Positive (Blue):</strong> Increased traffic or market share.",
-            "<strong>Negative (Red):</strong> Decreased traffic or market share.",
-            "<strong>Metrics:</strong> Toggle between Absolute flights, Relative %, or Market Share shifts."
+            "Positive (Blue): Increased traffic or market share.",
+            "Negative (Red): Decreased traffic or market share.",
+            "Metrics: Toggle between Absolute flights, Relative %, or Market Share shifts.",
+            "Interaction: Select with pointer the bar for getting more statistics informatios."
         ]
     };
 

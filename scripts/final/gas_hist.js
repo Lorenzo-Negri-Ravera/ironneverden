@@ -149,8 +149,8 @@
         createChartHelp("#histo-help-container", "#gas-linechart-wrapper", {
             title: "How to read the chart?",
             steps: [
-                "<strong>Prices:</strong> Household gas price index.", 
-                "<strong>Timeline:</strong> Aggregated by semester."
+                "Observe the impact of the war on the price of natural gas over time", 
+                "Timeline aggregated by semester."
             ]
         });
     }

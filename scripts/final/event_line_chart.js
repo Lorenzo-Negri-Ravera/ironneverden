@@ -191,6 +191,7 @@ function initEventsLineChart() {
         const helpContent = {
             title: "How to read the chart?",
             steps: [
+                "Observe how military tactics have changed over time.",
                 "Hover on the line to see details.",
                 "Click legend items to isolate specific event types."
             ]

@@ -176,9 +176,8 @@ function initFoodChart() {
         const helpContent = {
             title: "How to read the chart?",
             steps: [
-                "<strong>Y-Axis:</strong> Food price index values over time.",
-                "<strong>Categories:</strong> Different food categories tracked monthly.",
-                "<strong>Focus:</strong> Click a legend category to isolate its trend line."
+                "Observe the effect of war on the Food Price Index values over time.",
+                "Click a legend category to isolate its trend line."
             ]
         };
 

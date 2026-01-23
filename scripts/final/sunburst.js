@@ -319,9 +319,10 @@
     const sunburstHelpContent = {
         title: "How to read the chart?",
         steps: [
-            "<strong>Inner Ring:</strong> Continents.",
-            "<strong>Outer Ring:</strong> Countries.",
-            "<strong>Interaction:</strong> Click a region to zoom in. Click center to zoom out."
+            "Observe the major participants in the two economies",
+            "Inner Ring: Continents.",
+            "Outer Ring: Countries.",
+            "Click a region to zoom in, click center to zoom out."
         ]
     };
 
