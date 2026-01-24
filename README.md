@@ -12,8 +12,11 @@
 ### Project structure
 All datasets and geographic data used are saved in the main data folder and distributed across the various subfolders depending on the context.
 Instead, in the preprocessing folder there are the raw dataset downladed from the websites described in the section below.
+
 The style of our website is entirely managed by the style.css file. Furthermore, the website is composed by only one single page, found in the pages folder. 
-Data, pages, and scripts are all included in the corresponding 'final' folder; all the other materials is inherent to the labs during the year. The webpage developed during the year is always accessible through the following ULR: https://lorenzo-negri-ravera.github.io/ironneverden/pages/lab2-6/ukraine_russia_study.html
+Data, pages, and scripts are all included in the corresponding 'final' folder; all the other materials is inherent to the labs during the year. 
+
+The webpage developed during the year is always accessible through the following ULR: https://lorenzo-negri-ravera.github.io/ironneverden/pages/lab2-6/ukraine_russia_study.html
 
 ```text
 ironneverden/
@@ -108,6 +111,7 @@ Furthermore, using so much data, both geographical and qualitative, a considerab
 
 
 ### Reproducibility documentation
+
 
 
 
