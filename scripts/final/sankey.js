@@ -367,8 +367,8 @@
     const sunburstHelpContent = {
         title: "How to read the chart?",
         steps: [
-            "Interaction: Move the pointer on the chart for getting statistics informations.",
-            "N.B. Read the chart from left toward right following the fork flow of the infromation."
+            "Observe the trend of the exports from the two countries to the EU, pre and during war", 
+            "Move the pointer on the chart for getting statistics informations and highlighting the flow"
         ]
     };
 

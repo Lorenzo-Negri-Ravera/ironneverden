@@ -258,10 +258,9 @@
             createChartHelp("#race-help-container", "#race-chart-wrapper", {
                 title: "How to read the chart?",
                 steps: [
-                    "Bars: Represent flight volume per destination.",
-                    "Rank: Watch countries rise and fall in rank over time.",
-                    "Replay: Use the button to restart the animation.",
-                    "Interaction: Press play for activate the animation."
+                    "Represent flight volume per destination.",
+                    "Watch countries rise and fall in rank over time.",
+                    "Use the button replay to restart the animation."
                 ]
             });
         }

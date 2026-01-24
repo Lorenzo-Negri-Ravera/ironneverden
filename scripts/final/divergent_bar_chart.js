@@ -213,8 +213,8 @@
         steps: [
             "Positive (Blue): Increased traffic or market share.",
             "Negative (Red): Decreased traffic or market share.",
-            "Metrics: Toggle between Absolute flights, Relative %, or Market Share shifts.",
-            "Interaction: Select with pointer the bar for getting more statistics informatios."
+            "Toggle between Absolute flights, Relative % or Air traffic share.",
+            "Select with pointer the bar for getting more statistics informatios."
         ]
     };
 
