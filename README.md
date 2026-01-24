@@ -1,3 +1,4 @@
+
 # Data Visualization project
 #### Group: IronNeverden
 - Barbati Luca, S5082540
@@ -10,7 +11,10 @@
 
 ### Project structure
 All datasets and geographic data used are saved in the main data folder and distributed across the various subfolders depending on the context.
-Instead, in the preprocessing folder there are
+Instead, in the preprocessing folder there are the raw dataset downladed from the websites described in the section below.
+The style of our website is entirely managed by the style.css file. Furthermore, the website is composed by only one single page, found in the pages folder. 
+Data, pages, and scripts are all included in the corresponding 'final' folder; all the other materials is inherent to the labs during the year. The webpage developed during the year is always accessible through the following ULR: https://lorenzo-negri-ravera.github.io/ironneverden/pages/lab2-6/ukraine_russia_study.html
+
 ```text
 ironneverden/
 ├── data/
@@ -29,24 +33,22 @@ ironneverden/
 │       │   └── region
 │       ├── stackedbarchart
 │       └── trade-data/
-│           ├── eurostat_import
-│           ├── final_datasets
-│           └── OEC data
-├── preprocessing/
-│   ├── choropleth
-│   ├── divergent
-│   ├── flights
-│   ├── food_linechart
-│   ├── front_map
-│   └── spike_map
+│           └── final_datasets
+├── fonts
 ├── pages/
 │   └── final/
 │       └── europe_violence.html
+├── preprocessing/
+│   ├── choropleth
+│   ├── event_line
+│   ├── food_linechart
+│   ├── spike_map
+│   ├── stacked_bar_chart
+│   └── trade_data
 ├── scripts/
 │   └── final                  
 ├── index.html
-├── style.css
-└── fonts
+└── style.css
 ```
 
 
@@ -106,4 +108,7 @@ Furthermore, using so much data, both geographical and qualitative, a considerab
 
 
 ### Reproducibility documentation
+
+
+
 
