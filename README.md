@@ -105,7 +105,7 @@ For the Eurostat dataset, columns not relevant to the analysis were removed. Fur
 | Effects on air traffic: Ukrainian airspace closed with the start of the war                                                                                | Bar Chart Race              | Zenodo   |
 | Focus on the changing Eurasian air routes                                                                                                                  | Diverging Bar Chart         | Zenodo   |
 
-### Limitations (biases, missing data, uncertainty, methodological constraints)
+### Limitations
 The general limitation regarding this analysis was due to the recovery of suitable and consistent datasets, especially regarding Russian data.
 Focusing on a sensitive topic, we do not know in any case if there is any kind of bias in the data retrieved and used.
 Furthermore, using so much data, both geographical and qualitative, a considerable effort was made to standardize all the data so as to have the same nomenclature and codes for a clean and consistent representation.
@@ -118,6 +118,7 @@ Every Python notebooks created to edit or clean a dataset used in our project ca
 The only exception is for the Zenodo dataset which is too big to be uploaded on GitHub; consequently, it was uploaded only the clean version of it.
 
 To be fully complient with the GitHub pages environment, we used 'jekyll' to test the website locally. The instructions to install the service can be found here: https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/testing-your-github-pages-site-locally-with-jekyll.
+
 
 
 
