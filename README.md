@@ -57,9 +57,10 @@ ironneverden/
 
 
 
-### Data sources (where data comes from; links if public)
+### Data sources
 Datasets:
-- ACLED: Disaggregated data on political violence and protests around the world, updated in real time.
+- ACLED: Aggregated data on political violence and protests around the world, updated in real time.
+- ACLED accademic access: Disaggregated data on political violence and protests around the world, updated until 2025.
 - GADM: High-resolution spatial data for all global administrative areas, used to obtain accurate country, regional, and district boundaries on maps.
 - FAO: ONU agency from which the Food Price Index was extracted, to analyze monthly fluctuations in international food commodity prices.
 - Eurostat: Statistical office of the European Union, used as the official source for data on energy balances and trade flows of member countries.
@@ -74,12 +75,13 @@ Links:
 - OEC - https://oec.world/en
 - Zenodo - https://zenodo.org/records/7923702
 
-### Data cleaning and imputation (what you changed, fixed, assumed)
+### Data cleaning and imputation
 For the ACLED dataset, unrecognized countries or small colonized islands were cleaned.
 The following columns were also added:
 - YEAR: for direct access to the reference year
 - ISO: ISO country code used as ID
 - GID_1: country's internal region code
+
 Columns not required for the project's analysis and implementation were removed.
 
 For the OEC dataset concerning country imports and exports, only the main categories (70% of the economy) for Russia and Ukraine were retained. All other categories were grouped under 'Other'.
@@ -91,15 +93,15 @@ For the Eurostat dataset, columns not relevant to the analysis were removed. Fur
 | Visualization                                                                                                                                              | Chart                       | Dataset  |
 |------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------|----------|
 | Conflicts and civil unrests for each country and for eache region within the country in Eurasian area.                                                     | Choropleth Map              | ACLED    |
-| Focus on the Russian-Ukrainian war: depiction of battles and explosions on the front during the war.                                                       | Scatter Map                 | ACLED    |
-| Specific representation of Battles and Explosions events in Ukrainian soil. Detailed geographical representation by regions, districts and municipalities  | Spike Map                   | ACLED    |
+| Focus on the Russian-Ukrainian war: depiction of battles and explosions on the front during the war.                                                       | Scatter Map                 | ACLED (Student Access)   |
+| Specific representation of Battles and Explosions events in Ukrainian soil. Detailed geographical representation by regions, districts and municipalities  | Spike Map                   | ACLED (Student Access)   |
 | Focus on how the types of events that occurred in Ukraine changed from pre-war to post-war.                                                                | Stacked Normalized Barchart | ACLED    |
 | Representation of how military tactics changed during the conflict                                                                                         | Multi-line Chart            | ACLED    |
 | Representation of how the export products of Russia and Ukraine changed, pre-war (2021) and war-time (2023)                                                | Slope Chart                 | OEC      |
 | Visualization of the change in Russian and Ukrainian export destinations pre-war (2021) and war-time (2023)                                                | Sunburst                    | OEC      |
-| Visualization of the changes in the volume and composition of Russian and Ukrainian exports. From raw materials to various destination countries.          | Sankey Diagram              | Eurostat |
+| Visualization of the changes in the volume and composition of Russian and Ukrainian exports. From raw materials to various destination UE countries.       | Sankey Diagram              | Eurostat |
 | FAO Price Highlight: War Crisis, How Primary Prices Have Changed.                                                                                          | Multi-line Chart            | FAO      |
-| Impact and change in gas prices due to the war.                                                                                                            | Histogram o barchart??      | Eurostat |
+| Impact and change in gas prices due to the war in Europe                                                                                                   | Bar Chart      | Eurostat |
 | Effects on air traffic: Ukrainian airspace closed with the start of the war                                                                                | Bar Chart Race              | Zenodo   |
 | Focus on the changing Eurasian air routes                                                                                                                  | Diverging Bar Chart         | Zenodo   |
 
@@ -111,6 +113,7 @@ Furthermore, using so much data, both geographical and qualitative, a considerab
 
 
 ### Reproducibility documentation
+
 
 
 
