@@ -1,14 +1,13 @@
 
 (function () {
 
-
     const PATHS = {
         geoRegion: "../../data/final/spike/region/UKR.json",
         geoDistrict: "../../data/final/spike/district/Ukraine_ADM2.topojson",
         geoComuni: "../../data/final/spike/municipals/Ukraine_ADM3.topojson",
-        dataRegion: "../../data/final/spike/region/spikemap_ukr_region.csv",
-        dataDistrict: "../../data/final/spike/district/spikemap_ukr_province.csv",
-        dataComuni: "../../data/final/spike/municipals/spikemap_ukr_municipal.csv"
+        dataRegion: "../../data/final/spike/region/spikemap_ukr_regions.csv",
+        dataDistrict: "../../data/final/spike/district/spikemap_ukr_dinstricts.csv",
+        dataComuni: "../../data/final/spike/municipals/spikemap_ukr_municipals.csv"
     };
     const width = 1000;
     const height = 700;

@@ -51,7 +51,7 @@ function initEventsLineChart() {
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
 
-    d3.json("../../data/final/events_line_chart/events_line_chart.json").then(function(raw_data) {
+    d3.json("../../data/final/events_line_chart/events_line_chart_v2.json").then(function(raw_data) {
         
         const TARGET_TYPES = [
             "Shelling/artillery/missile attack",

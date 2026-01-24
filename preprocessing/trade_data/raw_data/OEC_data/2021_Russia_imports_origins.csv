@@ -1,0 +1,211 @@
+"Continent","Continent ID","Country","Country ID","ISO 3","Trade Value","Year"
+"Africa","af","Algeria","afdza","dza",18266821,2021
+"Africa","af","Egypt","afegy","egy",591912907,2021
+"Africa","af","Libya","aflby","lby",531,2021
+"Africa","af","Morocco","afmar","mar",416938406,2021
+"Africa","af","Sudan","afsdn","sdn",263241,2021
+"Africa","af","Tunisia","aftun","tun",140150114,2021
+"Africa","af","Burundi","afbdi","bdi",1523867.9999999998,2021
+"Africa","af","Comoros","afcom","com",121346,2021
+"Africa","af","Eritrea","aferi","eri",130781,2021
+"Africa","af","Ethiopia","afeth","eth",29559954,2021
+"Africa","af","Kenya","afken","ken",99578684,2021
+"Africa","af","Madagascar","afmdg","mdg",10432448,2021
+"Africa","af","Mozambique","afmoz","moz",51682245,2021
+"Africa","af","Mauritius","afmus","mus",7443628,2021
+"Africa","af","Malawi","afmwi","mwi",72260490,2021
+"Africa","af","Rwanda","afrwa","rwa",5294244,2021
+"Africa","af","Somalia","afsom","som",112348,2021
+"Africa","af","South Sudan","afssd","ssd",38330,2021
+"Africa","af","Seychelles","afsyc","syc",184871.00000000003,2021
+"Africa","af","Tanzania","aftza","tza",36157537,2021
+"Africa","af","Uganda","afuga","uga",14837597,2021
+"Africa","af","Angola","afago","ago",2447716.0000000005,2021
+"Africa","af","Central African Republic","afcaf","caf",109954,2021
+"Africa","af","Cameroon","afcmr","cmr",4266833,2021
+"Africa","af","Democratic Republic of the Congo","afcod","cod",325577,2021
+"Africa","af","Republic of the Congo","afcog","cog",144462,2021
+"Africa","af","Gabon","afgab","gab",49542641.99999999,2021
+"Africa","af","Equatorial Guinea","afgnq","gnq",6190,2021
+"Africa","af","Sao Tome and Principe","afstp","stp",74569,2021
+"Africa","af","Chad","aftcd","tcd",10780,2021
+"Africa","af","Botswana","afbwa","bwa",15712026.000000002,2021
+"Africa","af","Lesotho","aflso","lso",72035,2021
+"Africa","af","Namibia","afnam","nam",1638227,2021
+"Africa","af","Eswatini","afswz","swz",2034542,2021
+"Africa","af","South Africa","afzaf","zaf",610051916,2021
+"Africa","af","Zambia","afzmb","zmb",15018681,2021
+"Africa","af","Zimbabwe","afzwe","zwe",32612265,2021
+"Africa","af","Benin","afben","ben",848315,2021
+"Africa","af","Burkina Faso","afbfa","bfa",122949,2021
+"Africa","af","Cote d'Ivoire","afciv","civ",198307031,2021
+"Africa","af","Cape Verde","afcpv","cpv",24278.999999999996,2021
+"Africa","af","Ghana","afgha","gha",81663876,2021
+"Africa","af","Guinea","afgin","gin",102490643.99999999,2021
+"Africa","af","Gambia","afgmb","gmb",3754,2021
+"Africa","af","Liberia","aflbr","lbr",5185202,2021
+"Africa","af","Mali","afmli","mli",652358,2021
+"Africa","af","Mauritania","afmrt","mrt",49804298,2021
+"Africa","af","Niger","afner","ner",170009,2021
+"Africa","af","Nigeria","afnga","nga",37341219,2021
+"Africa","af","Senegal","afsen","sen",2476900,2021
+"Africa","af","Saint Helena","afshn","shn",23807,2021
+"Africa","af","Sierra Leone","afsle","sle",636933,2021
+"Africa","af","Togo","aftgo","tgo",959672,2021
+"Asia","as","Kazakhstan","askaz","kaz",7422428141,2021
+"Asia","as","Kyrgyzstan","askgz","kgz",414386163,2021
+"Asia","as","Tajikistan","astjk","tjk",99096274,2021
+"Asia","as","Turkmenistan","astkm","tkm",140605201,2021
+"Asia","as","Uzbekistan","asuzb","uzb",1710625051,2021
+"Asia","as","China","aschn","chn",69623793676,2021
+"Asia","as","Hong Kong","ashkg","hkg",862446650,2021
+"Asia","as","Japan","asjpn","jpn",8423291756,2021
+"Asia","as","South Korea","askor","kor",10256712582,2021
+"Asia","as","Macau","asmac","mac",1154782,2021
+"Asia","as","Mongolia","asmng","mng",114801702,2021
+"Asia","as","North Korea","asprk","prk",40571,2021
+"Asia","as","Chinese Taipei","astwn","twn",1899106297,2021
+"Asia","as","Brunei","asbrn","brn",3950,2021
+"Asia","as","Cocos (Keeling) Islands","ascck","cck",12461,2021
+"Asia","as","Christmas Island","ascxr","cxr",805,2021
+"Asia","as","Indonesia","asidn","idn",2142732393,2021
+"Asia","as","Cambodia","askhm","khm",187292038,2021
+"Asia","as","Laos","aslao","lao",11783493,2021
+"Asia","as","Burma","asmmr","mmr",131744446,2021
+"Asia","as","Malaysia","asmys","mys",1492808128,2021
+"Asia","as","Philippines","asphl","phl",499450620,2021
+"Asia","as","Singapore","assgp","sgp",672957330,2021
+"Asia","as","Thailand","astha","tha",1768234803,2021
+"Asia","as","TimorLeste","astls","tls",7249,2021
+"Asia","as","Vietnam","asvnm","vnm",4145109886,2021
+"Asia","as","Afghanistan","asafg","afg",4722184,2021
+"Asia","as","Bangladesh","asbgd","bgd",1273263088,2021
+"Asia","as","Bhutan","asbtn","btn",9511.999999999998,2021
+"Asia","as","India","asind","ind",3977243755,2021
+"Asia","as","Iran","asirn","irn",578521432,2021
+"Asia","as","Sri Lanka","aslka","lka",225317533,2021
+"Asia","as","Maldives","asmdv","mdv",3749,2021
+"Asia","as","Nepal","asnpl","npl",2517921,2021
+"Asia","as","Pakistan","aspak","pak",340141005,2021
+"Asia","as","United Arab Emirates","asare","are",1212436277,2021
+"Asia","as","Armenia","asarm","arm",792391244,2021
+"Asia","as","Azerbaijan","asaze","aze",931897806,2021
+"Asia","as","Bahrain","asbhr","bhr",15121237,2021
+"Asia","as","Georgia","asgeo","geo",612850970,2021
+"Asia","as","Iraq","asirq","irq",49098,2021
+"Asia","as","Israel","asisr","isr",827433808,2021
+"Asia","as","Jordan","asjor","jor",83191765,2021
+"Asia","as","Kuwait","askwt","kwt",1859988,2021
+"Asia","as","Lebanon","aslbn","lbn",20264912,2021
+"Asia","as","Oman","asomn","omn",7977345,2021
+"Asia","as","Palestine","aspse","pse",68004,2021
+"Asia","as","Qatar","asqat","qat",52735856,2021
+"Asia","as","Saudi Arabia","assau","sau",337018677,2021
+"Asia","as","Turkey","astur","tur",6301613486,2021
+"Asia","as","Yemen","asyem","yem",154950,2021
+"Europe","eu","Cyprus","ascyp","cyp",92578577,2021
+"Europe","eu","Bulgaria","eubgr","bgr",584784937,2021
+"Europe","eu","Belarus","eublr","blr",15964294937,2021
+"Europe","eu","Czechia","eucze","cze",3997408442,2021
+"Europe","eu","Hungary","euhun","hun",2294337109,2021
+"Europe","eu","Moldova","eumda","mda",328259659,2021
+"Europe","eu","Poland","eupol","pol",8133891206,2021
+"Europe","eu","Romania","eurou","rou",1554136367,2021
+"Europe","eu","Slovakia","eusvk","svk",1940546306,2021
+"Europe","eu","Ukraine","euukr","ukr",3658121204,2021
+"Europe","eu","Denmark","eudnk","dnk",1679706955,2021
+"Europe","eu","Estonia","euest","est",1245511186,2021
+"Europe","eu","Finland","eufin","fin",4169264452,2021
+"Europe","eu","United Kingdom","eugbr","gbr",3977290261,2021
+"Europe","eu","Ireland","euirl","irl",1513665174,2021
+"Europe","eu","Iceland","euisl","isl",45847408,2021
+"Europe","eu","Lithuania","eultu","ltu",2909153496,2021
+"Europe","eu","Latvia","eulva","lva",1161593786,2021
+"Europe","eu","Norway","eunor","nor",547451580,2021
+"Europe","eu","Sweden","euswe","swe",2687377975,2021
+"Europe","eu","Albania","eualb","alb",16864164,2021
+"Europe","eu","Andorra","euand","and",428327,2021
+"Europe","eu","Bosnia and Herzegovina","eubih","bih",87378450,2021
+"Europe","eu","Spain","euesp","esp",3301525689,2021
+"Europe","eu","Gibraltar","eugib","gib",20995,2021
+"Europe","eu","Greece","eugrc","grc",293437759,2021
+"Europe","eu","Croatia","euhrv","hrv",274137230,2021
+"Europe","eu","Italy","euita","ita",9819266512,2021
+"Europe","eu","North Macedonia","eumkd","mkd",77856456,2021
+"Europe","eu","Malta","eumlt","mlt",22190536,2021
+"Europe","eu","Montenegro","eumne","mne",32312539,2021
+"Europe","eu","Portugal","euprt","prt",489750921,2021
+"Europe","eu","San Marino","eusmr","smr",11142920,2021
+"Europe","eu","Serbia","eusrb","srb",1068308196,2021
+"Europe","eu","Slovenia","eusvn","svn",1107008219,2021
+"Europe","eu","Austria","euaut","aut",2443408640,2021
+"Europe","eu","Belgium","eubel","bel",3045647368,2021
+"Europe","eu","Switzerland","euche","che",3917112020,2021
+"Europe","eu","Germany","eudeu","deu",30775499461,2021
+"Europe","eu","France","eufra","fra",8083426884,2021
+"Europe","eu","Luxembourg","eulux","lux",220638018,2021
+"Europe","eu","Netherlands","eunld","nld",5986058215,2021
+"North America","na","Antigua and Barbuda","naatg","atg",1918.0000000000002,2021
+"North America","na","Bahamas","nabhs","bhs",1698.0000000000002,2021
+"North America","na","Barbados","nabrb","brb",998777,2021
+"North America","na","Cuba","nacub","cub",5397204,2021
+"North America","na","Curaçao","nacuw","cuw",148160,2021
+"North America","na","Cayman Islands","nacym","cym",377496,2021
+"North America","na","Dominica","nadma","dma",53334,2021
+"North America","na","Dominican Republic","nadom","dom",37730330,2021
+"North America","na","Grenada","nagrd","grd",42681,2021
+"North America","na","Haiti","nahti","hti",324890,2021
+"North America","na","Jamaica","najam","jam",50186501,2021
+"North America","na","Saint Kitts and Nevis","nakna","kna",8364,2021
+"North America","na","Saint Lucia","nalca","lca",234264,2021
+"North America","na","Montserrat","namsr","msr",423,2021
+"North America","na","Turks and Caicos Islands","natca","tca",604,2021
+"North America","na","Trinidad and Tobago","natto","tto",1065794,2021
+"North America","na","British Virgin Islands","navgb","vgb",15789,2021
+"North America","na","Belize","nablz","blz",406228.99999999994,2021
+"North America","na","Costa Rica","nacri","cri",83684551,2021
+"North America","na","Guatemala","nagtm","gtm",63781196,2021
+"North America","na","Honduras","nahnd","hnd",15042516,2021
+"North America","na","Mexico","namex","mex",1332539995,2021
+"North America","na","Nicaragua","nanic","nic",14017425,2021
+"North America","na","Panama","napan","pan",3483489,2021
+"North America","na","El Salvador","naslv","slv",4642833,2021
+"North America","na","Bermuda","nabmu","bmu",34285,2021
+"North America","na","Canada","nacan","can",589656928,2021
+"North America","na","Greenland","nagrl","grl",103432892,2021
+"North America","na","Saint Pierre and Miquelon","naspm","spm",38,2021
+"North America","na","United States","nausa","usa",8497273881,2021
+"Oceania","oc","Australia","ocaus","aus",748502508,2021
+"Oceania","oc","New Zealand","ocnzl","nzl",215437022,2021
+"Oceania","oc","Fiji","ocfji","fji",142274,2021
+"Oceania","oc","New Caledonia","ocncl","ncl",4704.000000000001,2021
+"Oceania","oc","Papua New Guinea","ocpng","png",3116531,2021
+"Oceania","oc","Solomon Islands","ocslb","slb",17490,2021
+"Oceania","oc","Vanuatu","ocvut","vut",29698,2021
+"Oceania","oc","Micronesia","ocfsm","fsm",508,2021
+"Oceania","oc","Guam","ocgum","gum",131,2021
+"Oceania","oc","Marshall Islands","ocmhl","mhl",1811710,2021
+"Oceania","oc","Northern Mariana Islands","ocmnp","mnp",2776,2021
+"Oceania","oc","Nauru","ocnru","nru",4784,2021
+"Oceania","oc","American Samoa","ocasm","asm",5814,2021
+"Oceania","oc","Cook Islands","occok","cok",32784,2021
+"Oceania","oc","Niue","ocniu","niu",722,2021
+"Oceania","oc","French Polynesia","ocpyf","pyf",4970,2021
+"Oceania","oc","Tokelau","octkl","tkl",11643,2021
+"Oceania","oc","Tonga","octon","ton",2259,2021
+"Oceania","oc","Tuvalu","octuv","tuv",6248,2021
+"Oceania","oc","Wallis and Futuna","ocwlf","wlf",1183.9999999999998,2021
+"Oceania","oc","Pitcairn Islands","ocpcn","pcn",67343,2021
+"South America","sa","Argentina","saarg","arg",935703786,2021
+"South America","sa","Bolivia","sabol","bol",13876654,2021
+"South America","sa","Brazil","sabra","bra",1776939893,2021
+"South America","sa","Chile","sachl","chl",806257855,2021
+"South America","sa","Colombia","sacol","col",162706558,2021
+"South America","sa","Ecuador","saecu","ecu",1139830629,2021
+"South America","sa","Falkland Islands","saflk","flk",1137171,2021
+"South America","sa","Guyana","saguy","guy",272261,2021
+"South America","sa","Peru","saper","per",228782653,2021
+"South America","sa","Paraguay","sapry","pry",759944677,2021
+"South America","sa","Suriname","sasur","sur",29653,2021
+"South America","sa","Uruguay","saury","ury",115809705,2021
+"Unknown","xx","French Southern Territories","xxatf","atf",327,2021

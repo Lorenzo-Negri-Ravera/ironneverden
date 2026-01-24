@@ -77,7 +77,7 @@ function initStackedBarChart() {
             });
     }
 
-    d3.json("../../data/final/stackedbarchart/Year_Events_UKR.json").then(function(data) {
+    d3.json("../../data/final/stackedbarchart/Year_Events_UKR_v2.json").then(function(data) {
         data.forEach(d => { d.YEAR = +d.YEAR; d.count = +d.count; if(d.EVENT_TYPE) d.EVENT_TYPE = d.EVENT_TYPE.trim(); });
         
         const filteredData = data.filter(d => d.YEAR >= 2017 && keys.includes(d.EVENT_TYPE));

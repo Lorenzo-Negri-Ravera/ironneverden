@@ -3,10 +3,10 @@
 (function() {
 
     const DATA_PATHS = {
-        UKR_2021: "../../data/final/trade-data/final_datasets/UKR_export_2021_destinations.json",
-        UKR_2023: "../../data/final/trade-data/final_datasets/UKR_export_2023_destinations.json",
-        RUS_2021: "../../data/final/trade-data/final_datasets/RUS_export_2021_destinations.json",
-        RUS_2023: "../../data/final/trade-data/final_datasets/RUS_export_2023_destinations.json"
+        UKR_2021: "../../data/final/trade-data/final_datasets/UKR_export_2021_destinations_v2.json",
+        UKR_2023: "../../data/final/trade-data/final_datasets/UKR_export_2023_destinations_v2.json",
+        RUS_2021: "../../data/final/trade-data/final_datasets/RUS_export_2021_destinations_v2.json",
+        RUS_2023: "../../data/final/trade-data/final_datasets/RUS_export_2023_destinations_v2.json"
     };
 
     const width = 600; 

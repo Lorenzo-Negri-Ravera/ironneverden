@@ -1,6 +1,6 @@
 (function() {
 
-    const CSV_PATH = "../../data/final/trade-data/final_datasets/output_data.csv"; 
+    const CSV_PATH = "../../data/final/trade-data/final_datasets/output_data_v2.csv"; 
     
     const LOGICAL_WIDTH = 800;
     const LOGICAL_HEIGHT = 900;

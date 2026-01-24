@@ -1,9 +1,9 @@
 (function() {
     
-    const RUS_export_2021 = "../../data/final/trade-data/final_datasets/RUS_export_2021_grouped.json";
-    const RUS_export_2023 = "../../data/final/trade-data/final_datasets/RUS_export_2023_grouped.json";
-    const UKR_export_2021 = "../../data/final/trade-data/final_datasets/UKR_export_2021_grouped.json";
-    const UKR_export_2023 = "../../data/final/trade-data/final_datasets/UKR_export_2023_grouped.json";
+    const RUS_export_2021 = "../../data/final/trade-data/final_datasets/RUS_export_2021_grouped_v2.json";
+    const RUS_export_2023 = "../../data/final/trade-data/final_datasets/RUS_export_2023_grouped_v2.json";
+    const UKR_export_2021 = "../../data/final/trade-data/final_datasets/UKR_export_2021_grouped_v2.json";
+    const UKR_export_2023 = "../../data/final/trade-data/final_datasets/UKR_export_2023_grouped_v2.json";
 
     const width = 1000;
     const height = 700;
