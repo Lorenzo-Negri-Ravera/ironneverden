@@ -100,7 +100,7 @@ For the Eurostat dataset, columns not relevant to the analysis were removed. Fur
 | Representation of how the export products of Russia and Ukraine changed, pre-war (2021) and war-time (2023)                                                | Slope Chart                 | OEC      |
 | Visualization of the change in Russian and Ukrainian export destinations pre-war (2021) and war-time (2023)                                                | Sunburst                    | OEC      |
 | Visualization of the changes in the volume and composition of Russian and Ukrainian exports. From raw materials to various destination UE countries.       | Sankey Diagram              | Eurostat |
-| FAO Price Highlight: War Crisis, How Primary Prices Have Changed.                                                                                          | Multi-line Chart            | FAO      |
+| FAO Price Highlight: war crisis, how primary prices have changed in the World                                                                                         | Multi-line Chart            | FAO      |
 | Impact and change in gas prices due to the war in Europe                                                                                                   | Bar Chart      | Eurostat |
 | Effects on air traffic: Ukrainian airspace closed with the start of the war                                                                                | Bar Chart Race              | Zenodo   |
 | Focus on the changing Eurasian air routes                                                                                                                  | Diverging Bar Chart         | Zenodo   |
@@ -113,6 +113,7 @@ Furthermore, using so much data, both geographical and qualitative, a considerab
 
 
 ### Reproducibility documentation
+
 
 
 
