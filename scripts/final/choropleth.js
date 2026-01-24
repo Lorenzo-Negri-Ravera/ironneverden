@@ -6,8 +6,8 @@
     const NEUTRAL_COLOR = "#6b3e10b1";
 
     const EVENT_COLORS = {
-        "Battles": "#ff6361",
-        "Explosions/Remote violence": "#ffa600",
+        "Battles": "#D73027",
+        "Explosions/Remote violence": "#E69F00",
         "Protests": "#1e88e5",
         "Riots": "#58508d",
         "Violence against civilians": "#bc5090",

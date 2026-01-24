@@ -24,11 +24,12 @@
 
         <main class="p-4">
 
-            <section id="choropleth-intro-text-section" class="mt-5 mb-4">
+            <section id="choropleth-intro-text-section" class="mt-3 mb-4">
                 <div class="text-container">
+                    <h1 class="fw-bold mb-3">Results of the investigation into the Russia-Ukraine conflict and its consequences</h1>
                     <p>
                         In this report, we provide a comprehensive overview of the unrest and conflict
-                        events that occurred in the Eurasian region between 2017 and 2025. This analysis
+                        events that occurred in the Eurasian region between 2017 and 2026. This analysis
                         leverages data provided by <a href="https://acleddata.com/" target="_blank">ACLED</a>
                         (Armed Conflict Location & Event Data Project), an independent organization dedicated to
                         monitoring and collecting data on conflicts and protests worldwide. <br>
@@ -41,13 +42,17 @@
                         the evolution of modern warfare modalities, and the broader economic and geopolitical impacts on
                         Europe and the global community.
                     </p>
+                    <p>
+                        The following chart provides a general overview of the distribution of civilian unrest and conflict in Eurasia
+                    </p>
                 </div>
             </section>
 
             <section id="choropleth-section" class="mb-5 position-relative">
                 <div class="chart-header text-center">
                     <h3 class="chart-title">International Conflicts and Civil Unrest in Eurasia</h3>
-                    <p class="chart-subtitle">Distribution of events aggregated by country and administrative region from 2017 to 2025.</p>
+                    <p class="chart-subtitle">Distribution of events aggregated by country and administrative region
+                        from 2017 to 2025.</p>
                 </div>
                 <div class="row justify-content-center mb-3">
                     <div class="col-lg-10">
@@ -101,30 +106,30 @@
                 <div class="text-container">
 
                     <p>
-                    Data regarding the 2017–2025 period highlights a significant shift in the
-                    geographical focus of instability. In the initial phase (2017–2019), the Eurasian
-                    landscape was defined primarily by the localized conflict in Eastern Ukraine (Donbas)
-                    and political unrest within Russia. However, starting from 2020, the trend of
-                    civil disorder moved decisively towards Western Europe. <br>
+                        Data regarding the 2017–2026 period highlights a significant shift in the
+                        geographical focus of instability. In the initial phase (2017–2019), the Eurasian
+                        landscape was defined primarily by the localized conflict in Eastern Ukraine (Donbas)
+                        and political unrest within Russia. However, starting from 2020, the trend of
+                        civil disorder moved decisively towards Western Europe. <br>
                     </p>
                     <p>
                         France emerges as the country with the highest frequency of civil unrest,
                         recording approximately 40,000 events. A detailed breakdown of the event types reveals a
                         distinct geographical dichotomy:
                     </p>
-                        <ul>
-                            <li><strong>Protests</strong>: Peaceful demonstrations are widespread across the entire
-                                territory, with particularly
-                                high intensity observed along the Western coast (Brittany/Nouvelle-Aquitaine) and in the
-                                Southern regions.</li>
+                    <ul>
+                        <li><strong>Protests</strong>: Peaceful demonstrations are widespread across the entire
+                            territory, with particularly
+                            high intensity observed along the Western coast (Brittany/Nouvelle-Aquitaine) and in the
+                            Southern regions.</li>
 
-                            <li><strong>Riots</strong>: Conversely, violent riots are far more localized, showing a sharp
-                                concentration in the
-                                Île-de-France (Paris) region and major urban hubs like Lyon, while remaining less frequent
-                                in rural areas.</li>
-                        </ul>
+                        <li><strong>Riots</strong>: Conversely, violent riots are far more localized, showing a sharp
+                            concentration in the
+                            Île-de-France (Paris) region and major urban hubs like Lyon, while remaining less frequent
+                            in rural areas.</li>
+                    </ul>
                     <p>
-                        Italy ranks second with over 26,000 recorded events. As visualized in the heatmap, these
+                        Italy ranks second with over 26000 recorded events. As visualized in the heatmap, these
                         manifestations
                         are clustered around major urban centers and the northern regions.
                         Notably, the data indicates a marginally higher incidence of excessive force used
@@ -132,7 +137,7 @@
                     </p>
                     <p>
                         Germany and Spain follow in the rankings. Germany shows a widespread
-                        distribution of roughly 24,000 events, while Spain (approx. 22,000 events)
+                        distribution of roughly 24000 events, while Spain (approx. 22000 events)
                         displays a distinct pattern where unrest is concentrated in the capital, Madrid, and along the
                         coastal regions.<br>
                     </p>
@@ -147,27 +152,23 @@
                     <p>
                         Specifically, Ukraine has emerged as the absolute epicenter of this violence.
                         The data reveals a staggering escalation in the number of battle events:
-                        In 2017, during the localized conflict in the east, only 37 events were recorded and
-                        by 2022, with the onset of the full-scale invasion, this number surged to 7,569.<br>
-                        By 2025, the intensity of the conflict further intensified, reaching a peak of 22,353
+                        in 2017, during the localized conflict in the east, only 37 events were recorded and
+                        by 2022, with the onset of the full-scale invasion, this number surged to over 7000.<br>
+                        By 2025, the scale of the conflict further intensified, reaching a peak of 22,353
                         recorded events, nearly tripling the figures seen at the start of the invasion.<br>
-                    </p>
-                    <p>
-                        Upon observing the geographical distribution of conflict events in
-                        Europe (based on data available since 2017), an anomalous and
-                        constant concentration of activity in Ukraine emerged starting from 2020.
-                        Consequently, we decided to visually analyze the temporal evolution of the
-                        conflict between 2021 and 2024, highlighting the most significant phases and moments of the
+                        Consequently, we decided to visually analyze the temporal evolution of the Ukraine-Russia
+                        conflict up to 2024, highlighting the most significant phases and moments of the
                         hostilities.
                     </p>
                 </div>
             </section>
 
-            <section id="front-map-section" class="mb-5 mt-5">
+            <section id="front-map-section" class="mb-5">
                 <div class="row justify-content-center">
                     <div class="chart-header text-center">
                         <h3 class="chart-title">Evolution of the Russo-Ukrainian Conflict</h3>
-                        <p class="chart-subtitle">Timeline of battles and explosions from January 1, 2022, to December 29, 2024</p>
+                        <p class="chart-subtitle">Timeline of battles and explosions from January 1, 2022, to December
+                            29, 2024</p>
                     </div>
                     <div class="col-lg-10">
                         <div id="tooltip" class="shared-tooltip"></div>
@@ -179,21 +180,6 @@
                             <div class="compact-divider"></div>
                             <button class="btn-compact" data-type="Explosions/Remote violence">Explosions</button>
                         </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
                         <div class="row mb-3">
                             <div class="col-12 p-0">
@@ -250,7 +236,7 @@
                 </div>
             </section>
 
-            <section id="front-map-analysis-text-section" class="mb-5">
+            <section id="front-map-analysis-text-section" class="mb-4">
                 <div class="text-container">
                     <p>
                         As is widely known, the conflict on Ukrainian soil has been ongoing for nearly a decade,
@@ -296,21 +282,11 @@
                 </div>
             </section>
 
-
-
-
-
-
-
-
-
-
-
-            <section id="spike-map-section" class="mb-5 mt-5">
+            <section id="spike-map-section" class="mb-5">
                 <div class="row justify-content-center">
                     <div class="chart-header text-center">
                         <h3 class="chart-title">A Conflict Confined to the border?</h3>
-                        <p class="chart-subtitle">Distribution of civilian fatalities on Ukrainian soil 
+                        <p class="chart-subtitle">Distribution of civilian fatalities on Ukrainian soil
                             aggregated by region, district, and municipality.
                     </div>
                     <div class="col-lg-10 text-center">
@@ -320,7 +296,8 @@
                                 <input type="radio" class="btn-check" name="mapLevel" id="lvl-region" value="region">
                                 <label class="btn-compact" for="lvl-region">Regions</label>
                                 <div class="compact-divider"></div>
-                                <input type="radio" class="btn-check" name="mapLevel" id="lvl-district" value="district" checked>
+                                <input type="radio" class="btn-check" name="mapLevel" id="lvl-district" value="district"
+                                    checked>
                                 <label class="btn-compact active" for="lvl-district">Districts</label>
                                 <div class="compact-divider"></div>
                                 <input type="radio" class="btn-check" name="mapLevel" id="lvl-comuni" value="comuni">
@@ -410,7 +387,7 @@
 
             </section>
 
-            <section id="stacked-bar-section" class="mb-5 mt-5">
+            <section id="stacked-bar-section" class="mb-5">
                 <div class="chart-header text-center">
                     <h3 class="chart-title">Proportion of Events on Ukrainian Soil</h3>
                     <p class="chart-subtitle">Percentage share of event types (2017–2025).</p>
@@ -439,7 +416,7 @@
                 </div>
             </section>
 
-            <section id="stacked-bar-analysis-text-section" class="mb-5">
+            <section id="stacked-bar-analysis-text-section" class="mb-4">
                 <div class="text-container">
                     <p>
                         The visualization illustrates how the conflict has
@@ -458,16 +435,17 @@
                         effectively suppressing ordinary civil demonstrations.
                     </p>
                     <p>
-                        Having examined the distribution of events in Ukraine between 2017 and 2025,
+                        To further examine the distribution of events in Ukraine between 2017 and 2026,
                         we conducted a detailed analysis of the specific engagement modalities.
                     </p>
                 </div>
             </section>
 
-            <section id="events-line-section" class="mb-5 mt-5">
+            <section id="events-line-section" class="mb-5">
                 <div class="chart-header text-center">
                     <h3 class="chart-title">Evolution of Warfare Tactics in Ukraine Conflict</h3>
-                    <p class="chart-subtitle">Timeline of artillery, drone strikes, and armed clashes frequency since the 2022 invasion.</p>
+                    <p class="chart-subtitle">Timeline of artillery, drone strikes, and armed clashes frequency since
+                        the 2022 invasion.</p>
                 </div>
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
@@ -493,18 +471,18 @@
                 </div>
             </section>
 
-            <section id="events-line-analysis-text-section" class="mb-5">
+            <section id="events-line-analysis-text-section">
                 <div class="text-container">
                     <p>
                         The chart highlights a clear transformation in the conflict's dynamics,
                         both in tactical terms and, by inference, in economic terms. In the initial phase,
-                        shelling and missile attacks (Red line) were the predominant method of engagement. <br>
+                        shelling and missile attacks (Yellow line) were the predominant method of engagement. <br>
                         However, following an upward trend in the first two years,
                         this type of attack exhibited a steady decline, reaching its lowest levels between
                         late 2024 and 2025.
                     </p>
                     <p>
-                        Conversely, both Air/Drone Strikes (Orange line) and Armed Clashes (Blue line)
+                        Conversely, both Air/Drone Strikes (Blue line) and Armed Clashes (Orange line)
                         have maintained a slow but steady upward trend since the beginning of hostilities.
                         Around mid-2024, a turning point is observed: the frequency of these two event types
                         surpassed that of artillery shelling.
@@ -513,25 +491,29 @@
                         This trend reversal suggests several important strategic implications:
                     </p>
                     <ul>
-                        <li><strong>Tactical Evolution:</strong> The conflict appears to have shifted from a phase
-                                dominated by long-range strikes to one characterized by short-range incursions
-                                (ground clashes) and the massive use of drones. </li>
-                        <li><strong>Economic and Technological Impact:</strong> The decrease in missile usage (which is
-                                costly and resource-intensive) in favor of drones and infantry may indicate
-                                an adaptation towards a more sustainable war economy, potentially suggesting
-                                a depletion of missile stockpiles or a strategic shift based on cost-effectiveness.</li>
+                        <li><strong>tactical Evolution:</strong> The conflict appears to have shifted from a phase
+                            dominated by long-range strikes to one characterized by short-range incursions
+                            (ground clashes) and the massive use of drones. </li>
+                        <li><strong>economic and Technological Impact:</strong> The decrease in missile usage (which is
+                            costly and resource-intensive) in favor of drones and infantry may indicate
+                            an adaptation towards a more sustainable war economy, potentially suggesting
+                            a depletion of missile stockpiles or a strategic shift based on cost-effectiveness.</li>
                     </ul>
+                    <h2 class="fw-bold mb-3 mt-5">Economic implications of the conflict</h2>
                     <p>
-                        Investigating the economic composition of the two nations pre- and post-conflict reveals
-                        diverging trend.
+                        The ongoing conflict between Russia and Ukraine has had profound implications
+                        on global trade dynamics, particularly in the export sectors of both nations.
+                        The following sections analyze these shifts through visualizations that
+                        highlight changes in export compositions and trade partnerships from 2021 to 2023.
                     </p>
                 </div>
             </section>
 
-            <section id="slope-chart-section" class="mb-5 mt-5">
+            <section id="slope-chart-section" class="mb-5 mt-4">
                 <div class="chart-header text-center">
                     <h3 class="chart-title">Impact of the War on Exports</h3>
-                    <p class="chart-subtitle">Shifts in major export categories from Russia and Ukraine to the World (2021 vs 2023).</p>
+                    <p class="chart-subtitle">Shifts in major export categories from Russia and Ukraine to the World
+                        (2021 vs 2023).</p>
                 </div>
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
@@ -557,7 +539,7 @@
                 </div>
             </section>
 
-            <section id="slope-analysis-text-section" class="mb-5">
+            <section id="slope-analysis-text-section" class="mb-4">
                 <div class="text-container">
                     <p>
                         Russia appears to have consolidated its economy around energy extraction,
@@ -567,16 +549,16 @@
                         and Coal saw a significant jump (from 3.8% to 6.9%).
                     </p>
                     <p>
-                        In contrast, Ukraine has experienced a forced structural shift. The heavy industry sector
+                        In contrast, Ukraine has experienced a forced structural shift. The heavy mineral sector
                         collapsed,
-                        with Metals (formerly the leading export at 23.4%) dropping drastically to 9.7%.
+                        with Metals (formerly the leading export at 23.4%) dropping drastically to 10.5%.
                         This decline likely reflects the severe loss of industrial capacity in the eastern
                         regions (Donbas) affected by the war. Conversely, the agricultural sector has proven
                         to be the most resilient pillar of the economy, as the export share of essential
                         goods like Cereals and Seed Oils significantly increased.
                     </p>
                     <p>
-                        In addition to the composition of exports of goods, 
+                        In addition to the composition of exports of goods,
                         partners from all over the world who imported such goods also changed.
                     </p>
                 </div>
@@ -585,7 +567,8 @@
             <section id="sunburst-section" class="mb-5 position-relative">
                 <div class="chart-header text-center">
                     <h3 class="chart-title">The Impact of War on Global Trade Flows</h3>
-                    <p class="chart-subtitle">Comparison of trade volumes and destinations before (2021) and during the war (2023).</p>
+                    <p class="chart-subtitle">Comparison of trade volumes and destinations before (2021) and during the
+                        war (2023).</p>
                 </div>
                 <div class="container-fluid p-0">
                     <div class="row justify-content-center mb-0">
@@ -638,7 +621,7 @@
             <section id="sunburst-text-section" class="mb-4">
                 <div class="text-container">
                     <p>
-                        The total export volume contracted significantly over the two-year period,
+                        The total Russian export volume contracted significantly over the two-year period,
                         dropping from $490 billion in 2021 to $390 billion in 2023.<br>
                     </p>
                     <p>
@@ -660,7 +643,7 @@
                         and Kazakhstan. The conflict also had severe repercussions on overseas trade, particularly
                         with North America, which drastically decreased its imports from Russia, effectively severing
                         trade relations.
-                        "Analyzing Ukraine, the total export volume contracted sharply, falling from $69 billion in 2021
+                        Analyzing Ukraine, the total export volume contracted sharply, falling from $69 billion in 2021
                         to $40 billion in 2023.<br>
                     </p>
                     <p>
@@ -682,15 +665,16 @@
                     </p>
                     <p>
                         For an export eurpoean perspective, we have studied the change of the principal
-                        exportation goods from russia/Ukraine to the european counties comparing the 2021 and 2023
+                        exportation goods from Russia/Ukraine to the european counties comparing the 2021 and 2023.
                     </p>
                 </div>
             </section>
 
             <section id="sankey-section" class="mb-5 position-relative">
                 <div class="chart-header text-center">
-                    <h3 class="chart-title">Exports from Russia and Ukraine to the European Union</h3>
-                    <p class="chart-subtitle">Comparison of trade volumes and product flows before (2021) and during the war (2023).</p>
+                    <h3 class="chart-title">Exports from Russia and Ukraine to the EU</h3>
+                    <p class="chart-subtitle">Comparison of trade volumes of a selection of products before (2021) and during the
+                        war (2023).</p>
                 </div>
                 <div class="container-fluid p-0">
                     <div class="row justify-content-center mb-0">
@@ -736,7 +720,8 @@
                     <p>
                         In the pre-war period (2021), the trade landscape was dominated by the exchange of
                         Crude and Refined Petroleum, followed by Natural Gas and Metals. These exports were widely
-                        distributed across EU member states, generating a massive total trade volume of €132.5 billion.
+                        distributed across EU member states, generating a massive total trade volume of €132.5 billion
+                        with this subset of products alone.
                         <br>
                     </p>
                     <p>
@@ -774,20 +759,21 @@
                         To better illustrate the war's impact on the global economy,
                         we analyzed the FAO Food Price Index (FFPI),
                         provided by the Food and Agriculture Organization of the United Nations
-                        (<a href="https://www.fao.org/worldfoodsituation/FoodPricesIndex/en" target="_blank" rel="noopener noreferrer">FAO</a>).
+                        (<a href="https://www.fao.org/worldfoodsituation/FoodPricesIndex/en" target="_blank"
+                            rel="noopener noreferrer">FAO</a>).
                         <br>
                         This index, which monitors monthly fluctuations in the international
                         prices of a basket of food commodities, allows for a comprehensive overview
                         of price inflation and trends within the global agri-food market.
                     </p>
-                    
+
                 </div>
             </section>
 
-            <section id="food_linechart_section" class="mb-5 mt-5">
+            <section id="food_linechart_section" class="mb-5">
                 <div class="chart-header text-center">
                     <h3 class="chart-title">The Impact of Conflict on Global Food Prices</h3>
-                    <p class="chart-subtitle">Historical data of FAO indices for key commodities (food price index, meat, cereals, oils, sugar).</p>
+                    <p class="chart-subtitle">Historical data of FAO indices for key commodities.</p>
                 </div>
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
@@ -811,25 +797,26 @@
                 </div>
             </section>
 
-            <section id="food-analysis-text-section" class="mb-5">
+            <section id="food-analysis-text-section" class="mb-4">
                 <div class="text-container">
                     <p>
                         The chart illustrates how the outbreak of the Russia-Ukraine conflict resulted
                         in a substantial increase in the prices of food commodities monitored by the FAO,
                         thereby contributing to widespread inflation within the sector
                         (as reported by
-                        <a href="https://it.tradingeconomics.com/euro-area/inflation-cpi" target="_blank">tradingeconomics</a> for the Euro Area).
+                        <a href="https://it.tradingeconomics.com/euro-area/inflation-cpi"
+                            target="_blank">tradingeconomics</a> for the Euro Area).
                     </p>
                     <p>
-                        Specifically, cereals (indicated by the purple line) experienced significant price hikes.
+                        Specifically, cereals (indicated by the yellow line) experienced significant price hikes.
                         An analysis of FAO export data reveals that, just 12 months into the conflict,
-                        Ukraine’s market share was drastically reduced:
+                        Ukraine's market share was drastically reduced:
                     </p>
                     <ul>
-                        <li><strong>Wheat:</strong> Ukraine fell from 5th to 7th place among global exporters
+                        <li><strong>wheat:</strong> Ukraine fell from 5th to 7th place among global exporters
                             (decreasing from approximately 19.4 to 11.2 million tonnes, a drop of 42%).</li>
-                        <li><strong>Barley:</strong> It dropped from 3rd to 5th place (a decrease of 60%).</li>
-                        <li><strong>Maize:</strong> While slipping from 3rd to 4th place, it actually recorded
+                        <li><strong>barley:</strong> It dropped from 3rd to 5th place (a decrease of 60%).</li>
+                        <li><strong>maize:</strong> While slipping from 3rd to 4th place, it actually recorded
                             a slight increase in volume (+3%).</li>
                     </ul>
                     <p>
@@ -838,7 +825,7 @@
                     </p>
                     <p>
                         However, the commodity that experienced the sharpest price increase
-                        was vegetable oil (red line). Although Ukraine maintained its position
+                        was vegetable oil (green line). Although Ukraine maintained its position
                         as the leading exporter of sunflower oil, export volumes declined by 16%
                         (from 5.1 to 4.3 million tonnes), causing the price index to surge by more
                         than 50 points compared to the previous year.
@@ -852,10 +839,10 @@
                 </div>
             </section>
 
-            <section id="gas-linechart-section" class="mb-5 mt-5 position-relative">
+            <section id="gas-linechart-section" class="mb-5 position-relative">
                 <div class="chart-header text-center">
                     <h3 class="chart-title">The Impact of Conflict on Gas Prices</h3>
-                    <p class="chart-subtitle">Gas price trends from 2021 to 2025 (€/kWh).</p>
+                    <p class="chart-subtitle">Gas price for household consumers from 2021 to 2025 (€/kWh).</p>
                 </div>
                 <div class="container-fluid p-0">
                     <div class="row justify-content-center">
@@ -876,12 +863,12 @@
                 </div>
             </section>
 
-            <section id="gas-analysis-text-section" class="mb-5">
+            <section id="gas-analysis-text-section" class="mb-4">
                 <div class="text-container">
                     <p>
                         It is evident that, starting from the second half of 2022,
-                        gas prices experienced a sharp surge—peaking at nearly double the pre-war
-                        values—before entering a slow decline in subsequent years, but despite this downward trend,
+                        gas prices experienced a sharp surge (peaking at nearly double the pre-war
+                        values) before entering a slow decline in subsequent years, but despite this downward trend,
                         prices in 2025 remain significantly higher than in the pre-conflict period.
                     </p>
                     <p>
@@ -891,7 +878,7 @@
                         including sanctions and diversification measures intended to disincentivize the continuation of
                         the conflict.
                     </p>
-
+                    <h2 class="fw-bold mb-3 mt-5">The transformation of regional air traffic</h2>
                     <p>
                         Continuing the economic analysis, we examined data regarding the number
                         of flights destined for Eastern Europe presents on
@@ -903,7 +890,7 @@
             </section>
 
 
-            <section id="race-chart-section" class="mb-5 mt-5">
+            <section id="race-chart-section" class="mb-5">
                 <div class="chart-header text-center">
                     <h3 class="chart-title">Top Flight Destinations to Eastern Europe</h3>
                     <p class="chart-subtitle">Evolution of major flight destinations from 2021 to 2022</p>
@@ -940,19 +927,19 @@
                 </div>
             </section>
 
-            <section id="race-analysis-text-section" class="mb-5">
+            <section id="race-analysis-text-section" class="mb-4">
                 <div class="text-container">
                     <p>
                         Two major phenomena emerge from the data:
                     </p>
 
                     <ul>
-                        <li><strong>The isolation of Ukraine:</strong> By late 2022, Ukraine registered 0 flights,
+                        <li><strong>the isolation of Ukraine:</strong> By late 2022, Ukraine registered 0 flights,
                             dropping from over 2,100 monthly flights in 2021. This total collapse is a
                             direct consequence of the closure of Ukrainian airspace due to extreme security risks
                             (no-fly zone), effectively severing the country's aerial connectivity. </li>
 
-                        <li><strong>The shifting of logistic hubs:</strong> While Russia maintained its position as the
+                        <li><strong>the shifting of logistic hubs:</strong> While Russia maintained its position as the
                             top
                             destination with stable flight volumes (increasing slightly from ~18,900 to ~19,700),
                             a dramatic shift occurred in neighboring countries. Poland experienced a massive surge,
@@ -967,10 +954,11 @@
                 </div>
             </section>
 
-            <section id="divergence-chart-section" class="mb-5 mt-5">
+            <section id="divergence-chart-section" class="mb-5">
                 <div class="chart-header text-center">
                     <h3 class="chart-title">Decline in Direct Flights to Russia</h3>
-                    <p class="chart-subtitle">Change in the number of direct flights from major partner countries (Pre-war vs. War-time).</p>
+                    <p class="chart-subtitle">Change in the number of direct flights from major partner countries
+                        (Pre-war vs. War-time).</p>
                 </div>
                 <div class="row justify-content-center">
                     <div class="col-lg-10 text-center">
@@ -980,12 +968,14 @@
                         <div id="divergence-controls" class="d-flex justify-content-center flex-wrap gap-3 mb-4">
                             <div class="compact-menu-bar d-inline-flex align-items-center" role="group">
 
-                                <input type="radio" class="btn-check" name="metricMode" id="metric-abs" value="absolute" checked>
+                                <input type="radio" class="btn-check" name="metricMode" id="metric-abs" value="absolute"
+                                    checked>
                                 <label class="btn-compact active" for="metric-abs">Absolute Diff</label>
 
                                 <div class="compact-divider"></div>
 
-                                <input type="radio" class="btn-check" name="metricMode" id="metric-rel" value="relative">
+                                <input type="radio" class="btn-check" name="metricMode" id="metric-rel"
+                                    value="relative">
                                 <label class="btn-compact" for="metric-rel">Relative Diff (%)</label>
 
                                 <div class="compact-divider"></div>
@@ -1041,23 +1031,24 @@
                         <li><strong>United Arab Emirates</strong>: Jumped from 6.2% to 28.2%.</li>
                     </ul>
                     <p>
-                    These figures vividly demonstrate how quickly geopolitical dynamics can reshape economic
-                    connectivity within a span of just 12 months.
+                        These figures vividly demonstrate how quickly geopolitical dynamics can reshape economic
+                        connectivity within a span of just 12 months.
                     </p>
                 </div>
             </section>
         </main>
 
         <footer class="text-light py-5 rounded-bottom" style="background-color: #404040;">
-            <div class="container-fluid"> <div class="row justify-content-center">
+            <div class="container-fluid">
+                <div class="row justify-content-center">
                     <div class="col-lg-10">
-                        
+
                         <div class="row gy-4 align-items-start">
-                            
+
                             <div class="col-lg-4 text-center text-lg-start">
                                 <h4 class="fw-bold mb-3 text-white">IronNeverden</h4>
                                 <p class="small text-secondary-subtle mb-0">
-                                    A comprehensive data visualization <br> 
+                                    A comprehensive data visualization <br>
                                     project analyzing the geopolitical, economic,
                                     <br> and human impact of the conflict <br> in Eurasia (2017–2025).
                                 </p>
@@ -1077,19 +1068,24 @@
                                     <h4 class="fw-bold mb-3 text-white">Data Sources</h4>
                                     <ul class="list-unstyled small mb-0">
                                         <li class="mb-1">
-                                            <a href="https://acleddata.com/" target="_blank" class="text-decoration-none text-info link-opacity-75-hover">ACLED</a> 
+                                            <a href="https://acleddata.com/" target="_blank"
+                                                class="text-decoration-none text-info link-opacity-75-hover">ACLED</a>
                                             <span class="text-secondary-subtle">– Conflict data</span>
                                         </li>
                                         <li class="mb-1">
-                                            <a href="https://www.fao.org/worldfoodsituation/FoodPricesIndex/en" target="_blank" class="text-decoration-none text-info link-opacity-75-hover">FAO</a> 
+                                            <a href="https://www.fao.org/worldfoodsituation/FoodPricesIndex/en"
+                                                target="_blank"
+                                                class="text-decoration-none text-info link-opacity-75-hover">FAO</a>
                                             <span class="text-secondary-subtle">– Food price index</span>
                                         </li>
                                         <li class="mb-1">
-                                            <a href="https://ec.europa.eu/eurostat/web/energy/database" target="_blank" class="text-decoration-none text-info link-opacity-75-hover">Eurostat</a> 
+                                            <a href="https://ec.europa.eu/eurostat/web/energy/database" target="_blank"
+                                                class="text-decoration-none text-info link-opacity-75-hover">Eurostat</a>
                                             <span class="text-secondary-subtle">– Energy prices</span>
                                         </li>
                                         <li class="mb-0">
-                                            <a href="https://zenodo.org/records/7923702" target="_blank" class="text-decoration-none text-info link-opacity-75-hover">Zenodo</a> 
+                                            <a href="https://zenodo.org/records/7923702" target="_blank"
+                                                class="text-decoration-none text-info link-opacity-75-hover">Zenodo</a>
                                             <span class="text-secondary-subtle">– Air traffic data</span>
                                         </li>
                                     </ul>
@@ -1101,22 +1097,29 @@
                 </div>
 
                 <div class="row mt-5 pt-3 border-top border-secondary justify-content-center">
-                    <div class="col-lg-10 d-flex flex-column flex-md-row justify-content-between align-items-center small text-secondary-subtle gap-2">
-                        
-                        <a href="#" class="text-light text-decoration-none d-flex align-items-center gap-1 link-opacity-75-hover order-2 order-md-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-arrow-up" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"/></svg>
+                    <div
+                        class="col-lg-10 d-flex flex-column flex-md-row justify-content-between align-items-center small text-secondary-subtle gap-2">
+
+                        <a href="#"
+                            class="text-light text-decoration-none d-flex align-items-center gap-1 link-opacity-75-hover order-2 order-md-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
+                                class="bi bi-arrow-up" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z" />
+                            </svg>
                             Back to Top
                         </a>
 
                         <span class="order-1 order-md-2">&copy; 2025 IronNeverden. All rights reserved.</span>
 
                         <span class="order-3 text-md-end">
-                            Built with <span class="text-white">D3.js</span> & <span class="text-white">Bootstrap 5</span>
+                            Built with <span class="text-white">D3.js</span> & <span class="text-white">Bootstrap
+                                5</span>
                         </span>
                     </div>
                 </div>
             </div>
-        </footer>   
+        </footer>
     </div>
 
 
