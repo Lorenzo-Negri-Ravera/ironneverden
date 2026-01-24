@@ -20,7 +20,7 @@ The webpage developed during the year is always accessible through the following
 
 ```text
 ironneverden/
-├── data/
+├── data/                                                      # data sources for scripts
 │   └── final/
 │       ├── air_traffic
 │       ├── choropleth
@@ -37,18 +37,18 @@ ironneverden/
 │       ├── stackedbarchart
 │       └── trade-data/
 │           └── final_datasets
-├── fonts
+├── fonts                                                      # Fira-Sans and Roboto Slab
 ├── pages/
 │   └── final/
 │       └── europe_violence.html
-├── preprocessing/
+├── preprocessing/                                             # Python notebooks to clean and edit raw data (included in the sub-folders)
 │   ├── choropleth
 │   ├── event_line
 │   ├── food_linechart
 │   ├── spike_map
 │   ├── stacked_bar_chart
 │   └── trade_data
-├── scripts/
+├── scripts/                                                   # Javascript files 
 │   └── final                  
 ├── index.html
 └── style.css
@@ -118,6 +118,7 @@ Every Python notebooks created to edit or clean a dataset used in our project ca
 The only exception is for the Zenodo dataset which is too big to be uploaded on GitHub; consequently, it was uploaded only the clean version of it.
 
 To be fully complient with the GitHub pages environment, we used 'jekyll' to test the website locally. The instructions to install the service can be found here: https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/testing-your-github-pages-site-locally-with-jekyll.
+
 
 
 
