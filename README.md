@@ -113,6 +113,9 @@ Furthermore, using so much data, both geographical and qualitative, a considerab
 
 
 ### Reproducibility documentation
+Every Python notebooks created to edit or clean a dataset used in our project can be found in 'preprocessing' folder. If a dataset does not have a corresponding file in the preprocessing folder, it means that the dataset was used as the website made it available.
+
+The only exception is for the Zenodo dataset which is too big to be uploaded on GitHub; consequently, it was uploaded only the clean version of it.
 
 
 
